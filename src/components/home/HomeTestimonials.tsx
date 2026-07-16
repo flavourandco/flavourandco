@@ -139,7 +139,7 @@ export default function HomeTestimonials() {
           <button
             type="button"
             onClick={prevSlide}
-            className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 sm:left-0"
+            className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 sm:left-0"
             aria-label="Previous testimonial"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -147,7 +147,7 @@ export default function HomeTestimonials() {
           <button
             type="button"
             onClick={nextSlide}
-            className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 sm:right-0"
+            className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 sm:right-0"
             aria-label="Next testimonial"
           >
             <ChevronRight className="h-5 w-5" />
@@ -196,7 +196,7 @@ function HomeBundleCTA() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-brand-green py-24 text-cream md:py-32"
+      className="relative overflow-hidden bg-brand-green py-12 text-cream md:py-16"
     >
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute -right-32 top-0 h-96 w-96 rounded-full bg-brand-gold blur-3xl" />
@@ -204,19 +204,19 @@ function HomeBundleCTA() {
       </div>
 
       <div className="bundle-content relative mx-auto max-w-3xl px-6 text-center lg:px-10 z-10">
-        <p className="text-[12px] font-bold uppercase tracking-[0.3em] text-brand-gold">
+        <p className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.3em] text-brand-gold">
           Bundle & Save
         </p>
-        <h2 className="mt-4 font-serif text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.05] tracking-tight text-white">
+        <h2 className="mt-2 font-serif text-[clamp(1.5rem,4vw,2.5rem)] leading-[1.1] tracking-tight text-white">
           Order More. Save More.
           <br />
           <span className="italic text-brand-gold">Enjoy More Together.</span>
         </h2>
-        <p className="mt-5 text-base leading-relaxed text-cream/80">
+        <p className="mt-3 text-xs md:text-sm leading-relaxed text-cream/80 max-w-xl mx-auto">
           Curate your perfect table package, mix & match different pies, and receive extra value on every gathering.
         </p>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-6 w-full max-w-[540px] sm:max-w-none mx-auto">
           {[
             { spend: "$50", save: "Save $5" },
             { spend: "$75", save: "Free Shipping" },
@@ -224,19 +224,21 @@ function HomeBundleCTA() {
           ].map((tier) => (
             <div
               key={tier.spend}
-              className="rounded-2xl border border-brand-gold/20 bg-brand-green/50 px-8 py-5 backdrop-blur-sm shadow-md"
+              className="flex flex-col justify-center items-center text-center rounded-xl sm:rounded-2xl border border-brand-gold/20 bg-brand-green/50 px-2 py-2.5 sm:px-8 sm:py-5 backdrop-blur-sm shadow-md h-full min-h-[70px] sm:min-h-0"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold">
+              <p className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-brand-gold">
                 Spend {tier.spend}
               </p>
-              <p className="mt-1 font-serif text-xl text-white font-medium">{tier.save}</p>
+              <p className="mt-0.5 font-serif text-[9px] min-[350px]:text-xs min-[400px]:text-sm sm:text-xl text-white font-medium leading-tight">
+                {tier.save}
+              </p>
             </div>
           ))}
         </div>
 
         <Link
           href="/shop"
-          className="mt-10 inline-flex rounded-md bg-brand-gold text-brand-green hover:bg-cream hover:scale-105 px-10 py-4 text-[12px] font-bold uppercase tracking-[0.18em] transition-all duration-300 shadow-xl"
+          className="mt-6 inline-flex rounded-md bg-brand-gold text-brand-green hover:bg-cream hover:scale-105 px-6 py-2.5 text-[10px] sm:px-10 sm:py-3.5 sm:text-[11px] font-bold uppercase tracking-[0.18em] transition-all duration-300 shadow-xl"
         >
           Shop Bundles
         </Link>

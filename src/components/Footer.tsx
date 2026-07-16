@@ -41,7 +41,7 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 relative z-10">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 md:gap-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <img
@@ -78,42 +78,45 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold">
-              Quick Links
-            </h4>
-            <ul className="mt-5 space-y-3">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-cream/70 transition-colors hover:text-white hover:underline decoration-brand-gold decoration-2 underline-offset-4"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Group Quick Links and Contact side-by-side on mobile/tablet, and expand to separate columns on desktop */}
+          <div className="grid grid-cols-2 gap-6 md:col-span-1 lg:contents">
+            <div>
+              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+                Quick Links
+              </h4>
+              <ul className="mt-5 space-y-3">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-cream/70 transition-colors hover:text-white hover:underline decoration-brand-gold decoration-2 underline-offset-4"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold">
-              Contact
-            </h4>
-            <ul className="mt-5 space-y-4">
-              <li className="flex items-start gap-3 text-sm text-cream/70">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold" />
-                Sydney, NSW, Australia
-              </li>
-              <li className="flex items-center gap-3 text-sm text-cream/70">
-                <Phone className="h-4 w-4 shrink-0 text-brand-gold" />
-                +61 423 092 989
-              </li>
-              <li className="flex items-center gap-3 text-sm text-cream/70">
-                <Mail className="h-4 w-4 shrink-0 text-brand-gold" />
-                info@flavourandco.com.au
-              </li>
-            </ul>
+            <div>
+              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+                Contact
+              </h4>
+              <ul className="mt-5 space-y-4">
+                <li className="flex items-start gap-3 text-sm text-cream/70">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold" />
+                  Sydney, NSW, Australia
+                </li>
+                <li className="flex items-center gap-3 text-sm text-cream/70">
+                  <Phone className="h-4 w-4 shrink-0 text-brand-gold" />
+                  +61 423 092 989
+                </li>
+                <li className="flex items-center gap-3 text-sm text-cream/70">
+                  <Mail className="h-4 w-4 shrink-0 text-brand-gold" />
+                  info@flavourandco.com.au
+                </li>
+              </ul>
+            </div>
           </div>
 
           <div>
