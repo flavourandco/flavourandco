@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdf8f3;
+  --foreground: #1c1410;
+  --cream: #fdf8f3;
+  --warm-white: #f7efe6;
+  --charcoal: #1c1410;
+  --gold: #c4956a;
+  --gold-light: #d4af8a;
+  --blush: #f2a4b3;
+  --blush-dark: #e8879a;
+  --sand: #ebe3d8;
+  --espresso: #2a211c;
+  --brand-green: #07402B;
+  --brand-gold: #C69C40;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-warm-white: var(--warm-white);
+  --color-charcoal: var(--charcoal);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-blush: var(--blush);
+  --color-blush-dark: var(--blush-dark);
+  --color-sand: var(--sand);
+  --color-espresso: var(--espresso);
+  --color-brand-green: var(--brand-green);
+  --color-brand-gold: var(--brand-gold);
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-instrument);
+  --font-script: var(--font-caveat);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #f2a4b344;
+  color: #1c1410;
+}
+
+.reveal-line {
+  overflow: hidden;
+}
+
+.reveal-line > * {
+  display: block;
 }
