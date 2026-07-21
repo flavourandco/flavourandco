@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight } from "lucide-react";
+import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight, ChevronRight, HelpCircle } from "lucide-react";
 import { navLinks, products } from "@/lib/data";
 import { media } from "@/lib/media";
 
@@ -37,121 +37,279 @@ export default function HomeNavbar() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[100] bg-base-100 shadow-sm border-b border-secondary/15 transition-all duration-300">
-        {/* Top Announcement Bar */}
-        <div className="bg-secondary py-1.5 px-4 text-center text-secondary-content text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]">
+        {/* Top Free Shipping Announcement Bar */}
+        {/* PC View: Static and Centered */}
+        <div className="hidden md:block bg-secondary py-1.5 px-4 text-center text-secondary-content text-[11px] font-bold uppercase tracking-[0.2em]">
           Free Express Shipping on Orders Over $100 | Handcrafted Sydney-Wide
         </div>
 
-        {/* Unified Single Header Bar */}
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-3.5 flex items-center justify-between gap-6">
-          {/* Left: Brand Logo */}
-          <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105">
-            <img
-              src={media.logo}
-              alt="Flavour & Co. Logo"
-              className="h-9 sm:h-11 w-auto object-contain"
-            />
-          </Link>
+        {/* Mobile View: Continuous Infinite Marquee Ticker */}
+        <div className="md:hidden overflow-hidden bg-secondary py-1.5 text-secondary-content text-[10px] font-bold uppercase tracking-[0.18em]">
+          <div className="animate-ticker flex whitespace-nowrap">
+            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
+            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
+            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
+            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
+          </div>
+        </div>
 
-          {/* Center: Merged Navigation Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            <ul className="flex items-center gap-6 lg:gap-8 text-xs font-bold uppercase tracking-[0.18em]">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={`transition-colors hover:text-secondary ${
-                      pathname === link.href ? "text-secondary border-b-2 border-secondary pb-1" : "text-primary"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-3 sm:gap-4 text-primary">
-            {/* Search Icon Trigger */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="p-2 hover:text-secondary transition-colors"
-              aria-label="Open search drawer"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-
-            {/* Help Link */}
-            <Link
-              href="/contact"
-              className="hidden lg:inline-block text-[11px] font-bold uppercase tracking-wider hover:text-secondary transition-colors"
-            >
-              Help
-            </Link>
-
-            {/* Wishlist */}
-            <Link
-              href="/shop"
-              className="p-2 hover:text-secondary transition-colors"
-              aria-label="Wishlist"
-            >
-              <Heart className="h-5 w-5" />
-            </Link>
-
-            {/* Account */}
+        {/* Unified Header Bar */}
+        <div className="mx-auto max-w-[1400px]">
+          {/* MOBILE VIEW NAVBAR (md:hidden) */}
+          <div className="flex md:hidden items-center justify-between px-4 py-3 relative min-h-[56px]">
+            {/* Left: Mobile Profile Icon */}
             <Link
               href="/login"
-              className="p-2 hover:text-secondary transition-colors"
+              className="p-2 text-primary hover:text-secondary transition-colors z-10"
               aria-label="Account"
             >
               <User className="h-5 w-5" />
             </Link>
 
-            {/* Cart Icon with badge */}
+            {/* Center: Just Logo */}
             <Link
-              href="/shop"
-              className="relative p-2 hover:text-secondary transition-colors"
-              aria-label="Cart"
+              href="/"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10"
             >
-              <ShoppingBag className="h-5 w-5" />
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
-                0
-              </span>
+              <img
+                src={media.logo}
+                alt="Flavour & Co. Logo"
+                className="h-9 w-auto object-contain"
+              />
             </Link>
 
-            {/* Mobile Hamburger Toggle */}
-            <button
-              type="button"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 hover:text-secondary transition-colors md:hidden"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            {/* Right: Search, Cart, Hamburger */}
+            <div className="flex items-center gap-1 text-primary z-10">
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="p-2 hover:text-secondary transition-colors"
+                aria-label="Open search drawer"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+
+              <Link
+                href="/shop"
+                className="relative p-2 hover:text-secondary transition-colors"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
+                  0
+                </span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2 hover:text-secondary transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+
+          {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
+          <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-3.5 gap-6">
+            {/* Left: Brand Logo */}
+            <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105">
+              <img
+                src={media.logo}
+                alt="Flavour & Co. Logo"
+                className="h-10 lg:h-11 w-auto object-contain"
+              />
+            </Link>
+
+            {/* Center: Merged Navigation Links */}
+            <nav className="flex items-center gap-6 lg:gap-8">
+              <ul className="flex items-center gap-6 lg:gap-8 text-xs font-bold uppercase tracking-[0.18em]">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`transition-colors hover:text-secondary ${
+                        pathname === link.href ? "text-secondary border-b-2 border-secondary pb-1" : "text-primary"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-3 sm:gap-4 text-primary">
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="p-2 hover:text-secondary transition-colors"
+                aria-label="Open search drawer"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+
+              <Link
+                href="/contact"
+                className="hidden lg:inline-block text-[11px] font-bold uppercase tracking-wider hover:text-secondary transition-colors"
+              >
+                Help
+              </Link>
+
+              <Link
+                href="/shop"
+                className="p-2 hover:text-secondary transition-colors"
+                aria-label="Wishlist"
+              >
+                <Heart className="h-5 w-5" />
+              </Link>
+
+              <Link
+                href="/login"
+                className="p-2 hover:text-secondary transition-colors"
+                aria-label="Account"
+              >
+                <User className="h-5 w-5" />
+              </Link>
+
+              <Link
+                href="/shop"
+                className="relative p-2 hover:text-secondary transition-colors"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
+                  0
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
-
-        {/* Mobile Menu Overlay */}
-        {mobileOpen && (
-          <div className="fixed inset-x-0 top-[105px] bottom-0 z-50 bg-base-100 p-6 overflow-y-auto md:hidden border-t border-secondary/15">
-            <ul className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-3.5 text-xl font-bold uppercase tracking-wider text-primary border-b border-secondary/15 hover:text-secondary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </header>
+
+      {/* Mobile Redesigned Sidebar Drawer with Smooth Slide Animation */}
+      <div
+        className={`fixed inset-0 z-[150] md:hidden transition-all duration-300 ${
+          mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${
+            mobileOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setMobileOpen(false)}
+        />
+
+        {/* Sliding Sidebar Panel */}
+        <aside
+          className={`fixed inset-y-0 right-0 z-[160] w-[88%] max-w-sm bg-base-100 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${
+            mobileOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* Top Section */}
+          <div>
+            {/* Sidebar Header */}
+            <div className="flex items-center justify-between pb-5 border-b border-secondary/15">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
+                <img
+                  src={media.logo}
+                  alt="Flavour & Co. Logo"
+                  className="h-8 w-auto object-contain"
+                />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Wishlist Highlight Card inside Sidebar */}
+            <div className="mt-6">
+              <Link
+                href="/shop"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between rounded-none border border-secondary/30 bg-secondary/10 p-3.5 text-primary hover:bg-secondary hover:text-secondary-content transition-all duration-200 group"
+              >
+                <div className="flex items-center gap-3">
+                  <Heart className="h-5 w-5 text-secondary group-hover:text-secondary-content transition-colors fill-secondary/20" />
+                  <span className="text-xs font-bold uppercase tracking-wider">My Wishlist</span>
+                </div>
+                <span className="rounded-none bg-secondary group-hover:bg-primary group-hover:text-white px-2.5 py-0.5 text-[10px] font-bold text-secondary-content transition-colors">
+                  0 Saved
+                </span>
+              </Link>
+            </div>
+
+            {/* Navigation Links */}
+            <nav className="mt-6">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 block mb-2">
+                Menu & Exploration
+              </span>
+              <ul className="flex flex-col space-y-1">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center justify-between py-3 px-3 rounded-none text-sm font-bold uppercase tracking-wider transition-all ${
+                          isActive
+                            ? "bg-secondary/15 text-secondary border-l-4 border-secondary pl-4"
+                            : "text-primary hover:bg-base-200 hover:text-secondary hover:pl-4"
+                        }`}
+                      >
+                        <span>{link.label}</span>
+                        <ChevronRight className={`h-4 w-4 ${isActive ? "text-secondary" : "opacity-40"}`} />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+
+          {/* Bottom Section */}
+          <div className="pt-6 border-t border-secondary/15 mt-8 space-y-4">
+            {/* Quick Links */}
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all"
+              >
+                <User className="h-4 w-4 text-secondary" />
+                Account
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all"
+              >
+                <HelpCircle className="h-4 w-4 text-secondary" />
+                Help & FAQ
+              </Link>
+            </div>
+
+            {/* Handcrafted Tagline */}
+            <div className="text-center">
+              <p className="font-fraunces text-xs italic text-primary/70">
+                Handcrafted Fusion Pies • Sydney-Wide Express
+              </p>
+              <p className="text-[10px] text-primary/40 uppercase tracking-widest mt-1">
+                Flavour & Co. Artisanal Bakery
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
 
       {/* Slide-Over Search Drawer (Full width on Mobile, Half width on PC) */}
       <div
@@ -189,7 +347,7 @@ export default function HomeNavbar() {
               </button>
             </div>
 
-            {/* Input Box: Not Rounded at all with Inner Padding */}
+            {/* Input Box */}
             <div className="mt-8">
               <div className="relative">
                 <input
