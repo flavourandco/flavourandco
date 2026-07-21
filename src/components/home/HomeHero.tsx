@@ -2,95 +2,202 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Fraunces } from "next/font/google";
 import { media } from "@/lib/media";
 
-gsap.registerPlugin(ScrollTrigger);
+// Display face — swap into your global font setup if you already load fonts elsewhere.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+});
 
 export default function HomeHero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useGSAP(
     () => {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduceMotion) {
+        gsap.set(
+          [
+            ".hero-badge",
+            ".hero-title-line",
+            ".hero-crimp",
+            ".hero-subtext",
+            ".hero-ingredients",
+            ".hero-actions",
+            ".hero-divider",
+            ".hero-ticket",
+          ],
+          { opacity: 1, x: 0, y: 0, scaleX: 1, scaleY: 1 }
+        );
+        return;
+      }
+
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      tl.from(".hero-badge", { y: 30, opacity: 0, duration: 0.8 })
-        .from(
-          ".hero-line",
-          { y: "110%", duration: 1.1, stagger: 0.12 },
-          "-=0.4"
+      tl.from(".hero-badge", { y: 16, opacity: 0, duration: 0.6 }, 0.1)
+        .from(".hero-title-line", { y: 44, opacity: 0, duration: 1, stagger: 0.14 }, 0.25)
+        .fromTo(
+          ".hero-crimp",
+          { scaleX: 0, transformOrigin: "left center" },
+          { scaleX: 1, opacity: 1, duration: 0.9, ease: "power2.inOut" },
+          "-=0.5"
         )
-        .from(".hero-sub", { y: 30, opacity: 0, duration: 0.8 }, "-=0.5")
-        .from(".hero-cta", { y: 30, opacity: 0, duration: 0.8, stagger: 0.1 }, "-=0.4");
-
-      if (videoWrapperRef.current) {
-        gsap.to(videoWrapperRef.current, {
-          yPercent: 12,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      }
+        .from(".hero-subtext", { y: 22, opacity: 0, duration: 0.8 }, "-=0.55")
+        .from(".hero-ingredients", { y: 12, opacity: 0, duration: 0.6 }, "-=0.4")
+        .fromTo(
+          ".hero-divider",
+          { scaleY: 0, transformOrigin: "top center" },
+          { scaleY: 1, opacity: 1, duration: 0.7 },
+          "-=0.6"
+        )
+        .from(".hero-actions", { x: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, "-=0.6")
+        .from(".hero-ticket", { y: -14, opacity: 0, duration: 0.6 }, "-=0.9");
     },
-    { scope: sectionRef }
+    { scope: containerRef }
   );
 
   return (
     <section
-      ref={sectionRef}
-      className="relative flex min-h-screen items-end overflow-hidden pb-16 pt-36 md:items-center md:pb-24 md:pt-40"
+      ref={containerRef}
+      className={`${fraunces.variable} relative flex min-h-screen w-full items-end overflow-hidden bg-[#0D0A08] text-[#F2E6D3]`}
     >
-      {/* Background Video with Brand Overlay */}
-      <div ref={videoWrapperRef} className="absolute inset-0 scale-110">
+      {/* Background video */}
+      <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
         <video
+          ref={videoRef}
           src={media.heroVideo}
           autoPlay
           loop
           muted
           playsInline
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
         />
-        {/* Neutral Dark Gradients to make text legible without a green tint */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/90" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_10%,_rgba(10,10,10,0.8)_100%)]" />
+
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1B1410]/90 via-[#1B1410]/55 to-[#1B1410]/35" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0A08]/90 via-[#0D0A08]/30 to-transparent" />
+        <div className="absolute inset-0 z-10 bg-[#C1481D]/10 mix-blend-multiply" />
+
+        <svg className="absolute inset-0 z-10 h-full w-full opacity-[0.06]" aria-hidden="true">
+          <filter id="grain">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain)" />
+        </svg>
       </div>
 
-      <div className="relative mx-auto w-full max-w-[1400px] px-6 text-center lg:px-10 z-10">
-        <p className="hero-badge mb-6 text-[12px] font-bold uppercase tracking-[0.4em] text-brand-gold">
-          Featured on Channel 7's Plate of Origin
-        </p>
-
-        <h1 className="mx-auto max-w-5xl font-serif text-[clamp(2.25rem,8vw,5.5rem)] font-normal leading-[0.95] tracking-tight text-cream">
-          <span className="reveal-line block">
-            <span className="hero-line block">Delivering Great Tasting</span>
+      {/* Rotated ticket tab — now top-right, out of the buttons' way */}
+      <div className="hero-ticket pointer-events-none absolute right-6 top-10 z-20 hidden lg:block xl:right-10">
+        <div className="flex items-center gap-3 whitespace-nowrap border-y border-[#F2E6D3]/25 px-2 py-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#E3A72B]">
+            Slow-Spiced
           </span>
-          <span className="reveal-line block">
-            <span className="hero-line block italic text-brand-gold">Indo-Australian</span>
+          <span className="h-1 w-1 rounded-full bg-[#F2E6D3]/40" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#F2E6D3]/70">
+            Flaky-Finished
           </span>
-          <span className="reveal-line block">
-            <span className="hero-line block">Pies Sydney-Wide</span>
-          </span>
-        </h1>
+        </div>
+      </div>
 
-        <p className="hero-sub mx-auto mt-8 max-w-2xl text-[12px] md:text-[13px] font-medium uppercase leading-relaxed tracking-[0.18em] text-cream/80 px-2">
-          Unique fusion pies created by Ash & Simran, combining rich Indian spiced fillings with flaky Aussie pastry.
-        </p>
+      {/* Main content — left text column / right action column (Shifted downwards) */}
+      <div className="relative z-20 mx-auto flex w-full max-w-[1400px] flex-col gap-10 px-6 pt-36 pb-12 sm:px-10 sm:pb-16 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:px-16 lg:pb-20 lg:pt-48">
+        {/* Left: text stack */}
+        <div className="flex max-w-2xl flex-col items-start text-left">
+          <div className="hero-badge mb-7 inline-flex items-center gap-2 rounded-full border border-[#E3A72B]/40 bg-[#1B1410]/60 px-4 py-1.5 backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#C1481D]" />
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#E3A72B] sm:text-[11px]">
+              Est. by Ash &amp; Simran
+            </span>
+          </div>
 
-        <div className="hero-cta mt-12 flex items-center justify-center px-6">
+          <h1
+            style={{ fontFamily: "var(--font-fraunces)" }}
+            className="text-4xl font-semibold leading-[1.05] tracking-tight text-[#F2E6D3] sm:text-5xl md:text-6xl lg:text-[4.2rem]"
+          >
+            <span className="hero-title-line block">
+              Handcrafted{" "}
+              <span className="italic font-medium text-[#E3A72B]">Indo-Australian</span>
+            </span>
+            <span className="hero-title-line mt-1 block font-bold">
+              Gourmet Fusion Pies
+            </span>
+          </h1>
+
+          <svg
+            className="hero-crimp mt-6 h-4 w-full max-w-md opacity-0"
+            viewBox="0 0 400 16"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M0,8 Q10,0 20,8 T40,8 T60,8 T80,8 T100,8 T120,8 T140,8 T160,8 T180,8 T200,8 T220,8 T240,8 T260,8 T280,8 T300,8 T320,8 T340,8 T360,8 T380,8 T400,8"
+              fill="none"
+              stroke="#C1481D"
+              strokeWidth="2"
+            />
+          </svg>
+
+          <p className="hero-subtext mt-6 max-w-xl text-sm font-normal leading-relaxed text-[#F2E6D3]/85 sm:text-base">
+            Baking our roots into every pie. Rich, slow-cooked Indian spiced fillings, wrapped
+            in light, multi-layered flaky Aussie pastry — made by hand, one crimp at a time.
+          </p>
+
+          <div className="hero-ingredients mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.15em] text-[#F2E6D3]/50">
+            <span>Cardamom</span>
+            <span className="text-[#57683F]">·</span>
+            <span>Ghee</span>
+            <span className="text-[#57683F]">·</span>
+            <span>Golden Pastry</span>
+            <span className="text-[#57683F]">·</span>
+            <span>Slow-Roasted Spice</span>
+          </div>
+        </div>
+
+        {/* Crimp-line divider between columns, desktop only */}
+        <div
+          className="hero-divider hidden self-stretch w-px bg-gradient-to-b from-transparent via-[#F2E6D3]/25 to-transparent opacity-0 lg:block"
+          aria-hidden="true"
+        />
+
+        {/* Right: stacked action panel */}
+        <div className="hero-actions flex w-full flex-row items-center gap-5 lg:w-auto lg:flex-col lg:items-end lg:gap-4">
           <Link
             href="/shop"
-            className="group relative text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold transition-colors duration-300 hover:text-white"
+            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden bg-[#C1481D] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-[#a83e19] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
+            style={{
+              clipPath:
+                "polygon(3% 0%, 97% 0%, 100% 20%, 97% 40%, 100% 60%, 97% 80%, 100% 100%, 3% 100%, 0% 80%, 3% 60%, 0% 40%, 3% 20%)",
+            }}
           >
             <span>Explore Menu</span>
-            <span className="absolute -bottom-2 left-0 h-[1px] w-full bg-brand-gold transition-all duration-300 group-hover:bg-white" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+
+          <Link
+            href="/our-story"
+            className="group relative inline-flex w-full items-center justify-center text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3]/75 py-1 transition-colors hover:text-[#F2E6D3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
+          >
+            <span>Our Story</span>
+            <svg
+              className="absolute -bottom-1 left-1/2 h-2 w-24 -translate-x-1/2 opacity-50 transition-opacity group-hover:opacity-100 lg:left-0 lg:w-full lg:translate-x-0"
+              viewBox="0 0 100 8"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 T50,4 T60,4 T70,4 T80,4 T90,4 T100,4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+            </svg>
           </Link>
         </div>
       </div>

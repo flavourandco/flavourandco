@@ -177,18 +177,18 @@ export default function HomeProducts() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-warm-white py-24 md:py-32 border-b border-brand-gold/10 overflow-hidden">
+    <section ref={sectionRef} className="bg-base-200 py-24 md:py-32 border-b border-secondary/15 overflow-hidden text-base-content">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
         <div className="product-header mx-auto max-w-3xl text-center">
-          <p className="text-[12px] font-bold uppercase tracking-[0.3em] text-brand-gold">
+          <p className="text-[12px] font-bold uppercase tracking-[0.3em] text-secondary">
             On the Menu
           </p>
-          <h2 className="mt-4 font-serif text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.05] tracking-tight text-brand-green">
-            Our Indo-Australian Pies
+          <h2 className="mt-4 font-fraunces text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-primary">
+            Our Indo-Australian <span className="italic font-medium text-secondary">Pies</span>
             <br />
-            <span className="italic text-brand-gold">Delivering Sydney-Wide</span>
+            <span className="text-secondary">Delivering Sydney-Wide</span>
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-charcoal/70">
+          <p className="mt-5 text-base leading-relaxed opacity-75">
             Created by Ash & Simran, representing Flavour & Co. on Channel 7&apos;s Plate of Origin. Try our award-winning butter chicken, keema lamb, and samosa pies today!
           </p>
         </div>
@@ -219,10 +219,10 @@ export default function HomeProducts() {
                     className="shrink-0 px-1.5 sm:px-3 transition-all duration-300"
                     style={{ width: `${100 / itemsPerPage}%` }}
                   >
-                    <article className="product-card group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-white shadow-lg hover:shadow-2xl border border-brand-gold/10 h-full">
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-brand-green/5">
+                    <article className="product-card group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-base-100 shadow-lg hover:shadow-2xl border border-secondary/15 h-full">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-primary/5">
                         {/* Badge */}
-                        <div className="absolute left-2 sm:left-4 top-2 sm:top-4 z-10 rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider shadow-md">
+                        <div className="absolute left-2 sm:left-4 top-2 sm:top-4 z-10 rounded-full bg-primary text-primary-content border border-secondary/20 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider shadow-md">
                           {product.badge}
                         </div>
 
@@ -233,60 +233,60 @@ export default function HomeProducts() {
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                           sizes="(max-width: 768px) 50vw, 30vw"
                         />
-                        <div className="absolute inset-0 bg-brand-green/0 transition-colors duration-500 group-hover:bg-brand-green/10" />
+                        <div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
                       </div>
 
                       <div className="flex flex-col flex-grow p-3 sm:p-6">
                         {/* Rating */}
-                        <div className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-brand-gold">
+                        <div className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-secondary">
                           <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-current" />
                           <span>{product.rating.toFixed(1)}</span>
-                          <span className="text-charcoal/40 font-normal hidden xs:inline">({product.reviews} reviews)</span>
+                          <span className="opacity-50 font-normal hidden xs:inline">({product.reviews} reviews)</span>
                         </div>
 
                         {/* Title & Description */}
                         <div className="min-h-[2.75rem] sm:min-h-[3.25rem] md:min-h-[3.75rem] flex items-center mt-1 sm:mt-2">
-                          <h3 className="font-serif text-sm sm:text-lg md:text-xl font-medium text-brand-green leading-tight sm:leading-snug">
+                          <h3 className="font-trivane-retro text-sm sm:text-base md:text-lg font-black text-primary leading-tight uppercase">
                             {product.name}
                           </h3>
                         </div>
                         
                         {/* Hidden on mobile to make room for two products per row */}
-                        <p className="mt-2 text-xs leading-relaxed text-charcoal/60 flex-grow hidden sm:block">
+                        <p className="mt-2 text-xs leading-relaxed opacity-70 flex-grow hidden sm:block">
                           {product.description}
                         </p>
 
                         {/* Nutritional Facts Row - Hidden on mobile */}
-                        <div className="mt-4 grid grid-cols-4 gap-1.5 border-t border-b border-brand-green/5 py-3 text-center hidden sm:grid">
+                        <div className="mt-4 grid grid-cols-4 gap-1.5 border-t border-b border-primary/10 py-3 text-center hidden sm:grid">
                           <div className="flex flex-col justify-center">
-                            <span className="text-[10px] font-semibold text-charcoal/40 uppercase">Cal</span>
-                            <span className="text-xs font-bold text-brand-green flex items-center justify-center gap-0.5">
-                              <Flame className="h-3 w-3 text-brand-gold" />
+                            <span className="text-[10px] font-semibold opacity-50 uppercase">Cal</span>
+                            <span className="text-xs font-bold text-primary flex items-center justify-center gap-0.5">
+                              <Flame className="h-3 w-3 text-secondary" />
                               {product.nutrition.cal}
                             </span>
                           </div>
-                          <div className="flex flex-col justify-center border-l border-brand-green/5">
-                            <span className="text-[10px] font-semibold text-charcoal/40 uppercase">Prot</span>
-                            <span className="text-xs font-bold text-brand-green flex items-center justify-center gap-0.5">
-                              <Trophy className="h-3 w-3 text-brand-gold" />
+                          <div className="flex flex-col justify-center border-l border-primary/10">
+                            <span className="text-[10px] font-semibold opacity-50 uppercase">Prot</span>
+                            <span className="text-xs font-bold text-primary flex items-center justify-center gap-0.5">
+                              <Trophy className="h-3 w-3 text-secondary" />
                               {product.nutrition.protein}
                             </span>
                           </div>
-                          <div className="flex flex-col justify-center border-l border-brand-green/5">
-                            <span className="text-[10px] font-semibold text-charcoal/40 uppercase">Carbs</span>
-                            <span className="text-xs font-bold text-brand-green">{product.nutrition.carbs}</span>
+                          <div className="flex flex-col justify-center border-l border-primary/10">
+                            <span className="text-[10px] font-semibold opacity-50 uppercase">Carbs</span>
+                            <span className="text-xs font-bold text-primary">{product.nutrition.carbs}</span>
                           </div>
-                          <div className="flex flex-col justify-center border-l border-brand-green/5">
-                            <span className="text-[10px] font-semibold text-charcoal/40 uppercase">Fat</span>
-                            <span className="text-xs font-bold text-brand-green">{product.nutrition.fat}</span>
+                          <div className="flex flex-col justify-center border-l border-primary/10">
+                            <span className="text-[10px] font-semibold opacity-50 uppercase">Fat</span>
+                            <span className="text-xs font-bold text-primary">{product.nutrition.fat}</span>
                           </div>
                         </div>
 
                         {/* Price and Interactive Add to Cart button */}
                         <div className="mt-auto pt-3 sm:pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                           <div className="flex flex-col">
-                            <span className="text-[8px] sm:text-[9px] font-semibold text-charcoal/40 uppercase tracking-wider">Per Pie</span>
-                            <span className="text-base sm:text-lg font-extrabold text-brand-green">
+                            <span className="text-[8px] sm:text-[9px] font-semibold opacity-50 uppercase tracking-wider">Per Pie</span>
+                            <span className="text-base sm:text-lg font-extrabold text-primary">
                               ${product.price.toFixed(2)}
                             </span>
                           </div>
@@ -295,17 +295,17 @@ export default function HomeProducts() {
                             <button
                               type="button"
                               onClick={() => updateQuantity(product.id, 1)}
-                              className="flex items-center justify-center gap-1 rounded-md bg-brand-green hover:bg-brand-gold hover:text-brand-green text-cream px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03]"
+                              className="flex items-center justify-center gap-1 rounded-md bg-primary hover:bg-secondary hover:text-secondary-content text-primary-content px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03]"
                             >
                               <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                               Add
                             </button>
                           ) : (
-                            <div className="flex items-center justify-center rounded-md bg-brand-green text-cream px-2 sm:px-3 py-1 sm:py-1.5 border border-brand-gold/20 shadow-md">
+                            <div className="flex items-center justify-center rounded-md bg-primary text-primary-content px-2 sm:px-3 py-1 sm:py-1.5 border border-secondary/20 shadow-md">
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(product.id, -1)}
-                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-brand-gold hover:text-brand-green transition-colors"
+                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-secondary hover:text-secondary-content transition-colors"
                               >
                                 <Minus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                               </button>
@@ -313,7 +313,7 @@ export default function HomeProducts() {
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(product.id, 1)}
-                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-brand-gold hover:text-brand-green transition-colors"
+                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-secondary hover:text-secondary-content transition-colors"
                               >
                                 <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                               </button>
@@ -335,7 +335,7 @@ export default function HomeProducts() {
                 type="button"
                 onClick={prevSlide}
                 disabled={currentIndex === 0}
-                className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:left-0"
+                className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 shadow-lg transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:left-0"
                 aria-label="Previous slide"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -344,7 +344,7 @@ export default function HomeProducts() {
                 type="button"
                 onClick={nextSlide}
                 disabled={currentIndex === maxIndex}
-                className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-brand-green text-brand-gold border border-brand-gold/20 shadow-lg transition-all hover:bg-brand-gold hover:text-brand-green hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:right-0"
+                className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 shadow-lg transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:right-0"
                 aria-label="Next slide"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -361,7 +361,7 @@ export default function HomeProducts() {
                   type="button"
                   onClick={() => setCurrentIndex(idx)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentIndex === idx ? "w-6 bg-brand-gold" : "w-1.5 bg-brand-green/20"
+                    currentIndex === idx ? "w-6 bg-secondary" : "w-1.5 bg-primary/20"
                   }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
@@ -373,7 +373,7 @@ export default function HomeProducts() {
         <div className="mt-16 text-center">
           <Link
             href="/shop"
-            className="inline-flex rounded-md border-2 border-brand-green/20 px-10 py-4 text-[12px] font-bold uppercase tracking-[0.18em] text-brand-green transition-all hover:bg-brand-green hover:text-cream hover:border-brand-green"
+            className="inline-flex rounded-md border-2 border-primary/30 px-10 py-4 text-[12px] font-bold uppercase tracking-[0.18em] text-primary transition-all hover:bg-primary hover:text-primary-content hover:border-primary"
           >
             Explore Full Menu
           </Link>

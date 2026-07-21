@@ -38,8 +38,7 @@ export const products = [
     description:
       "Tender chicken pieces simmered in our signature rich, creamy butter chicken gravy, encased in golden flaky pastry.",
     price: 22.99,
-    image:
-      "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-3.jpg",
     badge: "Plate of Origin Special",
   },
   {
@@ -48,8 +47,7 @@ export const products = [
     description:
       "Slow-cooked spiced minced lamb with homemade roasted spices for a deep, authentic Indian heritage flavour.",
     price: 27.99,
-    image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-5.jpg",
     badge: "Best Seller",
   },
   {
@@ -58,8 +56,7 @@ export const products = [
     description:
       "Bite-sized miniature keema lamb pies infused with heritage spices. Delivered frozen and perfect for parties.",
     price: 35.99,
-    image:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-4.jpg",
     badge: "10% OFF FROZEN!",
   },
   {
@@ -68,8 +65,7 @@ export const products = [
     description:
       "The ultimate entertainer's grazing box filled with a selection of our premium fusion party pies and signature dips.",
     price: 70.00,
-    image:
-      "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-7.jpg",
     badge: "Entertainers Pack",
   },
   {
@@ -78,8 +74,7 @@ export const products = [
     description:
       "Crisp, flaky pastry loaded with spiced potatoes, green peas, and Ash & Simran's custom aromatic garam masala blend.",
     price: 18.99,
-    image:
-      "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-6.jpg",
     badge: "Signature Veg",
   },
   {
@@ -88,8 +83,7 @@ export const products = [
     description:
       "Miniature party-sized butter chicken pies. Golden pastry outside, creamy rich butter chicken inside. Delivered frozen.",
     price: 31.49,
-    image:
-      "https://images.unsplash.com/photo-1621510456681-23a23cfb5f57?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-8.jpg",
     badge: "10% OFF FROZEN!",
   },
   {
@@ -98,8 +92,7 @@ export const products = [
     description:
       "Bite-sized mini samosa pies, featuring spiced potato and pea filling in flaky pastry sheets. A crowd favorite.",
     price: 25.19,
-    image:
-      "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-9.jpg",
     badge: "10% OFF FROZEN!",
   },
 ] as const;
@@ -109,22 +102,19 @@ export const moodCards = [
     title: "Watch & Enjoy",
     description:
       "Enjoy the iconic fusion pies that represented India on Channel 7's Plate of Origin, now delivered right to your couch.",
-    image:
-      "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-7.jpg",
   },
   {
     title: "Family Gatherings",
     description:
       "Celebrate with unique grazing boxes and mini party packs that combine Indian heritage with Australian traditions.",
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-8.jpg",
   },
   {
     title: "Effortless Catering",
     description:
       "From holiday feasts to corporate catering, make your next event memorable with pies that start conversations.",
-    image:
-      "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80",
+    image: "/products/PHOTOS_Flavour&Co-9.jpg",
   },
 ] as const;
 
@@ -145,6 +135,24 @@ export const testimonials = [
     quote:
       "Representing India on Plate of Origin was no fluke — these pies are pure culinary magic. A perfect blend of Indian spices and classic Aussie pies.",
     author: "David L. (Surry Hills)",
+    rating: 5,
+  },
+  {
+    quote:
+      "The Samosa Pie is an absolute gamechanger for vegetarians! Flaky, perfectly spiced, and delivered fresh to our door.",
+    author: "Ananya R. (Manly)",
+    rating: 5,
+  },
+  {
+    quote:
+      "We catered our office lunch with Flavour & Co. party pies. Everyone was blown away by the authentic gourmet flavours!",
+    author: "Marcus T. (Chatswood)",
+    rating: 5,
+  },
+  {
+    quote:
+      "Hands down the best pies in Australia. You can taste the love and heritage baked into every single layer of pastry.",
+    author: "Priya & Liam K. (Bondi)",
     rating: 5,
   },
 ] as const;

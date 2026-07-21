@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Caveat, DM_Sans, Instrument_Serif } from "next/font/google";
+import { Caveat, DM_Sans, Instrument_Serif, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const instrument = Instrument_Serif({
   variable: "--font-instrument",
   subsets: ["latin"],
   weight: ["400"],
+  style: ["normal", "italic"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
 });
 
@@ -35,8 +42,24 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrument.variable} ${caveat.variable} ${dmSans.variable} h-full antialiased`}
+      data-theme="garnet"
+      className={`${fraunces.variable} ${instrument.variable} ${caveat.variable} ${dmSans.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('flavour_theme') || 'garnet';
+                  document.documentElement.setAttribute('data-theme', saved);
+                  if (document.body) document.body.setAttribute('data-theme', saved);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

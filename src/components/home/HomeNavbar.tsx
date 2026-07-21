@@ -1,57 +1,20 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ShoppingBag, User, ArrowRight } from "lucide-react";
-import { navLinks } from "@/lib/data";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight } from "lucide-react";
+import { navLinks, products } from "@/lib/data";
 import { media } from "@/lib/media";
 
 export default function HomeNavbar() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
-  const [visible, setVisible] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const lastScrollY = useRef(0);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Monitor scroll for header background & hide-on-scroll-down behavior
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Scrolled state
-      if (currentScrollY > 60) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-
-      // Hide/Show behavior (only trigger if scrolled past 100px)
-      if (currentScrollY > 100) {
-        if (currentScrollY > lastScrollY.current) {
-          // Scrolling down - hide
-          setVisible(false);
-        } else {
-          // Scrolling up - show
-          setVisible(true);
-        }
-      } else {
-        setVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Prevent background scrolling when mobile menu is open
-  useEffect(() => {
-    if (mobileOpen) {
+    if (mobileOpen || searchOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -59,186 +22,256 @@ export default function HomeNavbar() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [mobileOpen]);
+  }, [mobileOpen, searchOpen]);
 
-  // GSAP animation for mobile menu items
-  useGSAP(
-    () => {
-      if (mobileOpen) {
-        gsap.to(".mobile-menu-overlay", {
-          opacity: 1,
-          duration: 0.4,
-          ease: "power2.out",
-        });
-        gsap.fromTo(
-          ".mobile-link",
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power3.out",
-            delay: 0.1,
-          }
-        );
-      } else {
-        gsap.to(".mobile-menu-overlay", {
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.in",
-        });
-      }
-    },
-    { dependencies: [mobileOpen], scope: menuRef }
-  );
+  const filteredProducts = searchQuery.trim()
+    ? products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
+  const popularSearches = ["Butter Chicken Pie", "Keema Lamb Pie", "Veggie Samosa", "Family Pack", "Dessert Tart"];
 
   return (
-    <div ref={menuRef}>
-      <header
-        className={`fixed inset-x-0 top-0 z-[100] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          visible ? "translate-y-0" : "-translate-y-full"
-        } ${
-          scrolled || mobileOpen
-            ? "bg-brand-green shadow-lg backdrop-blur-md py-3"
-            : "bg-transparent py-5"
-        }`}
-      >
-        <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-6 lg:px-10 relative">
-          {/* Left Section: Profile/User Icon and optionally Desktop Links */}
-          <div className="flex items-center gap-6 z-10">
+    <>
+      <header className="fixed inset-x-0 top-0 z-[100] bg-base-100 shadow-sm border-b border-secondary/15 transition-all duration-300">
+        {/* Top Announcement Bar */}
+        <div className="bg-secondary py-1.5 px-4 text-center text-secondary-content text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]">
+          Free Express Shipping on Orders Over $100 | Handcrafted Sydney-Wide
+        </div>
+
+        {/* Unified Single Header Bar */}
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-3.5 flex items-center justify-between gap-6">
+          {/* Left: Brand Logo */}
+          <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105">
+            <img
+              src={media.logo}
+              alt="Flavour & Co. Logo"
+              className="h-9 sm:h-11 w-auto object-contain"
+            />
+          </Link>
+
+          {/* Center: Merged Navigation Links (Desktop) */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            <ul className="flex items-center gap-6 lg:gap-8 text-xs font-bold uppercase tracking-[0.18em]">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`transition-colors hover:text-secondary ${
+                      pathname === link.href ? "text-secondary border-b-2 border-secondary pb-1" : "text-primary"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3 sm:gap-4 text-primary">
+            {/* Search Icon Trigger */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="p-2 hover:text-secondary transition-colors"
+              aria-label="Open search drawer"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+
+            {/* Help Link */}
+            <Link
+              href="/contact"
+              className="hidden lg:inline-block text-[11px] font-bold uppercase tracking-wider hover:text-secondary transition-colors"
+            >
+              Help
+            </Link>
+
+            {/* Wishlist */}
+            <Link
+              href="/shop"
+              className="p-2 hover:text-secondary transition-colors"
+              aria-label="Wishlist"
+            >
+              <Heart className="h-5 w-5" />
+            </Link>
+
+            {/* Account */}
             <Link
               href="/login"
-              className="text-white hover:text-brand-gold transition-colors p-2 flex items-center justify-center"
+              className="p-2 hover:text-secondary transition-colors"
               aria-label="Account"
             >
               <User className="h-5 w-5" />
             </Link>
-            
-            {/* Desktop Navigation Links - Left side */}
-            <ul className="hidden items-center gap-8 md:flex">
-              {navLinks.slice(1, 4).map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={`text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 ${
-                      scrolled || mobileOpen
-                        ? "text-cream/90 hover:text-brand-gold"
-                        : "text-cream/90 hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
 
-          {/* Center Logo - Image Branding */}
-          <Link
-            href="/"
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 z-10"
-          >
-            <img
-              src={media.logo}
-              alt="Flavour & Co. Logo"
-              className={`object-contain transition-all duration-300 ${
-                scrolled || mobileOpen ? "h-10 md:h-12" : "h-12 md:h-14"
-              } w-auto`}
-            />
-          </Link>
-
-          {/* Right Section: Desktop Links, Cart Icon, and Hamburger */}
-          <div className="flex items-center gap-4 z-10">
-            {/* Desktop Navigation Links - Right side */}
-            <ul className="hidden items-center gap-8 md:flex mr-2">
-              {navLinks.slice(4, 7).map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={`text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-300 ${
-                      scrolled || mobileOpen
-                        ? "text-cream/90 hover:text-brand-gold"
-                        : "text-cream/90 hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            {/* Cart Icon - Just Icon, no border, no bg */}
+            {/* Cart Icon with badge */}
             <Link
               href="/shop"
-              className="relative text-white hover:text-brand-gold transition-colors p-2 flex items-center justify-center"
+              className="relative p-2 hover:text-secondary transition-colors"
               aria-label="Cart"
             >
               <ShoppingBag className="h-5 w-5" />
-              <span className="absolute -right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-gold text-[9px] font-bold text-brand-green">
+              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
                 0
               </span>
             </Link>
-            
-            {/* Hamburger Button */}
+
+            {/* Mobile Hamburger Toggle */}
             <button
               type="button"
-              aria-label="Toggle menu"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="text-white hover:text-brand-gold transition-colors p-2 flex items-center justify-center"
+              className="p-2 hover:text-secondary transition-colors md:hidden"
+              aria-label="Toggle menu"
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
-        </nav>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        {mobileOpen && (
+          <div className="fixed inset-x-0 top-[105px] bottom-0 z-50 bg-base-100 p-6 overflow-y-auto md:hidden border-t border-secondary/15">
+            <ul className="flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-3.5 text-xl font-bold uppercase tracking-wider text-primary border-b border-secondary/15 hover:text-secondary"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </header>
 
-      {/* Full-Screen Mobile Menu Overlay */}
+      {/* Slide-Over Search Drawer (Full width on Mobile, Half width on PC) */}
       <div
-        className={`mobile-menu-overlay fixed inset-0 z-[90] flex items-center bg-brand-green px-8 pt-24 transition-opacity duration-300 md:px-16 ${
-          mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        className={`fixed inset-0 z-[200] overflow-hidden transition-all duration-300 ${
+          searchOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <div className="mx-auto w-full max-w-[1400px] grid gap-12 md:grid-cols-2">
-          <ul className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <li key={link.href} className="overflow-hidden">
-                <Link
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`mobile-link block font-serif text-4xl text-cream/90 transition-colors hover:text-brand-gold md:text-5xl ${
-                    pathname === link.href ? "italic text-brand-gold" : ""
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        {/* Backdrop */}
+        <div
+          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${
+            searchOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setSearchOpen(false)}
+        />
 
-          <div className="mobile-link hidden flex-col justify-end border-l border-brand-gold/20 pl-12 md:flex">
-            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-gold">
-              Ash & Simran
-            </p>
-            <h4 className="mt-4 font-serif text-2xl leading-snug text-cream">
-              Great Tasting
-              <br />
-              Indo-Australian Pies
-            </h4>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-cream/70">
-              Created by Ash & Simran, representing Flavour & Co. on Channel 7&apos;s Plate of Origin. We bake our roots into every single pie.
-            </p>
+        {/* Slide-Over Drawer Panel with Sliding Animation */}
+        <aside
+          className={`fixed inset-y-0 right-0 z-[210] flex w-full md:w-1/2 max-w-xl bg-base-100 p-6 sm:p-10 shadow-2xl flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${
+            searchOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div>
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between pb-6 border-b border-secondary/20">
+              <h3 className="font-fraunces text-2xl font-bold text-primary">
+                Search <span className="italic text-secondary">Flavour & Co.</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors"
+                aria-label="Close search"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Input Box: Not Rounded at all with Inner Padding */}
+            <div className="mt-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search fusion pies, grazing packs, recipes..."
+                  className="w-full rounded-none border-2 border-secondary/40 bg-base-200 px-5 py-4 pl-12 text-sm sm:text-base text-base-content placeholder:text-base-content/50 focus:border-secondary focus:outline-none transition-all"
+                />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary" />
+              </div>
+            </div>
+
+            {/* Suggested Tags */}
+            <div className="mt-6">
+              <span className="text-[11px] font-bold uppercase tracking-widest opacity-60 text-primary">
+                Popular Searches
+              </span>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {popularSearches.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSearchQuery(tag)}
+                    className="rounded-none border border-secondary/30 bg-base-200 px-3 py-1.5 text-xs font-semibold text-primary hover:border-secondary hover:bg-secondary hover:text-secondary-content transition-all"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Search Results */}
+            {searchQuery.trim() !== "" && (
+              <div className="mt-8">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-primary mb-4">
+                  Matching Products ({filteredProducts.length})
+                </h4>
+                {filteredProducts.length > 0 ? (
+                  <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                    {filteredProducts.map((product) => (
+                      <Link
+                        key={product.id}
+                        href="/shop"
+                        onClick={() => setSearchOpen(false)}
+                        className="flex items-center gap-4 rounded-none border border-secondary/15 bg-base-200 p-3 hover:border-secondary transition-all"
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-14 w-14 object-cover shrink-0"
+                        />
+                        <div className="flex-1">
+                          <h5 className="text-sm font-bold text-primary">{product.name}</h5>
+                          <p className="text-xs opacity-75 line-clamp-1">{product.description}</p>
+                          <span className="text-xs font-bold text-secondary mt-0.5 block">
+                            ${product.price.toFixed(2)} AUD
+                          </span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-secondary shrink-0" />
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm opacity-60 italic">No pies or products match &ldquo;{searchQuery}&rdquo;.</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Drawer Footer */}
+          <div className="pt-6 mt-8 border-t border-secondary/15 flex items-center justify-between text-xs opacity-70">
+            <span>Handcrafted Fusion Pies Sydney</span>
             <Link
               href="/shop"
-              onClick={() => setMobileOpen(false)}
-              className="group mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-gold hover:text-white"
+              onClick={() => setSearchOpen(false)}
+              className="font-bold text-secondary hover:underline uppercase tracking-wider"
             >
-              Shop Our Collection
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              View Full Menu →
             </Link>
           </div>
-        </div>
+        </aside>
       </div>
-    </div>
+    </>
   );
 }
