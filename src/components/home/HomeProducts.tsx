@@ -219,10 +219,10 @@ export default function HomeProducts() {
                     className="shrink-0 px-1.5 sm:px-3 transition-all duration-300"
                     style={{ width: `${100 / itemsPerPage}%` }}
                   >
-                    <article className="product-card group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-base-100 shadow-lg hover:shadow-2xl border border-secondary/15 h-full">
+                    <article className="product-card group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-base-100 border border-secondary/20 h-full">
                       <div className="relative aspect-[4/3] w-full overflow-hidden bg-primary/5">
                         {/* Badge */}
-                        <div className="absolute left-2 sm:left-4 top-2 sm:top-4 z-10 rounded-full bg-primary text-primary-content border border-secondary/20 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider shadow-md">
+                        <div className="absolute left-2 sm:left-4 top-2 sm:top-4 z-10 rounded-full bg-primary text-primary-content border border-secondary/20 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">
                           {product.badge}
                         </div>
 
@@ -301,7 +301,7 @@ export default function HomeProducts() {
                               Add
                             </button>
                           ) : (
-                            <div className="flex items-center justify-center rounded-md bg-primary text-primary-content px-2 sm:px-3 py-1 sm:py-1.5 border border-secondary/20 shadow-md">
+                            <div className="flex items-center justify-center rounded-md bg-primary text-primary-content px-2 sm:px-3 py-1 sm:py-1.5 border border-secondary/20">
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(product.id, -1)}
@@ -335,7 +335,7 @@ export default function HomeProducts() {
                 type="button"
                 onClick={prevSlide}
                 disabled={currentIndex === 0}
-                className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 shadow-lg transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:left-0"
+                className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:left-0"
                 aria-label="Previous slide"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -344,7 +344,7 @@ export default function HomeProducts() {
                 type="button"
                 onClick={nextSlide}
                 disabled={currentIndex === maxIndex}
-                className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 shadow-lg transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:right-0"
+                className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content border border-secondary/20 transition-all hover:bg-secondary hover:text-secondary-content hover:scale-105 disabled:opacity-30 disabled:pointer-events-none sm:right-0"
                 aria-label="Next slide"
               >
                 <ChevronRight className="h-5 w-5" />

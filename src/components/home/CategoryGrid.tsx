@@ -55,7 +55,7 @@ export default function CategoryGrid() {
             <Link
               key={cat.title}
               href={cat.href}
-              className="group flex flex-col items-center text-center rounded-2xl bg-white p-4 shadow-sm border border-brand-gold/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-brand-gold/30"
+              className="group flex flex-col items-center text-center rounded-2xl bg-white p-4 border border-brand-gold/20 transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40"
             >
               <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-cream">
                 <Image

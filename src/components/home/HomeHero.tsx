@@ -5,16 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Fraunces } from "next/font/google";
 import { media } from "@/lib/media";
-
-// Display face — swap into your global font setup if you already load fonts elsewhere.
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
-});
 
 export default function HomeHero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -67,7 +58,7 @@ export default function HomeHero() {
   return (
     <section
       ref={containerRef}
-      className={`${fraunces.variable} relative flex min-h-screen w-full items-end overflow-hidden bg-[#0D0A08] text-[#F2E6D3]`}
+      className="relative flex min-h-screen w-full items-end overflow-hidden bg-[#0D0A08] text-[#F2E6D3]"
     >
       {/* Background video */}
       <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
@@ -83,7 +74,7 @@ export default function HomeHero() {
 
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1B1410]/90 via-[#1B1410]/55 to-[#1B1410]/35" />
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0A08]/90 via-[#0D0A08]/30 to-transparent" />
-        <div className="absolute inset-0 z-10 bg-[#C1481D]/10 mix-blend-multiply" />
+        <div className="absolute inset-0 z-10 bg-[#07402B]/10 mix-blend-multiply" />
 
         <svg className="absolute inset-0 z-10 h-full w-full opacity-[0.06]" aria-hidden="true">
           <filter id="grain">
@@ -111,15 +102,14 @@ export default function HomeHero() {
         {/* Left: text stack */}
         <div className="flex max-w-2xl flex-col items-start text-left">
           <div className="hero-badge mb-7 inline-flex items-center gap-2 rounded-full border border-[#E3A72B]/40 bg-[#1B1410]/60 px-4 py-1.5 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C1481D]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#6B1D2F]" />
             <span className="font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#E3A72B] sm:text-[11px]">
               Est. by Ash &amp; Simran
             </span>
           </div>
 
           <h1
-            style={{ fontFamily: "var(--font-fraunces)" }}
-            className="text-4xl font-semibold leading-[1.05] tracking-tight text-[#F2E6D3] sm:text-5xl md:text-6xl lg:text-[4.2rem]"
+            className="text-4xl font-semibold leading-[1.05] tracking-tight text-[#F2E6D3] sm:text-5xl md:text-6xl lg:text-[4.2rem] font-serif"
           >
             <span className="hero-title-line block">
               Handcrafted{" "}

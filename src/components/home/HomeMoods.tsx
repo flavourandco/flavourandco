@@ -145,7 +145,7 @@ export default function HomeMoods() {
             {moodCardsWithMedia.map((card) => (
               <article
                 key={card.title}
-                className="mood-card group relative w-[80vw] shrink-0 overflow-hidden rounded-3xl bg-neutral-900 border border-brand-gold/15 transition-all duration-300 hover:shadow-2xl sm:w-[360px] md:w-[420px] snap-center aspect-[4/5]"
+                className="mood-card group relative w-[80vw] shrink-0 overflow-hidden rounded-3xl bg-neutral-900 border border-brand-gold/15 transition-all duration-300 sm:w-[360px] md:w-[420px] snap-center aspect-[4/5]"
               >
                 <Image
                   src={card.image}

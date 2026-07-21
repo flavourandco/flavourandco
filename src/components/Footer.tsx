@@ -47,7 +47,7 @@ export default function Footer() {
               <img
                 src={media.logo}
                 alt="Flavour & Co. Logo"
-                className="h-14 w-auto object-contain"
+                className="h-16 lg:h-20 w-auto object-contain"
               />
             </div>
             <p className="mt-5 text-sm leading-relaxed opacity-80">

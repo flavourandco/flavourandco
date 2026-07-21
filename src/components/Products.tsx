@@ -23,7 +23,7 @@ export default function Products() {
           {products.map((product, index) => (
             <article
               key={product.id}
-              className="group relative flex flex-col overflow-hidden bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-stone-200/50"
+              className="group relative flex flex-col overflow-hidden bg-white border border-brand-gold/20 transition-all duration-500 hover:-translate-y-1"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="relative aspect-[4/5] overflow-hidden">

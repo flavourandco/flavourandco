@@ -5,7 +5,6 @@ import HomeProducts from "@/components/home/HomeProducts";
 import PhilosophyQuote from "@/components/home/PhilosophyQuote";
 import HomeAbout from "@/components/home/HomeAbout";
 import HomeTestimonials, { HomeBundleCTA } from "@/components/home/HomeTestimonials";
-import ThemeSelector from "@/components/home/ThemeSelector";
 import OfferModal from "@/components/home/OfferModal";
 import Footer from "@/components/Footer";
 
@@ -22,7 +21,6 @@ export default function Home() {
           <HomeAbout />
           <HomeTestimonials />
           <HomeBundleCTA />
-          <ThemeSelector />
         </main>
         <Footer />
       </SmoothScroll>

@@ -58,7 +58,7 @@ export default function RecipeSection() {
           {recipes.map((recipe) => (
             <article
               key={recipe.title}
-              className="group flex flex-col rounded-2xl bg-white overflow-hidden shadow-md border border-brand-gold/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              className="group flex flex-col rounded-2xl bg-white overflow-hidden border border-brand-gold/20 transition-all duration-300 hover:border-brand-gold/50"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-warm-white">
                 <Image

@@ -56,17 +56,28 @@ export default function HomeNavbar() {
         {/* Unified Header Bar */}
         <div className="mx-auto max-w-[1400px]">
           {/* MOBILE VIEW NAVBAR (md:hidden) */}
-          <div className="flex md:hidden items-center justify-between px-4 py-3 relative min-h-[56px]">
-            {/* Left: Mobile Profile Icon */}
-            <Link
-              href="/login"
-              className="p-2 text-primary hover:text-secondary transition-colors z-10"
-              aria-label="Account"
-            >
-              <User className="h-5 w-5" />
-            </Link>
+          <div className="flex md:hidden items-center justify-between px-3 py-1.5 relative min-h-[50px]">
+            {/* Left: Mobile Profile & Search Icons */}
+            <div className="flex items-center gap-0.5 text-primary z-10">
+              <Link
+                href="/login"
+                className="p-1.5 hover:text-secondary transition-colors"
+                aria-label="Account"
+              >
+                <User className="h-5 w-5" />
+              </Link>
 
-            {/* Center: Just Logo */}
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="p-1.5 hover:text-secondary transition-colors"
+                aria-label="Open search drawer"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Center: Enlarged Brand Logo */}
             <Link
               href="/"
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10"
@@ -74,28 +85,19 @@ export default function HomeNavbar() {
               <img
                 src={media.logo}
                 alt="Flavour & Co. Logo"
-                className="h-9 w-auto object-contain"
+                className="h-14 sm:h-16 max-h-16 w-auto object-contain py-0.5"
               />
             </Link>
 
-            {/* Right: Search, Cart, Hamburger */}
-            <div className="flex items-center gap-1 text-primary z-10">
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
-                className="p-2 hover:text-secondary transition-colors"
-                aria-label="Open search drawer"
-              >
-                <Search className="h-5 w-5" />
-              </button>
-
+            {/* Right: Cart & Hamburger Menu */}
+            <div className="flex items-center gap-0.5 text-primary z-10">
               <Link
                 href="/shop"
-                className="relative p-2 hover:text-secondary transition-colors"
+                className="relative p-1.5 hover:text-secondary transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
+                <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
                   0
                 </span>
               </Link>
@@ -103,7 +105,7 @@ export default function HomeNavbar() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2 hover:text-secondary transition-colors"
+                className="p-1.5 hover:text-secondary transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -112,25 +114,25 @@ export default function HomeNavbar() {
           </div>
 
           {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
-          <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-3.5 gap-6">
+          <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-4 gap-6">
             {/* Left: Brand Logo */}
             <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105">
               <img
                 src={media.logo}
                 alt="Flavour & Co. Logo"
-                className="h-10 lg:h-11 w-auto object-contain"
+                className="h-14 lg:h-16 xl:h-18 w-auto object-contain max-h-20"
               />
             </Link>
 
             {/* Center: Merged Navigation Links */}
             <nav className="flex items-center gap-6 lg:gap-8">
-              <ul className="flex items-center gap-6 lg:gap-8 text-xs font-bold uppercase tracking-[0.18em]">
+              <ul className="flex items-center gap-6 lg:gap-8 text-sm lg:text-base font-bold uppercase tracking-wider">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`transition-colors hover:text-secondary ${
-                        pathname === link.href ? "text-secondary border-b-2 border-secondary pb-1" : "text-primary"
+                      className={`transition-colors pb-1 ${
+                        pathname === link.href ? "text-primary font-extrabold border-b-2 border-primary" : "text-primary/80 hover:text-primary font-bold"
                       }`}
                     >
                       {link.label}

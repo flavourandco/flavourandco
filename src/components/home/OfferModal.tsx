@@ -40,21 +40,21 @@ export default function OfferModal() {
       />
 
       {/* Modal Container — Wider landscape layout on PC, compact on mobile */}
-      <div className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl overflow-hidden rounded-lg bg-base-100 border-2 border-secondary/30 p-6 sm:p-8 md:p-10 shadow-2xl transition-all transform scale-100 z-10 text-base-content">
-        {/* Close Button */}
+      <div className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl overflow-hidden rounded-xl bg-base-100 border-2 border-secondary/30 p-6 sm:p-8 md:p-10 shadow-2xl transition-all transform scale-100 z-10 text-base-content">
+        {/* Square Close Button */}
         <button
           onClick={handleClose}
           type="button"
           aria-label="Close offer modal"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md bg-base-200 text-base-content/70 hover:bg-secondary hover:text-secondary-content transition-all border border-secondary/20 z-20 cursor-pointer"
+          className="absolute right-3 top-3 sm:right-5 sm:top-5 flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-secondary-content hover:bg-primary hover:text-primary-content transition-all border border-secondary/30 z-30 cursor-pointer shadow-md"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 stroke-[2.5]" />
         </button>
 
         {/* Ambient background accent */}
         <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-secondary/15 blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center relative z-10 pt-4 md:pt-2">
           {/* Left Column: Brand & Title Stack */}
           <div className="md:col-span-6 text-center md:text-left flex flex-col justify-center">
             <div className="inline-flex items-center gap-2 rounded-md border border-secondary/40 bg-base-200/80 px-3.5 py-1 text-[10px] font-mono font-medium uppercase tracking-[0.25em] text-secondary mb-3 self-center md:self-start">
@@ -96,7 +96,7 @@ export default function OfferModal() {
           </div>
 
           {/* Right Column: Value Highlights & Action Buttons */}
-          <div className="md:col-span-6 flex flex-col justify-between h-full space-y-4">
+          <div className="md:col-span-6 flex flex-col justify-between h-full space-y-4 pt-4 md:pt-6 md:pr-4">
             <div className="space-y-2">
               <div className="flex items-center gap-3.5 rounded-md bg-base-200/70 p-3 border border-secondary/20 transition-all hover:border-secondary/40">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-content">

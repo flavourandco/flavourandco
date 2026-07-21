@@ -74,7 +74,7 @@ export default function HomeTestimonials() {
           {marqueeItems.map((item, index) => (
             <div
               key={`${item.author}-${index}`}
-              className="w-[300px] sm:w-[360px] md:w-[420px] shrink-0 rounded-3xl bg-base-200 p-6 sm:p-8 shadow-md border border-secondary/15 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:border-secondary/40"
+              className="w-[300px] sm:w-[360px] md:w-[420px] shrink-0 rounded-3xl bg-base-200 p-6 sm:p-8 border border-secondary/20 flex flex-col justify-between transition-all duration-300 hover:border-secondary/40"
             >
               <div>
                 {/* Header: Stars & Quote Icon */}

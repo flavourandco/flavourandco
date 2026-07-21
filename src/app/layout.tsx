@@ -1,31 +1,12 @@
 import type { Metadata } from "next";
-import { Caveat, DM_Sans, Instrument_Serif, Fraunces } from "next/font/google";
+import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-});
-
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -42,25 +23,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="garnet"
-      className={`${fraunces.variable} ${instrument.variable} ${caveat.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${cormorant.variable} h-full antialiased`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var saved = localStorage.getItem('flavour_theme') || 'garnet';
-                  document.documentElement.setAttribute('data-theme', saved);
-                  if (document.body) document.body.setAttribute('data-theme', saved);
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-serif">{children}</body>
     </html>
   );
 }
