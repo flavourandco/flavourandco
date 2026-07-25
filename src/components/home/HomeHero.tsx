@@ -148,18 +148,22 @@ export default function HomeHero() {
         />
 
         {/* Right: action panel */}
-        <div className="hero-actions flex w-full flex-row items-center gap-4 sm:gap-5 lg:w-auto">
+        <div className="hero-actions flex w-full flex-row items-center gap-3 sm:gap-5 lg:w-auto">
           <Link
             href="/shop"
-            className="group inline-flex flex-1 lg:flex-initial items-center justify-center gap-2.5 bg-brand-garnet px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-brand-gold hover:text-brand-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56 shadow-sm whitespace-nowrap"
+            className="group relative overflow-hidden inline-flex flex-1 lg:flex-initial items-center justify-center gap-1.5 sm:gap-2.5 bg-brand-garnet px-3 sm:px-7 py-3.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-[#F2E6D3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] lg:w-56 shadow-sm whitespace-nowrap"
           >
-            <span>Explore Menu</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <span className="relative z-10 inline-flex items-center gap-1.5 sm:gap-2.5">
+              <span>Explore Menu</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+            {/* Sliding gold underline from bottom edge left-to-right */}
+            <span className="absolute bottom-0 left-0 h-[3px] bg-[#c69c40] w-full origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
           </Link>
 
           <Link
             href="/our-story"
-            className="group inline-flex flex-1 lg:flex-initial items-center justify-center gap-2.5 border border-[#F2E6D3]/30 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3]/90 transition-colors hover:border-[#F2E6D3] hover:bg-[#F2E6D3]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56 shadow-sm whitespace-nowrap"
+            className="group inline-flex flex-1 lg:flex-initial items-center justify-center gap-1.5 sm:gap-2.5 border border-[#F2E6D3]/30 px-3 sm:px-7 py-3.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-[#F2E6D3]/90 transition-colors hover:border-[#F2E6D3] hover:bg-[#F2E6D3]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] lg:w-56 shadow-sm whitespace-nowrap"
           >
             <span>Our Story</span>
           </Link>

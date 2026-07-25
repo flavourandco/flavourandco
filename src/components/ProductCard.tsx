@@ -26,16 +26,16 @@ export default function ProductCard({ product }: ProductCardProps) {
   const detailUrl = `/shop/${slug}/${product.id}`;
 
   return (
-    <article className="product-card group relative flex flex-col justify-between overflow-hidden bg-white rounded-lg border border-[#c69c40]/40 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+    <article className="product-card relative flex flex-col justify-between overflow-hidden bg-white rounded-lg border border-[#c69c40]/40 shadow-sm hover:shadow-md transition-all duration-300 h-full">
 
       {/* Image Area (Clickable Link to detail page) */}
-      <Link href={detailUrl} className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-b from-[#6b1e30]/20 to-[#6b1e30]/5 cursor-pointer block">
+      <Link href={detailUrl} className="group relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-b from-[#6b1e30]/20 to-[#6b1e30]/5 cursor-pointer block">
         {/* Normal image */}
         <Image
           src={product.images[0]}
           alt={product.name}
           fill
-          className="object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         {/* Hover image */}
@@ -43,7 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           src={product.images[1]}
           alt={`${product.name} hover view`}
           fill
-          className="object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100 absolute inset-0"
+          className="object-cover absolute inset-0 opacity-0 scale-95 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:scale-100"
           sizes="(max-width: 768px) 100vw, 33vw"
         />
 
