@@ -7,6 +7,7 @@ export default function ShopPage() {
       title="Shop"
       subtitle="Explore our full range of handcrafted Indo-fusion pies."
       fullWidth
+      hideHeader={true}
     >
       <Products />
     </PageLayout>

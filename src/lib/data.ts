@@ -2,7 +2,7 @@ export const marqueeItems = [
   "plate of origin on channel 7",
   "indo-australian fusion pies",
   "delivering sydney-wide",
-  "handcrafted by ash & simran",
+  "handcrafted by simran",
   "authentic heritage spices",
   "made with love",
 ] as const;
@@ -19,8 +19,8 @@ export const tickerItems = [
 export const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "About", href: "/our-story" },
-  { label: "Catering", href: "/wholesale" },
+  { label: "Our Story", href: "/our-story" },
+  { label: "Wholesale", href: "/wholesale" },
   { label: "FAQs", href: "/faq" },
   { label: "Blog", href: "/blog" },
   { label: "Contact Us", href: "/contact" },
@@ -28,100 +28,147 @@ export const navLinks = [
 
 export const homeNavLinks = [
   { label: "Shop", href: "/shop", hasDropdown: true },
-  { label: "About", href: "/our-story", hasDropdown: true },
+  { label: "Our Story", href: "/our-story", hasDropdown: true },
 ] as const;
 
-export const products = [
+export interface ProductVariant {
+  name: string;
+  price: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number; // base price (matches variants[0].price)
+  image: string; // base image (matches images[0])
+  images: [string, string]; // [normal, hover]
+  badge?: string;
+  category: "freshly-baked" | "frozen" | "grazing-box";
+  variants: ProductVariant[];
+  
+  // Backward compatibility support for navigation/carousel routing
+  isFeatured?: boolean;
+  isBestSeller?: boolean;
+  isNewArrival?: boolean;
+  option1Name?: string;
+  option1Choices?: ProductVariant[];
+  option2Name?: string;
+  option2Choices?: string[];
+}
+
+export const products: Product[] = [
   {
-    id: "butter-chicken-pie-2",
-    name: "Flavour & Co. Butter Chicken Pie - Pack of 2",
-    description:
-      "Tender chicken pieces simmered in our signature rich, creamy butter chicken gravy, encased in golden flaky pastry.",
-    price: 22.99,
+    id: "mini-authentic-butter-chicken",
+    name: "Mini Authentic Butter Chicken",
+    description: "Miniature party-sized butter chicken pies. Golden pastry outside, creamy rich butter chicken inside. Delivered frozen.",
+    price: 34.99,
     image: "/products/PHOTOS_Flavour&Co-3.jpg",
-    badge: "Plate of Origin Special",
-  },
-  {
-    id: "keema-lamb-pie-2",
-    name: "Flavour & Co. Keema Lamb Pie - Pack of 2",
-    description:
-      "Slow-cooked spiced minced lamb with homemade roasted spices for a deep, authentic Indian heritage flavour.",
-    price: 27.99,
-    image: "/products/PHOTOS_Flavour&Co-5.jpg",
+    images: ["/products/PHOTOS_Flavour&Co-3.jpg", "/products/PHOTOS_Flavour&Co-8.jpg"],
     badge: "Best Seller",
+    category: "frozen",
+    isFeatured: true,
+    isBestSeller: true,
+    variants: [
+      { name: "Single Pack (12 Pies)", price: 34.99 },
+      { name: "Party Pack (24 Pies)", price: 59.99 }
+    ]
   },
   {
-    id: "mini-keema-lamb-12",
-    name: "Flavour & Co. Mini Keema Lamb Pies - Pack of 12",
-    description:
-      "Bite-sized miniature keema lamb pies infused with heritage spices. Delivered frozen and perfect for parties.",
-    price: 35.99,
-    image: "/products/PHOTOS_Flavour&Co-4.jpg",
-    badge: "10% OFF FROZEN!",
+    id: "mini-samosa",
+    name: "Mini Samosa",
+    description: "Bite-sized mini samosa pies, featuring spiced potato and pea filling in flaky pastry sheets. A crowd favorite.",
+    price: 27.99,
+    image: "/products/PHOTOS_Flavour&Co-6.jpg",
+    images: ["/products/PHOTOS_Flavour&Co-6.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
+    category: "frozen",
+    isFeatured: false,
+    variants: [
+      { name: "Single Pack (12 Pies)", price: 27.99 },
+      { name: "Party Pack (24 Pies)", price: 49.99 }
+    ]
   },
   {
-    id: "grazing-boxes",
-    name: "Flavour & Co. Grazing Boxes",
-    description:
-      "The ultimate entertainer's grazing box filled with a selection of our premium fusion party pies and signature dips.",
-    price: 70.00,
-    image: "/products/PHOTOS_Flavour&Co-7.jpg",
-    badge: "Entertainers Pack",
+    id: "mini-lamb-keema",
+    name: "Mini Lamb Keema",
+    description: "Bite-sized miniature keema lamb pies infused with heritage spices. Delivered frozen and perfect for parties.",
+    price: 34.99,
+    image: "/products/PHOTOS_Flavour&Co-5.jpg",
+    images: ["/products/PHOTOS_Flavour&Co-5.jpg", "/products/PHOTOS_Flavour&Co-4.jpg"],
+    category: "frozen",
+    isFeatured: true,
+    variants: [
+      { name: "Single Pack (12 Pies)", price: 34.99 },
+      { name: "Party Pack (24 Pies)", price: 59.99 }
+    ]
   },
   {
-    id: "samosa-pie-2",
-    name: "Flavour & Co. Samosa Pie - Pack of 2",
-    description:
-      "Crisp, flaky pastry loaded with spiced potatoes, green peas, and Ash & Simran's custom aromatic garam masala blend.",
+    id: "100-vegetarian-samosa",
+    name: "100% Vegetarian Samosa",
+    description: "Crisp, flaky pastry loaded with spiced potatoes, green peas, and Simran's custom aromatic garam masala blend.",
     price: 18.99,
     image: "/products/PHOTOS_Flavour&Co-6.jpg",
-    badge: "Signature Veg",
+    images: ["/products/PHOTOS_Flavour&Co-6.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
+    category: "freshly-baked",
+    isNewArrival: true,
+    isFeatured: false,
+    variants: [
+      { name: "Single Serving (Pack of 2)", price: 18.99 },
+      { name: "Family Serving (Pack of 4)", price: 32.99 }
+    ]
   },
   {
-    id: "mini-butter-chicken-12",
-    name: "Flavour & Co. Mini Butter Chicken Pie - Pack of 12",
-    description:
-      "Miniature party-sized butter chicken pies. Golden pastry outside, creamy rich butter chicken inside. Delivered frozen.",
-    price: 31.49,
-    image: "/products/PHOTOS_Flavour&Co-8.jpg",
-    badge: "10% OFF FROZEN!",
+    id: "authentic-butter-chicken",
+    name: "Authentic Butter Chicken",
+    description: "Tender chicken pieces simmered in our signature rich, creamy butter chicken gravy, encased in golden flaky pastry.",
+    price: 22.99,
+    image: "/products/PHOTOS_Flavour&Co-3.jpg",
+    images: ["/products/PHOTOS_Flavour&Co-3.jpg", "/products/PHOTOS_Flavour&Co-8.jpg"],
+    badge: "220g",
+    category: "freshly-baked",
+    isBestSeller: true,
+    isFeatured: true,
+    variants: [
+      { name: "Single Serving (Pack of 2)", price: 22.99 },
+      { name: "Family Serving (Pack of 4)", price: 39.99 }
+    ]
   },
   {
-    id: "mini-samosa-12",
-    name: "Flavour & Co. Mini Samosa Pies - Pack of 12",
-    description:
-      "Bite-sized mini samosa pies, featuring spiced potato and pea filling in flaky pastry sheets. A crowd favorite.",
-    price: 25.19,
-    image: "/products/PHOTOS_Flavour&Co-9.jpg",
-    badge: "10% OFF FROZEN!",
+    id: "lamb-keema",
+    name: "Lamb Keema",
+    description: "Slow-cooked spiced minced lamb with homemade roasted spices for a deep, authentic Indian heritage flavour.",
+    price: 22.99,
+    image: "/products/PHOTOS_Flavour&Co-5.jpg",
+    images: ["/products/PHOTOS_Flavour&Co-5.jpg", "/products/PHOTOS_Flavour&Co-4.jpg"],
+    badge: "220g",
+    category: "freshly-baked",
+    isBestSeller: true,
+    isFeatured: true,
+    variants: [
+      { name: "Single Serving (Pack of 2)", price: 22.99 },
+      { name: "Family Serving (Pack of 4)", price: 39.99 }
+    ]
   },
-] as const;
-
-export const moodCards = [
   {
-    title: "Watch & Enjoy",
-    description:
-      "Enjoy the iconic fusion pies that represented India on Channel 7's Plate of Origin, now delivered right to your couch.",
+    id: "grazing-box",
+    name: "Grazing Box",
+    description: "The ultimate entertainer's grazing box filled with a selection of our premium fusion party pies and signature dips.",
+    price: 75.00,
     image: "/products/PHOTOS_Flavour&Co-7.jpg",
-  },
-  {
-    title: "Family Gatherings",
-    description:
-      "Celebrate with unique grazing boxes and mini party packs that combine Indian heritage with Australian traditions.",
-    image: "/products/PHOTOS_Flavour&Co-8.jpg",
-  },
-  {
-    title: "Effortless Catering",
-    description:
-      "From holiday feasts to corporate catering, make your next event memorable with pies that start conversations.",
-    image: "/products/PHOTOS_Flavour&Co-9.jpg",
-  },
-] as const;
+    images: ["/products/PHOTOS_Flavour&Co-7.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
+    category: "grazing-box",
+    isFeatured: true,
+    variants: [
+      { name: "Standard Box", price: 75.00 },
+      { name: "Deluxe Feast Box", price: 135.00 }
+    ]
+  }
+];
 
 export const testimonials = [
   {
     quote:
-      "Simran and Ash's butter chicken pie is the best fusion food I've ever tasted. The pastry is incredibly flaky and the filling is rich and authentic.",
+      "Simran's butter chicken pie is the best fusion food I've ever tasted. The pastry is incredibly flaky and the filling is rich and authentic.",
     author: "Monica G. (Sydney)",
     rating: 5,
   },
@@ -166,7 +213,7 @@ export const footerLinks = {
   ],
   explore: [
     { label: "Our Story", href: "/our-story" },
-    { label: "Catering", href: "/wholesale" },
+    { label: "Wholesale", href: "/wholesale" },
     { label: "FAQs", href: "/faq" },
     { label: "Blog", href: "/blog" },
   ],
@@ -187,6 +234,6 @@ export const craftFeatures = [
   },
   {
     title: "Sydney-Wide Delivery",
-    description: "Delivering fresh and frozen gourmet pies right to your doorstep, baked fresh by Ash & Simran.",
+    description: "Delivering fresh and frozen gourmet pies right to your doorstep, baked fresh by Simran.",
   },
 ] as const;

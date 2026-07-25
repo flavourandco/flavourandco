@@ -17,7 +17,6 @@ export default function HomeHero() {
       if (reduceMotion) {
         gsap.set(
           [
-            ".hero-badge",
             ".hero-title-line",
             ".hero-crimp",
             ".hero-subtext",
@@ -33,8 +32,7 @@ export default function HomeHero() {
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      tl.from(".hero-badge", { y: 16, opacity: 0, duration: 0.6 }, 0.1)
-        .from(".hero-title-line", { y: 44, opacity: 0, duration: 1, stagger: 0.14 }, 0.25)
+      tl.from(".hero-title-line", { y: 44, opacity: 0, duration: 1, stagger: 0.14 }, 0.25)
         .fromTo(
           ".hero-crimp",
           { scaleX: 0, transformOrigin: "left center" },
@@ -101,13 +99,6 @@ export default function HomeHero() {
       <div className="relative z-20 mx-auto flex w-full max-w-[1400px] flex-col gap-10 px-6 pt-36 pb-12 sm:px-10 sm:pb-16 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:px-16 lg:pb-20 lg:pt-48">
         {/* Left: text stack */}
         <div className="flex max-w-2xl flex-col items-start text-left">
-          <div className="hero-badge mb-7 inline-flex items-center gap-2 rounded-full border border-[#E3A72B]/40 bg-[#1B1410]/60 px-4 py-1.5 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#6B1D2F]" />
-            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.3em] text-[#E3A72B] sm:text-[11px]">
-              Est. by Ash &amp; Simran
-            </span>
-          </div>
-
           <h1
             className="text-4xl font-semibold leading-[1.05] tracking-tight text-[#F2E6D3] sm:text-5xl md:text-6xl lg:text-[4.2rem] font-serif"
           >
@@ -129,7 +120,7 @@ export default function HomeHero() {
             <path
               d="M0,8 Q10,0 20,8 T40,8 T60,8 T80,8 T100,8 T120,8 T140,8 T160,8 T180,8 T200,8 T220,8 T240,8 T260,8 T280,8 T300,8 T320,8 T340,8 T360,8 T380,8 T400,8"
               fill="none"
-              stroke="#C1481D"
+              stroke="#6b1e30"
               strokeWidth="2"
             />
           </svg>
@@ -139,14 +130,14 @@ export default function HomeHero() {
             in light, multi-layered flaky Aussie pastry — made by hand, one crimp at a time.
           </p>
 
-          <div className="hero-ingredients mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.15em] text-[#F2E6D3]/50">
-            <span>Cardamom</span>
-            <span className="text-[#57683F]">·</span>
-            <span>Ghee</span>
-            <span className="text-[#57683F]">·</span>
-            <span>Golden Pastry</span>
-            <span className="text-[#57683F]">·</span>
-            <span>Slow-Roasted Spice</span>
+          <div className="hero-ingredients mt-6 flex flex-wrap items-center gap-y-2 font-mono text-[11px] uppercase tracking-[0.15em]">
+            <span className="text-[#c69c40] font-bold">Cardamom</span>
+            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+            <span className="text-[#c69c40] font-bold">Ghee</span>
+            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+            <span className="text-[#c69c40] font-bold">Golden Pastry</span>
+            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+            <span className="text-[#c69c40] font-bold">Slow-Roasted Spice</span>
           </div>
         </div>
 
@@ -160,7 +151,7 @@ export default function HomeHero() {
         <div className="hero-actions flex w-full flex-row items-center gap-5 lg:w-auto lg:flex-col lg:items-end lg:gap-4">
           <Link
             href="/shop"
-            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden bg-[#C1481D] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-[#a83e19] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
+            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden bg-brand-garnet px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-brand-gold hover:text-brand-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
             style={{
               clipPath:
                 "polygon(3% 0%, 97% 0%, 100% 20%, 97% 40%, 100% 60%, 97% 80%, 100% 100%, 3% 100%, 0% 80%, 3% 60%, 0% 40%, 3% 20%)",

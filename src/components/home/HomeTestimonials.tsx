@@ -55,7 +55,7 @@ export default function HomeTestimonials() {
           Loved by Foodies & <span className="italic font-medium text-secondary">Gatherers Alike</span>
         </h2>
         <p className="mt-3 text-xs sm:text-sm opacity-75 max-w-xl mx-auto leading-relaxed">
-          See what pie lovers across Australia are saying about Ash & Simran&apos;s handcrafted fusion pies.
+          See what pie lovers across Australia are saying about Simran&apos;s handcrafted fusion pies.
         </p>
       </div>
 

@@ -1,67 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Plus, Minus, Star, Flame, Trophy, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { media } from "@/lib/media";
+import { products } from "@/lib/data";
+import ProductCard from "@/components/ProductCard";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Custom products data with category and nutritional facts
-const productsWithDetails = [
-  {
-    id: "butter-chicken-pie",
-    name: "Flavour & Co. Butter Chicken Pie",
-    description: "Tender chicken pieces simmered in our signature rich, creamy butter chicken gravy, encased in golden flaky pastry.",
-    price: 22.99,
-    image: media.products.butterChicken,
-    badge: "Plate of Origin Special",
-    category: "meat",
-    rating: 4.9,
-    reviews: 148,
-    nutrition: { cal: 520, protein: "24g", fat: "28g", carbs: "42g" }
-  },
-  {
-    id: "samosa-pie",
-    name: "Flavour & Co. Samosa Pie",
-    description: "Crisp, flaky pastry loaded with spiced potatoes, green peas, and Ash & Simran's custom aromatic masala blend.",
-    price: 18.99,
-    image: media.products.samosaPie,
-    badge: "Signature Veg",
-    category: "veg",
-    rating: 4.8,
-    reviews: 95,
-    nutrition: { cal: 410, protein: "8g", fat: "16g", carbs: "54g" }
-  },
-  {
-    id: "lamb-keema-pie",
-    name: "Flavour & Co. Keema Lamb Pie",
-    description: "Slow-cooked spiced minced lamb with homemade roasted spices for a deep, authentic Indian heritage flavour.",
-    price: 27.99,
-    image: media.products.lambKeema,
-    badge: "Best Seller",
-    category: "meat",
-    rating: 5.0,
-    reviews: 112,
-    nutrition: { cal: 580, protein: "28g", fat: "32g", carbs: "40g" }
-  },
-  {
-    id: "mini-keema-lamb-pies",
-    name: "Flavour & Co. Mini Keema Lamb Pies",
-    description: "Bite-sized miniature keema lamb pies infused with heritage spices. Delivered frozen and perfect for parties.",
-    price: 35.99,
-    image: media.products.paneerTikka,
-    badge: "10% OFF FROZEN!",
-    category: "meat",
-    rating: 4.8,
-    reviews: 86,
-    nutrition: { cal: 380, protein: "18g", fat: "22g", carbs: "30g" }
-  }
-];
 
 export default function HomeProducts() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -86,21 +34,15 @@ export default function HomeProducts() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const maxIndex = Math.max(0, productsWithDetails.length - itemsPerPage);
+  const featuredProducts = products.filter((p) => p.isFeatured);
+  const maxIndex = Math.max(0, featuredProducts.length - itemsPerPage);
 
   // Clamp currentIndex when itemsPerPage changes
   useEffect(() => {
     setCurrentIndex((prev) => Math.min(prev, maxIndex));
   }, [itemsPerPage, maxIndex]);
 
-  // Auto-scroll products every 5 seconds unless hovered
-  useEffect(() => {
-    if (isHovered || maxIndex <= 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isHovered, maxIndex]);
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -189,7 +131,7 @@ export default function HomeProducts() {
             <span className="text-secondary">Delivering Sydney-Wide</span>
           </h2>
           <p className="mt-5 text-base leading-relaxed opacity-75">
-            Created by Ash & Simran, representing Flavour & Co. on Channel 7&apos;s Plate of Origin. Try our award-winning butter chicken, keema lamb, and samosa pies today!
+            Created by Simran, representing Flavour & Co. on Channel 7&apos;s Plate of Origin. Try our award-winning butter chicken, keema lamb, and samosa pies today!
           </p>
         </div>
 
@@ -210,118 +152,14 @@ export default function HomeProducts() {
                 transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
               }}
             >
-              {productsWithDetails.map((product) => {
-                const quantity = cartQuantities[product.id] || 0;
-
+              {featuredProducts.map((product) => {
                 return (
                   <div
                     key={product.id}
-                    className="shrink-0 px-1.5 sm:px-3 transition-all duration-300"
+                    className="shrink-0 px-1.5 sm:px-3 transition-all duration-300 animate-fadeIn"
                     style={{ width: `${100 / itemsPerPage}%` }}
                   >
-                    <article className="product-card group flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-base-100 border border-secondary/20 h-full">
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-primary/5">
-                        {/* Badge */}
-                        <div className="absolute left-2 sm:left-4 top-2 sm:top-4 z-10 rounded-full bg-primary text-primary-content border border-secondary/20 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">
-                          {product.badge}
-                        </div>
-
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 768px) 50vw, 30vw"
-                        />
-                        <div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
-                      </div>
-
-                      <div className="flex flex-col flex-grow p-3 sm:p-6">
-                        {/* Rating */}
-                        <div className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-secondary">
-                          <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-current" />
-                          <span>{product.rating.toFixed(1)}</span>
-                          <span className="opacity-50 font-normal hidden xs:inline">({product.reviews} reviews)</span>
-                        </div>
-
-                        {/* Title & Description */}
-                        <div className="min-h-[2.75rem] sm:min-h-[3.25rem] md:min-h-[3.75rem] flex items-center mt-1 sm:mt-2">
-                          <h3 className="font-trivane-retro text-sm sm:text-base md:text-lg font-black text-primary leading-tight uppercase">
-                            {product.name}
-                          </h3>
-                        </div>
-                        
-                        {/* Hidden on mobile to make room for two products per row */}
-                        <p className="mt-2 text-xs leading-relaxed opacity-70 flex-grow hidden sm:block">
-                          {product.description}
-                        </p>
-
-                        {/* Nutritional Facts Row - Hidden on mobile */}
-                        <div className="mt-4 grid grid-cols-4 gap-1.5 border-t border-b border-primary/10 py-3 text-center hidden sm:grid">
-                          <div className="flex flex-col justify-center">
-                            <span className="text-[10px] font-semibold opacity-50 uppercase">Cal</span>
-                            <span className="text-xs font-bold text-primary flex items-center justify-center gap-0.5">
-                              <Flame className="h-3 w-3 text-secondary" />
-                              {product.nutrition.cal}
-                            </span>
-                          </div>
-                          <div className="flex flex-col justify-center border-l border-primary/10">
-                            <span className="text-[10px] font-semibold opacity-50 uppercase">Prot</span>
-                            <span className="text-xs font-bold text-primary flex items-center justify-center gap-0.5">
-                              <Trophy className="h-3 w-3 text-secondary" />
-                              {product.nutrition.protein}
-                            </span>
-                          </div>
-                          <div className="flex flex-col justify-center border-l border-primary/10">
-                            <span className="text-[10px] font-semibold opacity-50 uppercase">Carbs</span>
-                            <span className="text-xs font-bold text-primary">{product.nutrition.carbs}</span>
-                          </div>
-                          <div className="flex flex-col justify-center border-l border-primary/10">
-                            <span className="text-[10px] font-semibold opacity-50 uppercase">Fat</span>
-                            <span className="text-xs font-bold text-primary">{product.nutrition.fat}</span>
-                          </div>
-                        </div>
-
-                        {/* Price and Interactive Add to Cart button */}
-                        <div className="mt-auto pt-3 sm:pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                          <div className="flex flex-col">
-                            <span className="text-[8px] sm:text-[9px] font-semibold opacity-50 uppercase tracking-wider">Per Pie</span>
-                            <span className="text-base sm:text-lg font-extrabold text-primary">
-                              ${product.price.toFixed(2)}
-                            </span>
-                          </div>
-
-                          {quantity === 0 ? (
-                            <button
-                              type="button"
-                              onClick={() => updateQuantity(product.id, 1)}
-                              className="flex items-center justify-center gap-1 rounded-md bg-primary hover:bg-secondary hover:text-secondary-content text-primary-content px-3 sm:px-5 py-2 sm:py-2.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.03]"
-                            >
-                              <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                              Add
-                            </button>
-                          ) : (
-                            <div className="flex items-center justify-center rounded-md bg-primary text-primary-content px-2 sm:px-3 py-1 sm:py-1.5 border border-secondary/20">
-                              <button
-                                type="button"
-                                onClick={() => updateQuantity(product.id, -1)}
-                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-secondary hover:text-secondary-content transition-colors"
-                              >
-                                <Minus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                              </button>
-                              <span className="w-6 sm:w-8 text-center text-xs font-bold">{quantity}</span>
-                              <button
-                                type="button"
-                                onClick={() => updateQuantity(product.id, 1)}
-                                className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-md hover:bg-secondary hover:text-secondary-content transition-colors"
-                              >
-                                <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </article>
+                    <ProductCard product={product} />
                   </div>
                 );
               })}

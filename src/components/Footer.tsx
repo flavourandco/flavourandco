@@ -5,7 +5,7 @@ import { media } from "@/lib/media";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-primary-content border-t border-secondary/20 relative overflow-hidden">
+    <footer className="bg-brand-green text-white border-t border-secondary/20 relative overflow-hidden">
       {/* Subtle brand glow in the footer */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute -right-32 -bottom-32 h-96 w-96 rounded-full bg-secondary blur-3xl" />
@@ -15,11 +15,11 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div>
-              <h3 className="text-3xl md:text-4xl text-primary-content font-medium">
+              <h3 className="text-3xl md:text-4xl text-brand-gold font-medium">
                 Join the Family
               </h3>
               <p className="mt-3 max-w-md opacity-80">
-                Subscribe for exclusive offers, seasonal fusion pie releases, and updates from Ash & Simran.
+                Subscribe for exclusive offers, seasonal fusion pie releases, and updates from Simran.
               </p>
             </div>
             <form className="flex flex-col gap-3 sm:flex-row">
@@ -27,11 +27,11 @@ export default function Footer() {
                 type="email"
                 placeholder="Your email address"
                 aria-label="Email address"
-                className="flex-1 border border-secondary/30 bg-primary-content/10 px-5 py-4 text-sm text-primary-content placeholder:text-primary-content/50 outline-none transition-colors focus:border-secondary focus:bg-primary-content/20"
+                className="flex-1 border border-secondary/30 bg-white/10 px-5 py-4 text-sm text-white placeholder:text-white/50 outline-none transition-colors focus:border-secondary focus:bg-white/20"
               />
               <button
                 type="submit"
-                className="bg-secondary px-8 py-4 text-[13px] font-bold uppercase tracking-[0.15em] text-secondary-content hover:bg-base-100 hover:text-primary transition-all duration-300 shadow-md"
+                className="bg-secondary px-8 py-4 text-[13px] font-bold uppercase tracking-[0.15em] text-secondary-content hover:bg-base-100 hover:text-brand-green transition-all duration-300 shadow-md"
               >
                 Subscribe
               </button>
@@ -41,17 +41,17 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 relative z-10">
-        <div className="grid gap-10 md:gap-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <img
-                src={media.logo}
+                src={media.footerLogo}
                 alt="Flavour & Co. Logo"
-                className="h-16 lg:h-20 w-auto object-contain"
+                className="h-32 lg:h-40 w-auto object-contain"
               />
             </div>
             <p className="mt-5 text-sm leading-relaxed opacity-80">
-              Flavour & Co. is us, Ash & Simran. We bake our roots into every pie, delivering delicious Indo-Australian fusion pies Sydney-wide.
+              Flavour & Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian fusion pies Sydney-wide.
             </p>
             <div className="mt-6 flex gap-4">
               <a
@@ -78,8 +78,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Group Quick Links and Contact side-by-side on mobile/tablet, and expand to separate columns on desktop */}
-          <div className="grid grid-cols-2 gap-6 md:col-span-1 lg:contents">
             <div>
               <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
                 Quick Links
@@ -117,26 +115,18 @@ export default function Footer() {
                 </li>
               </ul>
             </div>
-          </div>
 
           <div>
             <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
-              Hours
+              Food Safety
             </h4>
-            <ul className="mt-5 space-y-2 text-sm opacity-80">
-              <li className="flex justify-between border-b border-secondary/10 pb-1">
-                <span>Mon – Fri</span>
-                <span className="font-semibold opacity-100">8am – 6pm</span>
-              </li>
-              <li className="flex justify-between border-b border-secondary/10 pb-1">
-                <span>Saturday</span>
-                <span className="font-semibold opacity-100">9am – 5pm</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Sunday</span>
-                <span className="font-semibold opacity-100">10am – 4pm</span>
-              </li>
-            </ul>
+            <div className="mt-5 bg-white p-4 rounded-xl inline-block shadow-lg w-full max-w-[260px]">
+              <img
+                src="/haccp-aust-cert-black.jpg"
+                alt="HACCP Certified Food Safety Logo"
+                className="w-full h-auto object-contain"
+              />
+            </div>
           </div>
         </div>
 

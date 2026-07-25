@@ -10,9 +10,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Flavour & Co. | Premium Indo-Fusion Artisan Pies by Ash & Simran",
+  title: "Flavour & Co. | Premium Indo-Fusion Artisan Pies by Simran",
   description:
-    "Delicious Indo-Australian fusion pies created by Ash & Simran, showcased on Channel 7's Plate of Origin. Delivered Sydney-wide.",
+    "Delicious Indo-Australian fusion pies created by Simran, showcased on Channel 7's Plate of Origin. Delivered Sydney-wide.",
 };
 
 export default function RootLayout({

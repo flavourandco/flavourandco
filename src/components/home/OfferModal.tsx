@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { X, ShoppingBag, ArrowRight, Truck, Award, Flame } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 import { Fraunces } from "next/font/google";
+import { media } from "@/lib/media";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -39,40 +39,51 @@ export default function OfferModal() {
         aria-hidden="true"
       />
 
-      {/* Modal Container — Wider landscape layout on PC, compact on mobile */}
-      <div className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl overflow-hidden rounded-xl bg-base-100 border-2 border-secondary/30 p-6 sm:p-8 md:p-10 shadow-2xl transition-all transform scale-100 z-10 text-base-content">
-        {/* Square Close Button */}
+      {/* Modal Container — Split-screen layout with left brand-green bg, right cream content */}
+      <div className="relative w-full max-w-lg md:max-w-3xl overflow-hidden rounded-xl bg-cream border border-brand-gold/30 shadow-2xl transition-all transform scale-100 z-10 text-base-content p-0">
+        {/* Rounded Close Button */}
         <button
           onClick={handleClose}
           type="button"
           aria-label="Close offer modal"
-          className="absolute right-3 top-3 sm:right-5 sm:top-5 flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-secondary-content hover:bg-primary hover:text-primary-content transition-all border border-secondary/30 z-30 cursor-pointer shadow-md"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 flex h-8 w-8 items-center justify-center rounded-full bg-[#1b1410]/20 hover:bg-[#1b1410]/40 text-stone-800 transition-all z-30 cursor-pointer shadow-md"
         >
-          <X className="h-4 w-4 stroke-[2.5]" />
+          <X className="h-4.5 w-4.5 stroke-[2.5]" />
         </button>
 
-        {/* Ambient background accent */}
-        <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-secondary/15 blur-3xl pointer-events-none" />
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-0 relative z-10">
+          {/* Left Column: Full Green Background (#07402b) (40% width) */}
+          <div className="md:col-span-4 bg-brand-green flex flex-col items-center justify-center p-8 md:p-12 text-center min-h-[220px] md:min-h-[380px] relative overflow-hidden">
+            {/* Subtle brand gold glow in left background */}
+            <div className="absolute inset-0 opacity-15 pointer-events-none">
+              <div className="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-brand-gold blur-2xl animate-pulse" />
+            </div>
+            
+            <img
+              src={media.footerLogo}
+              alt="Flavour & Co. Logo"
+              className="w-full h-auto max-w-[200px] md:max-w-full object-contain transition-transform duration-500 hover:scale-105 relative z-10"
+            />
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center relative z-10 pt-4 md:pt-2">
-          {/* Left Column: Brand & Title Stack */}
-          <div className="md:col-span-6 text-center md:text-left flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 rounded-md border border-secondary/40 bg-base-200/80 px-3.5 py-1 text-[10px] font-mono font-medium uppercase tracking-[0.25em] text-secondary mb-3 self-center md:self-start">
-              <span className="h-1.5 w-1.5 rounded-full bg-secondary inline-block" />
-              <span>Est. by Ash &amp; Simran</span>
+          {/* Right Column: Coupon & Subscribing details (60% width) */}
+          <div className="md:col-span-6 flex flex-col justify-center p-6 sm:p-8 md:p-10 text-center md:text-left bg-cream">
+            <div className="inline-flex items-center gap-2 rounded-md border border-brand-gold/40 bg-base-200/80 px-3 py-1 text-[9px] font-mono font-medium uppercase tracking-[0.2em] text-[#6b1e30] mb-3 self-center md:self-start">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#6b1e30] inline-block animate-pulse" />
+              <span>Pie Club Exclusive</span>
             </div>
 
             <h2
               style={{ fontFamily: "var(--font-fraunces-modal, 'Fraunces', serif)" }}
-              className="text-2xl sm:text-3xl md:text-3.5xl font-semibold leading-[1.1] tracking-tight text-primary uppercase"
+              className="text-2xl sm:text-3xl md:text-3.5xl font-semibold leading-[1.1] tracking-tight text-brand-green uppercase"
             >
-              Handcrafted <span className="italic font-medium text-secondary">Fusion</span>
-              <span className="block font-bold mt-0.5 text-primary">Artisan Pies</span>
+              Get <span className="text-[#6b1e30] italic font-medium">10% Off</span>
+              <span className="block font-bold mt-1 text-brand-green">Your First Order</span>
             </h2>
 
-            {/* HomeHero crimp divider */}
+            {/* Crimp Divider Line in Gold */}
             <div className="flex justify-center md:justify-start mt-3 mb-2">
-              <svg className="h-3 w-40 text-secondary" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true">
+              <svg className="h-3 w-40 text-brand-gold" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true">
                 <path
                   d="M0,6 Q10,0 20,6 T40,6 T60,6 T80,6 T100,6 T120,6 T140,6 T160,6 T180,6 T200,6"
                   fill="none"
@@ -82,85 +93,40 @@ export default function OfferModal() {
               </svg>
             </div>
 
-            <p className="text-xs sm:text-sm text-base-content/80 max-w-sm mx-auto md:mx-0 leading-relaxed mt-2">
-              Slow-cooked Indian spiced curries wrapped in 100% all-butter Australian flaky pastry.
+            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mt-2 font-medium">
+              Join the Flavour &amp; Co. family! Subscribe to our newsletter to receive a <span className="text-[#6b1e30] font-extrabold">10% discount code</span> on your first box of handcrafted Indo-Australian fusion pies.
             </p>
 
-            <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.15em] text-base-content/60">
-              <span>Cardamom</span>
-              <span className="text-secondary">·</span>
-              <span>Ghee</span>
-              <span className="text-secondary">·</span>
-              <span>Golden Flaky Pastry</span>
-            </div>
-          </div>
-
-          {/* Right Column: Value Highlights & Action Buttons */}
-          <div className="md:col-span-6 flex flex-col justify-between h-full space-y-4 pt-4 md:pt-6 md:pr-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3.5 rounded-md bg-base-200/70 p-3 border border-secondary/20 transition-all hover:border-secondary/40">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-content">
-                  <Truck className="h-4 w-4" />
-                </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-                    Free Express Delivery
-                  </h4>
-                  <p className="text-[11px] opacity-75">
-                    Fresh temperature-controlled Sydney delivery on orders over $100
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 rounded-md bg-base-200/70 p-3 border border-secondary/20 transition-all hover:border-secondary/40">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-content">
-                  <Award className="h-4 w-4" />
-                </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-                    Channel 7 Featured
-                  </h4>
-                  <p className="text-[11px] opacity-75">
-                    Award-winning recipes showcased on TV&apos;s Plate of Origin
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 rounded-md bg-base-200/70 p-3 border border-secondary/20 transition-all hover:border-secondary/40">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-content">
-                  <Flame className="h-4 w-4" />
-                </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-                    Baked Fresh Daily
-                  </h4>
-                  <p className="text-[11px] opacity-75">
-                    Crafted in small batches &amp; delivered ready to heat and savor
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="pt-1 flex flex-col gap-2">
-              <Link
-                href="/shop"
-                onClick={handleClose}
-                className="group flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-primary-content shadow-lg hover:bg-secondary hover:text-secondary-content transition-all duration-300"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                <span>Order Fresh Pies Now</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert("Welcome to the family! Use discount code: PIECLUB10 at checkout to get 10% off.");
+                handleClose();
+              }}
+              className="mt-5 space-y-3"
+            >
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                required
+                className="w-full px-4 py-3 text-xs sm:text-sm rounded-md border border-secondary/30 bg-white focus:outline-none focus:border-brand-green text-stone-800 placeholder:text-stone-400 shadow-sm"
+              />
               <button
-                onClick={handleClose}
-                type="button"
-                className="w-full text-center text-[11px] font-medium opacity-60 hover:opacity-100 transition-colors py-1 cursor-pointer"
+                type="submit"
+                className="w-full bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold uppercase tracking-wider py-3 px-6 rounded-md text-[10px] sm:text-xs transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2"
               >
-                No thanks, I will browse first
+                <span>Subscribe &amp; Claim 10% Off</span>
+                <ArrowRight className="h-4 w-4" />
               </button>
-            </div>
+            </form>
+
+            <button
+              onClick={handleClose}
+              type="button"
+              className="mt-4 text-center md:text-left text-[11px] font-medium opacity-60 hover:opacity-100 transition-colors py-1 cursor-pointer"
+            >
+              No thanks, I will browse first
+            </button>
           </div>
         </div>
       </div>

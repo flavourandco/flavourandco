@@ -47,7 +47,7 @@ export default function HomeAbout() {
       <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-20 lg:px-10">
         <div className="about-text">
           <p className="text-[12px] font-bold uppercase tracking-[0.3em] text-secondary">
-            About Flavour & Co.
+            Our Story
           </p>
           <h2 className="mt-4 font-fraunces text-[clamp(2.25rem,4.5vw,3.5rem)] font-semibold leading-[1.08] tracking-tight text-primary">
             Taste the Magic,
@@ -55,7 +55,7 @@ export default function HomeAbout() {
             Made with <span className="italic font-medium text-secondary">Love</span>.
           </h2>
           <p className="mt-6 text-lg leading-relaxed opacity-85 font-medium">
-            Flavour & Co. is us, Ash & Simran, a husband and wife whose love of Indian cuisine inspired these unique fusion pies, showcased on Channel 7&apos;s Plate of Origin.
+            Flavour & Co. is founded by Simran, whose love of Indian cuisine inspired these unique fusion pies, showcased on Channel 7&apos;s Plate of Origin.
           </p>
           <p className="mt-4 text-base leading-relaxed opacity-70">
             Having grown up abroad after leaving India, we wanted our kids to grow up with the flavours we hold dear — so we baked our roots into every single pie.

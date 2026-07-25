@@ -1,7 +1,9 @@
 // Media asset registry for Flavour & Co.
 
 export const media = {
-  logo: "/brand_logo.png",
+  logo: "/navbar_brand_logo.png",
+  navbarLogo: "/navbar_brand_logo.png",
+  footerLogo: "/footer_brand_logo.png",
   heroVideo: "/pies.mp4",
   
   // Local high-quality pie and bakery images from /products/
@@ -20,8 +22,8 @@ export const media = {
   },
 
   about: {
-    kitchen: "/products/PHOTOS_Flavour&Co-4.jpg",
-    baker: "/products/PHOTOS_Flavour&Co-5.jpg",
+    kitchen: "/founder/simran-kitchen.jpg",
+    baker: "/founder/simran-kitchen.jpg",
   }
 } as const;
 

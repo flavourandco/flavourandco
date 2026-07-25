@@ -1,85 +1,203 @@
+"use client";
+
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import { products } from "@/lib/data";
+import ProductCard from "@/components/ProductCard";
 
 export default function Products() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [maxPrice, setMaxPrice] = useState<number>(90);
+  const [sortBy, setSortBy] = useState<string>("recommended");
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
+
+  // Filter & Sort Logic
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Category Filter
+    if (selectedCategory === "freshly-baked") {
+      result = result.filter(p => !p.id.includes("mini") && p.id !== "grazing-boxes");
+    } else if (selectedCategory === "frozen") {
+      result = result.filter(p => p.id.includes("mini"));
+    } else if (selectedCategory === "grazing-box") {
+      result = result.filter(p => p.id === "grazing-boxes");
+    }
+
+    // Price Filter
+    result = result.filter(p => p.price <= maxPrice);
+
+    // Sorting
+    if (sortBy === "price-asc") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-desc") {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [selectedCategory, maxPrice, sortBy]);
+
   return (
-    <section className="bg-cream py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-brand-gold">
-            Our Collection
-          </p>
-          <h2 className="mt-4 font-serif text-4xl font-light tracking-tight text-brand-green md:text-5xl">
-            Our Indo-Australian Pies
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-stone-500">
-            Handcrafted fusion pies by Ash & Simran, showcased on Channel 7&apos;s Plate of Origin. Delivered Sydney-wide.
-          </p>
+    <section className="bg-cream pt-0 pb-16 md:pb-24">
+      {/* Banner Image - Full Screen Width, Thinner Height, No Rounded Corners */}
+      <div className="w-full relative h-48 md:h-64 lg:h-72 overflow-hidden shadow-md">
+        <Image
+          src="/product-page-banner.jpg"
+          alt="Flavour & Co. Product Selection Banner"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07402b]/20 to-transparent" />
+      </div>
+
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-10">
+        {/* Main Header */}
+        <div className="text-left mb-10 pb-6 border-b border-[#c69c40]/25">
+          <h1 className="font-serif text-3xl md:text-4xl text-brand-green font-bold uppercase tracking-wider">
+            All Products
+          </h1>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product, index) => (
-            <article
-              key={product.id}
-              className="group relative flex flex-col overflow-hidden bg-white border border-brand-gold/20 transition-all duration-500 hover:-translate-y-1"
-              style={{ animationDelay: `${index * 100}ms` }}
+        {/* 2-Column Grid: Sidebar (3 cols) + Product Grid (9 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Mobile Filter Trigger */}
+          <div className="lg:hidden flex items-center justify-between w-full mb-4 bg-white border border-brand-gold/25 p-4 rounded-lg shadow-sm">
+            <button
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-green"
             >
-              <div className="relative aspect-[4/5] overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                <span className="absolute left-4 top-4 bg-brand-green/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold rounded-md">
-                  {product.badge}
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>{isMobileFilterOpen ? "Hide Filters" : "Show Filters"}</span>
+            </button>
+            <span className="text-xs font-bold text-stone-500 uppercase tracking-wide">
+              {filteredProducts.length} Products
+            </span>
+          </div>
+
+          {/* Left Column: Filter Sidebar */}
+          <aside className={`lg:col-span-3 lg:sticky lg:top-32 space-y-8 ${isMobileFilterOpen ? "block" : "hidden lg:block"} bg-white p-6 rounded-lg border border-brand-gold/25 shadow-sm`}>
+            
+            <div className="flex items-center justify-between pb-4 border-b border-brand-gold/15">
+              <h3 className="font-serif text-xl text-brand-green font-semibold">Filter by</h3>
+              <button 
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setMaxPrice(90);
+                  setSortBy("recommended");
+                }}
+                className="text-[10px] font-bold uppercase tracking-wider text-[#6b1e30] hover:text-brand-gold transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+
+            {/* Price Filter */}
+            <div className="pb-6 border-b border-brand-gold/15">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-brand-green mb-4">Price (AUD)</h4>
+              <input
+                type="range"
+                min="18"
+                max="90"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full accent-brand-gold cursor-pointer"
+              />
+              <div className="flex justify-between items-center text-xs mt-2 text-stone-500 font-bold">
+                <span>A$18</span>
+                <span className="text-brand-green bg-[#6b1e30]/5 border border-[#6b1e30]/15 px-2.5 py-0.5 rounded font-mono">
+                  Up to A${maxPrice}
                 </span>
+                <span>A$90</span>
+              </div>
+            </div>
+
+            {/* Browse Categories */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-brand-green mb-4">Browse by</h4>
+              <div className="space-y-2.5">
+                {[
+                  { id: "all", label: "All Products" },
+                  { id: "freshly-baked", label: "Freshly Baked (Packs of 2)" },
+                  { id: "frozen", label: "Frozen Party Packs (12s)" },
+                  { id: "grazing-box", label: "Grazing Boxes" },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`w-full text-left text-xs py-2.5 px-3.5 rounded-md transition-all duration-300 font-bold uppercase tracking-wider border ${
+                      selectedCategory === cat.id
+                        ? "bg-brand-green text-cream border-brand-green shadow-sm"
+                        : "bg-white text-stone-600 border-brand-gold/15 hover:border-brand-gold hover:text-brand-green"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </aside>
+
+          {/* Right Column: Sorting Header + Product Cards Grid */}
+          <div className="lg:col-span-9 space-y-6">
+            
+            {/* Sorting Header (Desktop Only) */}
+            <div className="hidden lg:flex items-center justify-between pb-4 border-b border-brand-gold/15">
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">
+                Showing {filteredProducts.length} of {products.length} products
+              </span>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Sort by:</span>
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none bg-white border border-brand-gold/25 rounded-md py-1.5 pl-3 pr-8 text-xs font-bold uppercase tracking-wider text-brand-green focus:outline-none focus:border-brand-gold cursor-pointer"
+                  >
+                    <option value="recommended">Recommended</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-500 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Product Grid */}
+            {filteredProducts.length > 0 ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white border border-brand-gold/25 rounded-lg">
+                <p className="text-stone-500 font-bold uppercase tracking-wider text-sm">
+                  No products match your selected filters.
+                </p>
                 <button
-                  type="button"
-                  aria-label={`Add ${product.name} to cart`}
-                  className="absolute bottom-4 right-4 flex h-12 w-12 translate-y-4 items-center justify-center bg-brand-gold text-brand-green opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 hover:bg-brand-gold/90 rounded-md"
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setMaxPrice(90);
+                    setSortBy("recommended");
+                  }}
+                  className="mt-4 inline-flex items-center gap-2 rounded-md bg-brand-green hover:bg-[#6b1e30] text-cream hover:text-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 shadow-md"
                 >
-                  <Plus className="h-5 w-5" />
+                  Reset All Filters
                 </button>
               </div>
+            )}
 
-              <div className="flex flex-1 flex-col p-6 md:p-8">
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="font-serif text-xl text-brand-green md:text-2xl">
-                    {product.name}
-                  </h3>
-                  <p className="shrink-0 font-medium text-brand-gold">
-                    ${product.price.toFixed(2)}
-                  </p>
-                </div>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-stone-500">
-                  {product.description}
-                </p>
-                <Link
-                  href={`/shop/${product.id}`}
-                  className="mt-6 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.15em] text-brand-green transition-colors hover:text-brand-gold"
-                >
-                  View Details
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </article>
-          ))}
+          </div>
+
         </div>
 
-        <div className="mt-16 text-center">
-          <Link
-            href="/shop"
-            className="inline-flex items-center gap-3 border border-brand-green px-10 py-4 text-[13px] font-semibold uppercase tracking-[0.15em] text-brand-green transition-all hover:bg-brand-green hover:text-white rounded-md"
-          >
-            View All Products
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
       </div>
     </section>
   );
