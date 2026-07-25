@@ -14,32 +14,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   
   const product = products.find((p) => p.id === productId);
 
-  // Computed variables for flexible product schemas
-  const option1Choices = product?.variants && product.variants.length > 0
+  // Servings options (Pack of 2, Pack of 6)
+  const servingsOptions = product?.variants && product.variants.length > 0
     ? product.variants
-    : (product?.option1Choices ?? []);
-  
-  const option1Name = product?.option1Name ?? "Serving Size";
+    : [
+        { name: "Pack of 2", price: product?.price ?? 22.99 },
+        { name: "Pack of 6", price: (product?.price ?? 22.99) * 2.8 }
+      ];
 
-  const option2Choices = product?.option2Choices && product.option2Choices.length > 0
-    ? product.option2Choices
-    : (product?.category === "frozen" ? ["Frozen"] : ["Freshly Baked", "Frozen"]);
-  
-  const option2Name = product?.option2Name ?? "Freshly Baked or Frozen";
+  // Preparation options (Freshly Baked, Frozen)
+  const preparationOptions = product?.preparationOptions && product.preparationOptions.length > 0
+    ? product.preparationOptions
+    : ["Freshly Baked", "Frozen"];
 
   // States
-  const [selectedOption1Idx, setSelectedOption1Idx] = useState<number>(0);
-  const [selectedOption2, setSelectedOption2] = useState<string>("");
+  const [selectedServingIdx, setSelectedServingIdx] = useState<number>(0);
+  const [selectedPreparation, setSelectedPreparation] = useState<string>("Freshly Baked");
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
-
-  // Initialize selectedOption2 once options are computed
-  useState(() => {
-    if (option2Choices.length > 0) {
-      setSelectedOption2(option2Choices[0]);
-    }
-  });
 
   if (!product) {
     return (
@@ -54,7 +47,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     );
   }
 
-  const currentPrice = option1Choices[selectedOption1Idx]?.price ?? product.price;
+  const currentPrice = servingsOptions[selectedServingIdx]?.price ?? product.price;
   const totalPrice = currentPrice * quantity;
 
   return (
@@ -161,18 +154,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
 
-              {/* Option 1 Option Selector (Serving Size / Option choice) */}
+              {/* Servings Selector (Pack of 2, Pack of 6) */}
               <div className="space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
-                  {option1Name} *
+                  Servings *
                 </span>
                 <div className="flex flex-wrap gap-2.5">
-                  {option1Choices.map((choice, i) => (
+                  {servingsOptions.map((choice, i) => (
                     <button
                       key={choice.name}
-                      onClick={() => setSelectedOption1Idx(i)}
+                      onClick={() => setSelectedServingIdx(i)}
                       className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border transition-all duration-300 cursor-pointer ${
-                        selectedOption1Idx === i
+                        selectedServingIdx === i
                           ? "bg-[#07402b] text-cream border-[#07402b] shadow-sm scale-[1.02]"
                           : "bg-white text-stone-600 border-[#c69c40]/20 hover:border-[#c69c40]"
                       }`}
@@ -183,23 +176,23 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
 
-              {/* Option 2 Option Selector (Freshly Baked or Frozen Selection) */}
+              {/* Preparation Selector (Freshly Baked or Frozen) */}
               <div className="space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
-                  {option2Name} *
+                  Preparation *
                 </span>
                 <div className="flex flex-wrap gap-2.5">
-                  {option2Choices.map((choice) => (
+                  {preparationOptions.map((prep) => (
                     <button
-                      key={choice}
-                      onClick={() => setSelectedOption2(choice)}
+                      key={prep}
+                      onClick={() => setSelectedPreparation(prep)}
                       className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border transition-all duration-300 cursor-pointer ${
-                        selectedOption2 === choice
+                        selectedPreparation === prep
                           ? "bg-[#07402b] text-cream border-[#07402b] shadow-sm scale-[1.02]"
                           : "bg-white text-stone-600 border-[#c69c40]/20 hover:border-[#c69c40]"
                       }`}
                     >
-                      {choice}
+                      {prep}
                     </button>
                   ))}
                 </div>
@@ -236,7 +229,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 <Button
                   onClick={() =>
                     alert(
-                      `Added ${quantity}x ${product.name} (${option1Choices[selectedOption1Idx]?.name}, ${selectedOption2}) to cart!`
+                      `Added ${quantity}x ${product.name} (${servingsOptions[selectedServingIdx]?.name}, ${selectedPreparation}) to cart!`
                     )
                   }
                   variant="primary"
@@ -249,7 +242,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 <Button
                   onClick={() =>
                     alert(
-                      `Proceeding to checkout with ${quantity}x ${product.name} (${option1Choices[selectedOption1Idx]?.name}, ${selectedOption2})...`
+                      `Proceeding to checkout with ${quantity}x ${product.name} (${servingsOptions[selectedServingIdx]?.name}, ${selectedPreparation})...`
                     )
                   }
                   variant="secondary"
