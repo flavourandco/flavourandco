@@ -18,12 +18,8 @@ export default function Products() {
     let result = [...products];
 
     // Category Filter
-    if (selectedCategory === "freshly-baked") {
-      result = result.filter(p => !p.id.includes("mini") && p.id !== "grazing-boxes");
-    } else if (selectedCategory === "frozen") {
-      result = result.filter(p => p.id.includes("mini"));
-    } else if (selectedCategory === "grazing-box") {
-      result = result.filter(p => p.id === "grazing-boxes");
+    if (selectedCategory !== "all") {
+      result = result.filter(p => p.category === selectedCategory);
     }
 
     // Price Filter

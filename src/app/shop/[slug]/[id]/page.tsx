@@ -124,14 +124,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                     ? "Frozen Packs"
                     : "Grazing Box"}
                 </span>
-                {product.badge && (
+                {(product.badge || product.isBestSeller || product.isNewArrival) && (
                   <span
                     className="inline-block text-[8px] sm:text-[9px] font-serif font-bold uppercase tracking-wider text-white bg-[#07402b] px-3.5 py-1"
                     style={{
                       clipPath: "polygon(6% 0%, 94% 0%, 100% 25%, 94% 50%, 100% 75%, 94% 100%, 6% 100%, 0% 75%, 6% 50%, 0% 25%)"
                     }}
                   >
-                    {product.badge}
+                    {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
                   </span>
                 )}
               </div>

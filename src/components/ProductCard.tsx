@@ -47,9 +47,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         />
 
         {/* Bold Badge for Shop */}
-        {product.badge && (
+        {(product.badge || product.isBestSeller || product.isNewArrival) && (
           <span className="absolute top-3 left-3 text-[10px] font-sans font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3.5 py-1.5 rounded-full border border-[#c69c40]/40 shadow-md z-10">
-            {product.badge}
+            {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
           </span>
         )}
 

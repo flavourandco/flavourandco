@@ -48,9 +48,9 @@ export interface Product {
   variants: ProductVariant[];
   
   // Backward compatibility support for navigation/carousel routing
-  isFeatured?: boolean;
-  isBestSeller?: boolean;
-  isNewArrival?: boolean;
+  isFeatured: boolean;
+  isBestSeller: boolean;
+  isNewArrival: boolean;
   option1Name?: string;
   option1Choices?: ProductVariant[];
   option2Name?: string;
@@ -69,6 +69,7 @@ export const products: Product[] = [
     category: "frozen",
     isFeatured: true,
     isBestSeller: true,
+    isNewArrival: false,
     variants: [
       { name: "Single Pack (12 Pies)", price: 34.99 },
       { name: "Party Pack (24 Pies)", price: 59.99 }
@@ -83,6 +84,8 @@ export const products: Product[] = [
     images: ["/products/PHOTOS_Flavour&Co-6.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
     category: "frozen",
     isFeatured: false,
+    isBestSeller: false,
+    isNewArrival: false,
     variants: [
       { name: "Single Pack (12 Pies)", price: 27.99 },
       { name: "Party Pack (24 Pies)", price: 49.99 }
@@ -97,6 +100,8 @@ export const products: Product[] = [
     images: ["/products/PHOTOS_Flavour&Co-5.jpg", "/products/PHOTOS_Flavour&Co-4.jpg"],
     category: "frozen",
     isFeatured: true,
+    isBestSeller: false,
+    isNewArrival: false,
     variants: [
       { name: "Single Pack (12 Pies)", price: 34.99 },
       { name: "Party Pack (24 Pies)", price: 59.99 }
@@ -110,8 +115,9 @@ export const products: Product[] = [
     image: "/products/PHOTOS_Flavour&Co-6.jpg",
     images: ["/products/PHOTOS_Flavour&Co-6.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
     category: "freshly-baked",
-    isNewArrival: true,
     isFeatured: false,
+    isBestSeller: false,
+    isNewArrival: true,
     variants: [
       { name: "Single Serving (Pack of 2)", price: 18.99 },
       { name: "Family Serving (Pack of 4)", price: 32.99 }
@@ -126,8 +132,9 @@ export const products: Product[] = [
     images: ["/products/PHOTOS_Flavour&Co-3.jpg", "/products/PHOTOS_Flavour&Co-8.jpg"],
     badge: "220g",
     category: "freshly-baked",
-    isBestSeller: true,
     isFeatured: true,
+    isBestSeller: true,
+    isNewArrival: false,
     variants: [
       { name: "Single Serving (Pack of 2)", price: 22.99 },
       { name: "Family Serving (Pack of 4)", price: 39.99 }
@@ -142,8 +149,9 @@ export const products: Product[] = [
     images: ["/products/PHOTOS_Flavour&Co-5.jpg", "/products/PHOTOS_Flavour&Co-4.jpg"],
     badge: "220g",
     category: "freshly-baked",
-    isBestSeller: true,
     isFeatured: true,
+    isBestSeller: true,
+    isNewArrival: false,
     variants: [
       { name: "Single Serving (Pack of 2)", price: 22.99 },
       { name: "Family Serving (Pack of 4)", price: 39.99 }
@@ -158,6 +166,8 @@ export const products: Product[] = [
     images: ["/products/PHOTOS_Flavour&Co-7.jpg", "/products/PHOTOS_Flavour&Co-9.jpg"],
     category: "grazing-box",
     isFeatured: true,
+    isBestSeller: false,
+    isNewArrival: false,
     variants: [
       { name: "Standard Box", price: 75.00 },
       { name: "Deluxe Feast Box", price: 135.00 }
