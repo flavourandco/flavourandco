@@ -3,43 +3,58 @@
 import { use, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Minus, Plus, ShoppingBag, ArrowLeft, Heart, Share2 } from "lucide-react";
+import {
+  Star,
+  Minus,
+  Plus,
+  ShoppingBag,
+  ArrowLeft,
+  Heart,
+  Share2,
+  CheckCircle2,
+  Truck,
+  Sparkles,
+  Flame,
+  ShieldCheck,
+  Package,
+  Zap,
+} from "lucide-react";
 import { products } from "@/lib/data";
 import PageLayout from "@/components/PageLayout";
 import Button from "@/components/Button";
 
-export default function ProductDetailPage({ params }: { params: Promise<{ slug: string; id: string }> }) {
+export default function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string; id: string }>;
+}) {
   const resolvedParams = use(params);
   const productId = resolvedParams.id;
-  
+
   const product = products.find((p) => p.id === productId);
 
-  // Servings options (Pack of 2, Pack of 6)
-  const servingsOptions = product?.variants && product.variants.length > 0
-    ? product.variants
-    : [
-        { name: "Pack of 2", price: product?.price ?? 22.99 },
-        { name: "Pack of 6", price: (product?.price ?? 22.99) * 2.8 }
-      ];
-
-  // Preparation options (Freshly Baked, Frozen)
-  const preparationOptions = product?.preparationOptions && product.preparationOptions.length > 0
-    ? product.preparationOptions
-    : ["Freshly Baked", "Frozen"];
-
   // States
-  const [selectedServingIdx, setSelectedServingIdx] = useState<number>(0);
-  const [selectedPreparation, setSelectedPreparation] = useState<string>("Freshly Baked");
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState<number>(0);
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
 
   if (!product) {
     return (
-      <PageLayout title="Product Not Found" subtitle="Please check the URL or head back to the shop." fullWidth hideHeader={true}>
+      <PageLayout
+        title="Product Not Found"
+        subtitle="Please check the URL or head back to the shop."
+        fullWidth
+        hideHeader={true}
+      >
         <div className="bg-cream text-stone-800 min-h-[60vh] flex flex-col items-center justify-center text-center p-8">
-          <h2 className="font-serif text-3xl font-bold text-[#6b1e30] mb-4">We couldn&apos;t find this product</h2>
-          <Link href="/shop" className="inline-flex items-center gap-2 rounded-md bg-[#6b1e30] hover:bg-[#07402b] text-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 shadow-md">
+          <h2 className="font-serif text-3xl font-bold text-[#6b1e30] mb-4">
+            We couldn&apos;t find this product
+          </h2>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 rounded-md bg-[#6b1e30] hover:bg-[#07402b] text-white px-8 py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 shadow-md"
+          >
             Back to Shop
           </Link>
         </div>
@@ -47,239 +62,401 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     );
   }
 
-  const currentPrice = servingsOptions[selectedServingIdx]?.price ?? product.price;
-  const totalPrice = currentPrice * quantity;
+  // Active Variant & Unit Price (Static unit price display, does not multiply by quantity)
+  const activeVariant = product.variants?.[selectedVariantIdx];
+  const unitPrice = activeVariant ? activeVariant.price : product.price;
 
   return (
     <PageLayout title={product.name} subtitle="" fullWidth hideHeader={true}>
-      <div className="bg-cream text-stone-800 min-h-screen py-12 md:py-20 px-6 lg:px-8">
+      <div className="bg-cream text-stone-800 min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          
-          {/* Back button */}
-          <Link
-            href="/shop"
-            className="inline-flex items-center gap-2 text-[#6b1e30] hover:text-[#07402b] transition-colors text-xs font-bold uppercase tracking-wider mb-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Shop</span>
-          </Link>
+          {/* Top Breadcrumb Navigation */}
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#c69c40]/20">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 text-[#6b1e30] hover:text-[#07402b] transition-colors text-xs font-extrabold uppercase tracking-wider"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to All Products</span>
+            </Link>
+            <div className="flex items-center gap-2 text-xs text-stone-500 font-medium">
+              <Link href="/shop" className="hover:text-[#6b1e30]">
+                Shop
+              </Link>
+              <span>/</span>
+              <span className="capitalize">{product.category.replace("-", " ")}</span>
+              <span>/</span>
+              <span className="text-[#07402b] font-semibold truncate max-w-[140px] sm:max-w-none">
+                {product.name}
+              </span>
+            </div>
+          </div>
 
-          {/* Dynamic Details Layout Grid */}
-          <div className="grid gap-12 lg:grid-cols-12 items-start mt-6">
+          {/* Main Grid: STABLE Left Column (Image & Side-by-Side CTAs) vs SCROLLABLE Right Column (Details) */}
+          <div className="grid gap-8 lg:gap-10 lg:grid-cols-12 items-start">
             
-            {/* Left: Image Column (6 cols) */}
-            <div className="lg:col-span-6 flex flex-col md:flex-row gap-4 items-start">
+            {/* ───────────────────────────────────────────────────────────
+                LEFT COLUMN: Image Gallery & Side-by-Side Action CTAs (STABLE/STICKY)
+               ─────────────────────────────────────────────────────────── */}
+            <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4">
               
-              {/* Thumbnails vertical block */}
-              <div className="flex flex-row md:flex-col gap-3 shrink-0 order-last md:order-first w-full md:w-auto">
-                {product.images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImageIdx(i)}
-                    className={`relative h-16 w-16 overflow-hidden rounded-md border-2 transition-all cursor-pointer ${
-                      activeImageIdx === i
-                        ? "border-[#c69c40] scale-105"
-                        : "border-[#c69c40]/20 hover:border-[#c69c40]/60"
-                    }`}
-                    aria-label={`Switch to product image ${i + 1}`}
-                  >
-                    <Image
-                      src={img}
-                      alt={`${product.name} thumbnail ${i + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
+              {/* Product Images Container */}
+              <div className="space-y-3">
+                {/* Main Image Display */}
+                <div className="relative aspect-[4/3] sm:aspect-square sm:max-h-[380px] w-full overflow-hidden rounded-md border border-[#c69c40]/20 shadow-sm bg-white group">
+                  <Image
+                    src={product.images[activeImageIdx] || product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-all duration-500 group-hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 35vw"
+                    priority
+                  />
+                  {/* Category & Badge Overlay */}
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
+                    {product.badge && (
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3 py-1 rounded shadow-sm">
+                        {product.badge}
+                      </span>
+                    )}
+                    {product.isBestSeller && (
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-white bg-[#07402b] px-3 py-1 rounded shadow-sm">
+                        Best Seller
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Thumbnails Row */}
+                {product.images.length > 1 && (
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                    {product.images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImageIdx(i)}
+                        className={`relative h-14 w-14 shrink-0 overflow-hidden rounded border transition-all cursor-pointer ${
+                          activeImageIdx === i
+                            ? "border-[#6b1e30] ring-1 ring-[#6b1e30] scale-105 shadow-sm"
+                            : "border-[#c69c40]/20 hover:border-[#c69c40] opacity-75 hover:opacity-100"
+                        }`}
+                        aria-label={`Switch to photo ${i + 1}`}
+                      >
+                        <Image
+                          src={img}
+                          alt={`${product.name} thumbnail ${i + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Big Main Image display */}
-              <div className="relative aspect-square flex-1 w-full overflow-hidden rounded-xl border border-[#c69c40]/25 shadow-md bg-white">
-                <Image
-                  src={product.images[activeImageIdx]}
-                  alt={product.name}
-                  fill
-                  className="object-cover animate-fadeIn"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  priority
-                />
+              {/* Side-by-Side Action Buttons & Perks Container */}
+              <div className="bg-white rounded-md border border-[#c69c40]/20 p-4 shadow-sm space-y-4">
+                {/* Add to Cart & Buy Now side-by-side */}
+                <div className="flex flex-row gap-3">
+                  <Button
+                    onClick={() =>
+                      alert(
+                        `Added ${quantity}x ${product.name} (${activeVariant?.name || "Standard"}) to cart!`
+                      )
+                    }
+                    variant="primary"
+                    className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
+                  >
+                    <ShoppingBag className="h-4 w-4 shrink-0" />
+                    <span className="truncate">Add to Cart</span>
+                  </Button>
+
+                  <Button
+                    onClick={() =>
+                      alert(
+                        `Proceeding to checkout with ${quantity}x ${product.name} (${activeVariant?.name || "Standard"})!`
+                      )
+                    }
+                    variant="secondary"
+                    className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
+                  >
+                    <Zap className="h-3.5 w-3.5 fill-current shrink-0" />
+                    <span className="truncate">Buy Now</span>
+                  </Button>
+                </div>
+
+                {/* Wishlist & Share buttons */}
+                <div className="flex items-center justify-around pt-2 border-t border-stone-100 text-xs font-semibold text-stone-600">
+                  <button
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className="inline-flex items-center gap-1.5 hover:text-[#6b1e30] transition-colors cursor-pointer py-0.5"
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${
+                        isWishlisted ? "fill-[#6b1e30] text-[#6b1e30]" : "text-stone-400"
+                      }`}
+                    />
+                    <span>{isWishlisted ? "Saved" : "Add to Wishlist"}</span>
+                  </button>
+
+                  <div className="h-3.5 w-px bg-stone-200" />
+
+                  <button
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert("Product link copied to clipboard!");
+                      }
+                    }}
+                    className="inline-flex items-center gap-1.5 hover:text-[#6b1e30] transition-colors cursor-pointer py-0.5"
+                  >
+                    <Share2 className="h-4 w-4 text-stone-400" />
+                    <span>Share</span>
+                  </button>
+                </div>
+
+                {/* Perks Banner */}
+                <div className="bg-cream/60 rounded p-3 border border-[#c69c40]/15 space-y-2 text-[11px] text-stone-700">
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-3.5 w-3.5 text-[#07402b] shrink-0" />
+                    <span><strong>Sydney-Wide Delivery</strong> (Fresh & Frozen)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Flame className="h-3.5 w-3.5 text-[#6b1e30] shrink-0" />
+                    <span><strong>Oven & Air Fryer Ready</strong> in minutes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#c69c40] shrink-0" />
+                    <span><strong>No Artificial Preservatives</strong></span>
+                  </div>
+                </div>
+
               </div>
 
             </div>
 
-            {/* Right: Option Selectors & Descriptions Column (6 cols) */}
-            <div className="lg:col-span-6 text-left space-y-6 lg:pl-4">
+            {/* ───────────────────────────────────────────────────────────
+                RIGHT COLUMN: Header, Top Price & Quantity, Clean Minimal Sections (SCROLABLE)
+               ─────────────────────────────────────────────────────────── */}
+            <div className="lg:col-span-7 xl:col-span-7 space-y-6">
               
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-[0.25em] text-[#6b1e30] bg-[#6b1e30]/5 px-3 py-1 rounded border border-[#6b1e30]/15">
-                  {product.category === "freshly-baked"
-                    ? "Freshly Baked"
-                    : product.category === "frozen"
-                    ? "Frozen Packs"
-                    : "Grazing Box"}
-                </span>
-                {(product.badge || product.isBestSeller || product.isNewArrival) && (
-                  <span
-                    className="inline-block text-[8px] sm:text-[9px] font-serif font-bold uppercase tracking-wider text-white bg-[#07402b] px-3.5 py-1"
-                    style={{
-                      clipPath: "polygon(6% 0%, 94% 0%, 100% 25%, 94% 50%, 100% 75%, 94% 100%, 6% 100%, 0% 75%, 6% 50%, 0% 25%)"
-                    }}
-                  >
-                    {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
+              {/* Product Header Title & Category */}
+              <div className="space-y-2.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#6b1e30] bg-[#6b1e30]/10 px-2.5 py-0.5 rounded border border-[#6b1e30]/20">
+                    {product.category === "freshly-baked"
+                      ? "Freshly Baked"
+                      : product.category === "frozen"
+                      ? "Frozen Packs"
+                      : "Grazing Box"}
                   </span>
+                </div>
+
+                <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#07402b] leading-tight">
+                  {product.name}
+                </h1>
+
+                {product.tagline && (
+                  <p className="font-serif text-base italic text-[#6b1e30] font-medium">
+                    &ldquo;{product.tagline}&rdquo;
+                  </p>
                 )}
-              </div>
-              <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-[#07402b] leading-tight mt-4">
-                {product.name}
-              </h1>
 
-              {/* Price & Rating */}
-              <div className="flex flex-wrap items-center gap-6 py-2 border-y border-[#c69c40]/25">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3.5xl font-extrabold font-mono text-[#6b1e30] leading-none">
-                    A${totalPrice.toFixed(2)}
+                {/* Rating & Review Summary */}
+                <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center gap-0.5 text-brand-gold">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-3.5 w-3.5 fill-brand-gold text-brand-gold"
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-stone-800">5.0</span>
+                  <span className="text-xs text-stone-300">•</span>
+                  <span className="text-xs text-stone-500 font-semibold underline cursor-pointer">
+                    Verified Customer Reviews
                   </span>
-                  {quantity > 1 && (
-                    <span className="text-xs font-mono opacity-65">
-                      (A${currentPrice.toFixed(2)} each)
+                </div>
+              </div>
+
+              {/* ───────────────────────────────────────────────────────────
+                  PRICE & QUANTITY AT TOP RIGHT (Clean subtle box, static price)
+                 ─────────────────────────────────────────────────────────── */}
+              <div className="bg-white rounded-md border border-[#c69c40]/20 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                {/* Price (Static Display, does NOT change when quantity increases) */}
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400">
+                    Price
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold font-mono text-[#6b1e30]">
+                      A${unitPrice.toFixed(2)}
                     </span>
-                  )}
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#07402b] bg-[#07402b]/10 px-2 py-0.5 rounded border border-[#07402b]/20">
+                      <Sparkles className="h-3 w-3" />
+                      In Stock
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-0.5 text-brand-gold">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-brand-gold text-brand-gold" />
-                  ))}
-                  <span className="text-xs text-stone-600 ml-2 font-bold uppercase tracking-wide">5.0 (Review Score)</span>
-                </div>
-              </div>
-
-              {/* Servings Selector (Pack of 2, Pack of 6) */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
-                  Servings *
-                </span>
-                <div className="flex flex-wrap gap-2.5">
-                  {servingsOptions.map((choice, i) => (
-                    <button
-                      key={choice.name}
-                      onClick={() => setSelectedServingIdx(i)}
-                      className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border transition-all duration-300 cursor-pointer ${
-                        selectedServingIdx === i
-                          ? "bg-[#07402b] text-cream border-[#07402b] shadow-sm scale-[1.02]"
-                          : "bg-white text-stone-600 border-[#c69c40]/20 hover:border-[#c69c40]"
-                      }`}
-                    >
-                      {choice.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Preparation Selector (Freshly Baked or Frozen) */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
-                  Preparation *
-                </span>
-                <div className="flex flex-wrap gap-2.5">
-                  {preparationOptions.map((prep) => (
-                    <button
-                      key={prep}
-                      onClick={() => setSelectedPreparation(prep)}
-                      className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded border transition-all duration-300 cursor-pointer ${
-                        selectedPreparation === prep
-                          ? "bg-[#07402b] text-cream border-[#07402b] shadow-sm scale-[1.02]"
-                          : "bg-white text-stone-600 border-[#c69c40]/20 hover:border-[#c69c40]"
-                      }`}
-                    >
-                      {prep}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quantity Stepper */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
-                  Quantity *
-                </span>
-                <div className="flex items-center gap-3 border border-[#c69c40]/25 rounded-md p-1 bg-white w-32 justify-between">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="h-8 w-8 rounded flex items-center justify-center bg-cream border border-[#c69c40]/15 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-all duration-300 cursor-pointer"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="h-3.5 w-3.5" />
-                  </button>
-                  <span className="font-mono text-sm font-bold text-[#07402b] w-5 text-center">
-                    {quantity}
+                {/* Quantity Stepper */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                    Quantity:
                   </span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="h-8 w-8 rounded flex items-center justify-center bg-cream border border-[#c69c40]/15 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-all duration-300 cursor-pointer"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5 border border-stone-200 rounded-md p-1 bg-cream/30">
+                    <button
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      className="h-7 w-7 rounded flex items-center justify-center bg-white border border-stone-300 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-colors cursor-pointer"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <span className="font-mono text-sm font-bold text-[#07402b] w-6 text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity((q) => q + 1)}
+                      className="h-7 w-7 rounded flex items-center justify-center bg-white border border-stone-300 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-colors cursor-pointer"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* CTA Action Buttons */}
-              <div className="pt-4 flex flex-col sm:flex-row gap-5">
-                <Button
-                  onClick={() =>
-                    alert(
-                      `Added ${quantity}x ${product.name} (${servingsOptions[selectedServingIdx]?.name}, ${selectedPreparation}) to cart!`
-                    )
-                  }
-                  variant="primary"
-                  className="flex-1 py-4 px-6 text-xs tracking-widest gap-2 shadow-md"
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                  <span>Add to Cart</span>
-                </Button>
-                
-                <Button
-                  onClick={() =>
-                    alert(
-                      `Proceeding to checkout with ${quantity}x ${product.name} (${servingsOptions[selectedServingIdx]?.name}, ${selectedPreparation})...`
-                    )
-                  }
-                  variant="secondary"
-                  className="flex-1 py-4 px-6 text-xs tracking-widest shadow-md"
-                >
-                  Buy Now
-                </Button>
-              </div>
+              {/* Short Summary Description */}
+              <p className="text-stone-700 text-sm leading-relaxed pt-1">
+                {product.shortDescription}
+              </p>
 
-              {/* Wishlist & Share buttons */}
-              <div className="flex items-center gap-4 pt-2 text-xs font-bold uppercase tracking-wider text-stone-500">
-                <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="inline-flex items-center gap-2 hover:text-[#6b1e30] transition-colors cursor-pointer"
-                >
-                  <Heart className={`h-4.5 w-4.5 ${isWishlisted ? "fill-[#6b1e30] text-[#6b1e30]" : ""}`} />
-                  <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Product link copied to clipboard!");
-                  }}
-                  className="inline-flex items-center gap-2 hover:text-[#6b1e30] transition-colors cursor-pointer"
-                >
-                  <Share2 className="h-4.5 w-4.5" />
-                  <span>Share Product</span>
-                </button>
-              </div>
+              {/* Serving Info Section */}
+              {product.packInfo && (
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-stone-700 block">
+                    Serving
+                  </label>
+                  <div className="inline-block bg-white text-stone-800 text-xs font-semibold px-3.5 py-1.5 rounded-md border border-stone-300">
+                    {product.packInfo}
+                  </div>
+                </div>
+              )}
 
-              {/* Detailed Description */}
-              <div className="pt-6 border-t border-[#c69c40]/25 space-y-3 text-left">
-                <h3 className="font-serif text-lg font-bold text-[#07402b]">{product.name} Info</h3>
-                <p className="text-stone-600 text-sm leading-relaxed">
+              {/* ───────────────────────────────────────────────────────────
+                  SELECT VARIANTS (Clean, small pills, no prices inside)
+                 ─────────────────────────────────────────────────────────── */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700 block">
+                      Select Variants
+                    </label>
+                    <span className="text-xs font-mono font-semibold text-[#6b1e30]">
+                      {product.variants[selectedVariantIdx]?.name}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants.map((v, idx) => {
+                      const isSelected = selectedVariantIdx === idx;
+                      return (
+                        <button
+                          key={v.name}
+                          type="button"
+                          onClick={() => setSelectedVariantIdx(idx)}
+                          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider border transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-[#07402b] text-white border-[#07402b] shadow-sm"
+                              : "bg-white text-stone-700 border-stone-300 hover:border-[#07402b]"
+                          }`}
+                        >
+                          {v.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Full Description Story */}
+              <div className="space-y-2 pt-4 border-t border-stone-200/80">
+                <h2 className="font-serif text-xl font-bold text-[#07402b]">
+                  About {product.name}
+                </h2>
+                <p className="text-stone-700 text-sm leading-relaxed whitespace-pre-line">
                   {product.description}
                 </p>
+              </div>
+
+              {/* Why They Stand Out Section */}
+              {product.whyStandOut && product.whyStandOut.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-stone-200/80">
+                  <h2 className="font-serif text-xl font-bold text-[#07402b]">
+                    Why They Stand Out
+                  </h2>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {product.whyStandOut.map((point, index) => (
+                      <div
+                        key={index}
+                        className="bg-white p-3.5 rounded-md border border-[#c69c40]/15 space-y-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-[#07402b] shrink-0" />
+                          <h3 className="font-serif font-bold text-xs text-[#07402b]">
+                            {point.title}
+                          </h3>
+                        </div>
+                        <p className="text-[11px] text-stone-600 leading-relaxed pl-6">
+                          {point.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Product Details & Specifications */}
+              {product.productDetails && product.productDetails.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-stone-200/80">
+                  <h2 className="font-serif text-xl font-bold text-[#07402b]">
+                    Product Details
+                  </h2>
+
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-stone-700 bg-white p-4 rounded-md border border-[#c69c40]/15">
+                    {product.productDetails.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#6b1e30] mt-1 shrink-0" />
+                        <span className="font-medium">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Heating & Serving Instructions */}
+              <div className="space-y-3 pt-4 border-t border-stone-200/80">
+                <h2 className="font-serif text-xl font-bold text-[#07402b]">
+                  Heating & Serving Instructions
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-stone-700">
+                  <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
+                    <span className="font-bold text-[#07402b] uppercase block">Oven</span>
+                    <p>Preheat to 180°C. Bake for 12–15 mins (fresh) or 20–25 mins (frozen).</p>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
+                    <span className="font-bold text-[#07402b] uppercase block">Air Fryer</span>
+                    <p>Air fry at 170°C for 8–10 mins until golden and steaming hot.</p>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
+                    <span className="font-bold text-[#07402b] uppercase block">Microwave</span>
+                    <p>Heat on High for 60–90 seconds (quick option for soft warm pie).</p>
+                  </div>
+                </div>
               </div>
 
             </div>
