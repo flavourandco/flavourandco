@@ -9,7 +9,7 @@ import ProductCard from "@/components/ProductCard";
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [maxPrice, setMaxPrice] = useState<number>(90);
+  const [maxPrice, setMaxPrice] = useState<number>(100);
   const [sortBy, setSortBy] = useState<string>("recommended");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
 
@@ -83,7 +83,7 @@ export default function Products() {
               <button 
                 onClick={() => {
                   setSelectedCategory("all");
-                  setMaxPrice(90);
+                  setMaxPrice(100);
                   setSortBy("recommended");
                 }}
                 className="text-[10px] font-bold uppercase tracking-wider text-[#6b1e30] hover:text-brand-gold transition-colors"
@@ -98,7 +98,7 @@ export default function Products() {
               <input
                 type="range"
                 min="18"
-                max="90"
+                max="100"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-full accent-brand-gold cursor-pointer"
@@ -108,7 +108,7 @@ export default function Products() {
                 <span className="text-brand-green bg-[#6b1e30]/5 border border-[#6b1e30]/15 px-2.5 py-0.5 rounded font-mono">
                   Up to A${maxPrice}
                 </span>
-                <span>A$90</span>
+                <span>A$100</span>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ export default function Products() {
                 <button
                   onClick={() => {
                     setSelectedCategory("all");
-                    setMaxPrice(90);
+                    setMaxPrice(100);
                     setSortBy("recommended");
                   }}
                   className="mt-4 inline-flex items-center gap-2 rounded-md bg-brand-green hover:bg-[#6b1e30] text-cream hover:text-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] transition-all duration-300 shadow-md"
