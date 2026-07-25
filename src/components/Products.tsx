@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
@@ -12,6 +12,15 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState<number>(100);
   const [sortBy, setSortBy] = useState<string>("recommended");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, maxPrice, sortBy]);
 
   // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
@@ -34,6 +43,15 @@ export default function Products() {
 
     return result;
   }, [selectedCategory, maxPrice, sortBy]);
+
+  // Paginated Slices
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length);
+
+  const paginatedProducts = useMemo(() => {
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, startIndex]);
 
   return (
     <section className="bg-cream pt-0 pb-16 md:pb-24">
@@ -71,7 +89,7 @@ export default function Products() {
               <span>{isMobileFilterOpen ? "Hide Filters" : "Show Filters"}</span>
             </button>
             <span className="text-xs font-bold text-stone-500 uppercase tracking-wide">
-              {filteredProducts.length} Products
+              {filteredProducts.length > 0 ? `Showing ${startIndex + 1}–${endIndex} of ${filteredProducts.length}` : "0 Products"}
             </span>
           </div>
 
@@ -145,7 +163,7 @@ export default function Products() {
             {/* Sorting Header (Desktop Only) */}
             <div className="hidden lg:flex items-center justify-between pb-4 border-b border-brand-gold/15">
               <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">
-                Showing {filteredProducts.length} of {products.length} products
+                Showing {filteredProducts.length > 0 ? `${startIndex + 1}–${endIndex}` : "0"} of {filteredProducts.length} products
               </span>
               
               <div className="flex items-center gap-2">
@@ -166,12 +184,52 @@ export default function Products() {
             </div>
 
             {/* Product Grid */}
-            {filteredProducts.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+            {paginatedProducts.length > 0 ? (
+              <>
+                <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-10 border-t border-brand-gold/15 mt-8">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md border border-brand-gold/25 text-brand-green hover:bg-[#6b1e30] hover:text-white disabled:opacity-40 disabled:pointer-events-none transition-all duration-300 bg-white cursor-pointer"
+                    >
+                      Previous
+                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {Array.from({ length: totalPages }).map((_, idx) => {
+                        const pageNum = idx + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`h-8 w-8 text-xs font-mono font-bold rounded-md transition-all duration-300 cursor-pointer ${
+                              currentPage === pageNum
+                                ? "bg-brand-green text-white shadow-sm"
+                                : "bg-white text-stone-600 border border-brand-gold/15 hover:border-brand-gold hover:text-brand-green"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-md border border-brand-gold/25 text-brand-green hover:bg-[#6b1e30] hover:text-white disabled:opacity-40 disabled:pointer-events-none transition-all duration-300 bg-white cursor-pointer"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-20 bg-white border border-brand-gold/25 rounded-lg">
                 <p className="text-stone-500 font-bold uppercase tracking-wider text-sm">
