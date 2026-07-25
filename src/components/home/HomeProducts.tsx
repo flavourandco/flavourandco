@@ -164,7 +164,7 @@ export default function HomeProducts() {
                     className="shrink-0 px-1.5 sm:px-3 transition-all duration-300"
                     style={{ width: `${100 / itemsPerPage}%` }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard product={product} showBadge={false} />
                   </div>
                 );
               })}

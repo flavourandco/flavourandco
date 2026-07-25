@@ -20,7 +20,7 @@ export default function PageLayout({
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-cream pt-20">
+      <main className="min-h-screen bg-cream pt-[92px] sm:pt-[100px] md:pt-20">
         {!hideHeader && (
           <div className="border-b border-brand-gold/20 bg-brand-green h-48 md:h-64 lg:h-72 relative overflow-hidden flex items-center justify-center w-full">
             <div className="absolute inset-0 opacity-10 pointer-events-none">

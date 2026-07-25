@@ -56,7 +56,7 @@ export default function HomeNavbar() {
         {/* Unified Header Bar */}
         <div className="mx-auto max-w-[1400px]">
           {/* MOBILE VIEW NAVBAR (md:hidden) */}
-          <div className="flex md:hidden items-center justify-between px-3 py-0.5 relative min-h-[44px]">
+          <div className="flex md:hidden items-center justify-between px-4 py-2 relative min-h-[64px] sm:min-h-[72px]">
             {/* Left: Mobile Profile & Search Icons */}
             <div className="flex items-center gap-0.5 text-primary z-10">
               <Link
@@ -80,12 +80,12 @@ export default function HomeNavbar() {
             {/* Center: Enlarged Brand Logo */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1.5 px-3 block"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1 px-3 block"
             >
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-11 sm:h-12 max-h-12 w-auto object-contain"
+                className="h-[52px] sm:h-[60px] w-auto object-contain"
               />
             </Link>
 

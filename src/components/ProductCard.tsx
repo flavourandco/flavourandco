@@ -9,13 +9,14 @@ import Button from "./Button";
 
 interface ProductCardProps {
   product: Product;
+  showBadge?: boolean;
 }
 
 const GARNET = "#6b1e30";
 const GREEN = "#07402b";
 const GOLD = "#c69c40";
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, showBadge = true }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
 
   const price = product.price;
@@ -48,8 +49,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         />
 
         {/* Bold Badge for Shop */}
-        {(product.badge || product.isBestSeller || product.isNewArrival) && (
-          <span className="absolute top-3 left-3 text-[10px] font-sans font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3.5 py-1.5 rounded-full border border-[#c69c40]/40 shadow-md z-10">
+        {showBadge && (product.badge || product.isBestSeller || product.isNewArrival) && (
+          <span className="hidden sm:block absolute top-3 left-3 text-[10px] font-sans font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3.5 py-1.5 rounded-full border border-[#c69c40]/40 shadow-md z-10">
             {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
           </span>
         )}
