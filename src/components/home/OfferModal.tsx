@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { X, ArrowRight } from "lucide-react";
 import { Fraunces } from "next/font/google";
 import { media } from "@/lib/media";
+import { setWithTTL, hasExpired } from "@/lib/storage";
+
+const POPUP_KEY = "offer-popup-dismissed";
+const POPUP_TTL = 5 * 60 * 1000; // 5 minutes
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -16,16 +20,18 @@ export default function OfferModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Show popup immediately when website loads
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 300);
-
-    return () => clearTimeout(timer);
+    // Only show if the popup TTL has expired or has never been dismissed
+    if (hasExpired(POPUP_KEY)) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
+    setWithTTL(POPUP_KEY, POPUP_TTL);
   };
 
   if (!isOpen) return null;
