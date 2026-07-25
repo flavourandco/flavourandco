@@ -39,12 +39,12 @@ export default function HomeNavbar() {
       <header className="fixed inset-x-0 top-0 z-[100] bg-base-100 shadow-sm border-b border-secondary/15 transition-all duration-300">
         {/* Top Free Shipping Announcement Bar */}
         {/* PC View: Static and Centered */}
-        <div className="hidden md:block bg-brand-green py-1.5 px-4 text-center text-white text-[11px] font-bold uppercase tracking-[0.2em]">
+        <div className="hidden md:block bg-brand-green py-1.5 px-4 text-center text-brand-gold text-[11px] font-bold uppercase tracking-[0.2em]">
           Free Express Shipping on Orders Over $100 | Handcrafted Sydney-Wide
         </div>
 
         {/* Mobile View: Continuous Infinite Marquee Ticker */}
-        <div className="md:hidden overflow-hidden bg-brand-green py-1.5 text-white text-[10px] font-bold uppercase tracking-[0.18em]">
+        <div className="md:hidden overflow-hidden bg-brand-green py-1.5 text-brand-gold text-[10px] font-bold uppercase tracking-[0.18em]">
           <div className="animate-ticker flex whitespace-nowrap">
             <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
             <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
@@ -80,12 +80,12 @@ export default function HomeNavbar() {
             {/* Center: Enlarged Brand Logo */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1.5 px-3 block"
             >
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-11 sm:h-12 max-h-12 w-auto object-contain py-0.5"
+                className="h-11 sm:h-12 max-h-12 w-auto object-contain"
               />
             </Link>
 
@@ -116,11 +116,11 @@ export default function HomeNavbar() {
           {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
           <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-1 gap-6">
             {/* Left: Brand Logo */}
-            <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105">
+            <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105 py-1.5 px-3 block">
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-14 lg:h-16 xl:h-18 w-auto object-contain max-h-20"
+                className="h-13 lg:h-15 xl:h-16 w-auto object-contain max-h-20"
               />
             </Link>
 
@@ -153,12 +153,7 @@ export default function HomeNavbar() {
                 <Search className="h-5 w-5" />
               </button>
 
-              <Link
-                href="/contact"
-                className="hidden lg:inline-block text-[11px] font-extrabold uppercase tracking-wider hover:text-secondary transition-colors"
-              >
-                Help
-              </Link>
+
 
               <Link
                 href="/shop"

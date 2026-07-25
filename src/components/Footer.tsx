@@ -41,8 +41,8 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 relative z-10">
-        <div className="grid gap-10 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
+        <div className="grid gap-10 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="lg:col-span-2 lg:pr-10">
             <div className="flex items-center gap-3">
               <img
                 src={media.footerLogo}

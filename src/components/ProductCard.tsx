@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, Heart } from "lucide-react";
 import { Product } from "@/lib/data";
+import Button from "./Button";
 
 interface ProductCardProps {
   product: Product;
@@ -83,15 +84,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Bottom CTA Action Buttons (always locked at bottom) */}
         <div className="mt-4 flex items-center gap-2">
-          <button
+          <Button
             onClick={() => alert(`Added ${product.name} to cart!`)}
-            className="flex-1 bg-[#6b1e30] hover:opacity-90 text-white font-serif font-bold uppercase tracking-wider py-2.5 px-4 text-[10px] transition-opacity duration-300 shadow-sm cursor-pointer"
-            style={{
-              clipPath: "polygon(5% 0%, 95% 0%, 100% 25%, 95% 50%, 100% 75%, 95% 100%, 5% 100%, 0% 75%, 5% 50%, 0% 25%)"
-            }}
+            variant="primary"
+            className="flex-1 py-2.5 px-4 text-[10px]"
           >
             Add to Cart
-          </button>
+          </Button>
 
           <button
             onClick={() => setIsWishlisted((w) => !w)}

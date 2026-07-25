@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Star, Minus, Plus, ShoppingBag, ArrowLeft, Heart, Share2 } from "lucide-react";
 import { products } from "@/lib/data";
 import PageLayout from "@/components/PageLayout";
+import Button from "@/components/Button";
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string; id: string }> }) {
   const resolvedParams = use(params);
@@ -232,34 +233,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
               {/* CTA Action Buttons */}
               <div className="pt-4 flex flex-col sm:flex-row gap-5">
-                <button
+                <Button
                   onClick={() =>
                     alert(
                       `Added ${quantity}x ${product.name} (${option1Choices[selectedOption1Idx]?.name}, ${selectedOption2}) to cart!`
                     )
                   }
-                  className="flex-1 bg-[#6b1e30] hover:opacity-90 text-white font-serif font-bold uppercase tracking-widest py-4 px-6 text-xs transition-opacity duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2"
-                  style={{
-                    clipPath: "polygon(4% 0%, 96% 0%, 100% 25%, 96% 50%, 100% 75%, 96% 100%, 4% 100%, 0% 75%, 4% 50%, 0% 25%)"
-                  }}
+                  variant="primary"
+                  className="flex-1 py-4 px-6 text-xs tracking-widest gap-2 shadow-md"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>Add to Cart</span>
-                </button>
+                </Button>
                 
-                <button
+                <Button
                   onClick={() =>
                     alert(
                       `Proceeding to checkout with ${quantity}x ${product.name} (${option1Choices[selectedOption1Idx]?.name}, ${selectedOption2})...`
                     )
                   }
-                  className="flex-1 bg-[#c69c40] hover:opacity-90 text-white font-serif font-bold uppercase tracking-widest py-4 px-6 text-xs transition-opacity duration-300 shadow-md cursor-pointer flex items-center justify-center"
-                  style={{
-                    clipPath: "polygon(4% 0%, 96% 0%, 100% 25%, 96% 50%, 100% 75%, 96% 100%, 4% 100%, 0% 75%, 4% 50%, 0% 25%)"
-                  }}
+                  variant="secondary"
+                  className="flex-1 py-4 px-6 text-xs tracking-widest shadow-md"
                 >
                   Buy Now
-                </button>
+                </Button>
               </div>
 
               {/* Wishlist & Share buttons */}

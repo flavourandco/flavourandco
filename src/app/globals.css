@@ -20,9 +20,9 @@
   --color-cream: #fdf8f3;
   --color-warm-white: #faf6f0;
 
-  --font-cormorant: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --font-sans: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-playfair), "Playfair Display", Georgia, serif;
 }
 
 :root {
@@ -44,13 +44,13 @@
   --color-base-content: #1c1410;
 }
 
-/* Global Font Enforcement: Cormorant Garamond across whole website */
+/* Global Font Enforcement: Playfair Display across whole website */
 html,
 body,
 *,
 *::before,
 *::after {
-  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif !important;
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
 }
 
 .font-trivane-retro,
@@ -58,11 +58,11 @@ body,
 .font-serif,
 .font-sans,
 .font-mono {
-  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif !important;
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
 }
 
 .trivane-hero-title {
-  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif !important;
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
   line-height: 1.05;
   letter-spacing: -0.02em;
 }

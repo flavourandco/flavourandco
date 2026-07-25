@@ -147,15 +147,11 @@ export default function HomeHero() {
           aria-hidden="true"
         />
 
-        {/* Right: stacked action panel */}
-        <div className="hero-actions flex w-full flex-row items-center gap-5 lg:w-auto lg:flex-col lg:items-end lg:gap-4">
+        {/* Right: action panel */}
+        <div className="hero-actions flex w-full flex-row items-center gap-4 sm:gap-5 lg:w-auto">
           <Link
             href="/shop"
-            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden bg-brand-garnet px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-brand-gold hover:text-brand-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
-            style={{
-              clipPath:
-                "polygon(3% 0%, 97% 0%, 100% 20%, 97% 40%, 100% 60%, 97% 80%, 100% 100%, 3% 100%, 0% 80%, 3% 60%, 0% 40%, 3% 20%)",
-            }}
+            className="group inline-flex flex-1 lg:flex-initial items-center justify-center gap-2.5 bg-brand-garnet px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3] transition-colors hover:bg-brand-gold hover:text-brand-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56 shadow-sm whitespace-nowrap"
           >
             <span>Explore Menu</span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -163,22 +159,9 @@ export default function HomeHero() {
 
           <Link
             href="/our-story"
-            className="group relative inline-flex w-full items-center justify-center text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3]/75 py-1 transition-colors hover:text-[#F2E6D3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56"
+            className="group inline-flex flex-1 lg:flex-initial items-center justify-center gap-2.5 border border-[#F2E6D3]/30 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#F2E6D3]/90 transition-colors hover:border-[#F2E6D3] hover:bg-[#F2E6D3]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E3A72B] sm:text-sm lg:w-56 shadow-sm whitespace-nowrap"
           >
             <span>Our Story</span>
-            <svg
-              className="absolute -bottom-1 left-1/2 h-2 w-24 -translate-x-1/2 opacity-50 transition-opacity group-hover:opacity-100 lg:left-0 lg:w-full lg:translate-x-0"
-              viewBox="0 0 100 8"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 T50,4 T60,4 T70,4 T80,4 T90,4 T100,4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-            </svg>
           </Link>
         </div>
       </div>
