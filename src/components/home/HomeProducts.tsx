@@ -42,13 +42,13 @@ export default function HomeProducts() {
     setCurrentIndex((prev) => Math.min(prev, maxIndex));
   }, [itemsPerPage, maxIndex]);
 
-
-
+  // Trigger entrance animation once when section scrolls into view
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsInView(true);
+          observer.disconnect(); // stop observing once triggered — prevents re-firing mid-animation
         }
       },
       { threshold: 0.05 }
@@ -69,6 +69,7 @@ export default function HomeProducts() {
         duration: 0.5,
         stagger: 0.05,
         ease: "power2.out",
+        clearProps: "opacity,transform", // remove inline styles once done so nothing stays half-faded
       });
 
       gsap.from(".product-card", {
@@ -77,6 +78,7 @@ export default function HomeProducts() {
         duration: 0.5,
         stagger: 0.05,
         ease: "power2.out",
+        clearProps: "opacity,transform",
       });
     },
     { dependencies: [isInView], scope: sectionRef }
@@ -111,7 +113,7 @@ export default function HomeProducts() {
   };
 
   const updateQuantity = (productId: string, amount: number) => {
-    setCartQuantities(prev => {
+    setCartQuantities((prev) => {
       const current = prev[productId] || 0;
       const next = Math.max(0, current + amount);
       return { ...prev, [productId]: next };
@@ -119,7 +121,10 @@ export default function HomeProducts() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-base-200 py-24 md:py-32 border-b border-secondary/15 overflow-hidden text-base-content">
+    <section
+      ref={sectionRef}
+      className="bg-base-200 py-24 md:py-32 border-b border-secondary/15 overflow-hidden text-base-content"
+    >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
         <div className="product-header mx-auto max-w-3xl text-center">
           <p className="text-[12px] font-bold uppercase tracking-[0.3em] text-secondary">
@@ -198,9 +203,8 @@ export default function HomeProducts() {
                   key={idx}
                   type="button"
                   onClick={() => setCurrentIndex(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentIndex === idx ? "w-6 bg-secondary" : "w-1.5 bg-primary/20"
-                  }`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${currentIndex === idx ? "w-6 bg-secondary" : "w-1.5 bg-primary/20"
+                    }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
               ))}

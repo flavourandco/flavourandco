@@ -131,13 +131,11 @@ export default function HomeHero() {
           </p>
 
           <div className="hero-ingredients mt-6 flex flex-wrap items-center gap-y-2 font-mono text-[11px] uppercase tracking-[0.15em]">
-            <span className="text-[#c69c40] font-bold">Cardamom</span>
+            <span className="text-[#c69c40] font-bold">Handcrafted</span>
             <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
-            <span className="text-[#c69c40] font-bold">Ghee</span>
+            <span className="text-[#c69c40] font-bold">No Preservatives</span>
             <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
-            <span className="text-[#c69c40] font-bold">Golden Pastry</span>
-            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
-            <span className="text-[#c69c40] font-bold">Slow-Roasted Spice</span>
+            <span className="text-[#c69c40] font-bold">Australian Owned</span>
           </div>
         </div>
 
