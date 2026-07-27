@@ -514,18 +514,105 @@ export const footerLinks = {
   ],
 } as const;
 
-export const craftFeatures = [
+
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export const faqItems: FaqItem[] = [
   {
-    title: "Plate of Origin",
-    description: "As seen on Channel 7's hit cooking show, proudly representing Flavour & Co.'s unique flavours.",
+    id: "faq-1",
+    question: "Are your pies available fresh or frozen?",
+    answer: "Yes. Our pies are available fresh or frozen, giving you the flexibility to enjoy them whenever it suits you. Whether you're planning a gathering or stocking the freezer for easy meals, simply heat and serve for delicious results."
   },
   {
-    title: "Indo-Aussie Fusion",
-    description: "The ultimate culinary marriage of rich Indian spice fillings and flaky, buttery Australian pastry.",
+    id: "faq-2",
+    question: "How do I heat my pies?",
+    answer: "Our pies are designed for convenience and can be heated in the oven, air fryer or microwave.\n\nFor the best flaky pastry, we recommend heating them in the oven or air fryer. Heating instructions are provided on every pack."
   },
   {
-    title: "Sydney-Wide Delivery",
-    description: "Delivering fresh and frozen gourmet pies right to your doorstep, baked fresh by Simran.",
+    id: "faq-3",
+    question: "Do you cater for events?",
+    answer: "Absolutely. Our Mini Pies and Grazing Boxes are perfect for birthdays, corporate events, family celebrations, baby showers, sporting events and special occasions of all sizes."
   },
-] as const;
+  {
+    id: "faq-4",
+    question: "What comes in your Grazing Boxes?",
+    answer: "Each Grazing Box includes 30 handcrafted Mini Pies and our signature chutney for dipping.\n\nChoose from:\n• Mini Samosa Pies\n• Mini Butter Chicken Pies\n• Mini Lamb Keema Pies\n• Flavour Selection (a mix of all three)\n\nPerfect for sharing, entertaining or gifting."
+  },
+  {
+    id: "faq-5",
+    question: "What are the delivery cost?",
+    answer: "We currently offer delivery across Greater Sydney, with options for various locations and order values:\n\n• Local Delivery (within 10km radius of Norwest, NSW): $9.95 (if not in the free delivery area)\n• Greater Sydney Delivery (11km-45km radius from Norwest, NSW): $14.95\n• Free Local Delivery: For orders over $25 to the following suburbs: Kellyville, North Kellyville, Castle Hill, Baulkam Hills, Bella Vista, Glenwood, Parklea, Stanhope Gardens, Quakers Hill, Marayong, Colebee, Marsden Park, Schofields, Riverstone, The Ponds, and Rouse Hill.\n• Free Greater Sydney Delivery: For orders over $200 (up to 50km from Norwest, NSW)."
+  },
+  {
+    id: "faq-6",
+    question: "Do your products contain artificial preservatives?",
+    answer: "No. We proudly make our products without artificial preservatives, using carefully selected ingredients to deliver exceptional flavour and quality."
+  },
+  {
+    id: "faq-7",
+    question: "Are your pies suitable for vegetarians?",
+    answer: "Our Mini Samosa Pies are 100% vegetarian and egg-free.\n\nOur Butter Chicken and Lamb Keema Pies contain meat and are not suitable for vegetarians.\n\nPlease refer to the product packaging for full ingredient and allergen information."
+  },
+  {
+    id: "faq-8",
+    question: "Where are your products made?",
+    answer: "All Flavour & Co products are proudly made in Australia using premium ingredients and carefully crafted in small batches to ensure consistent quality and flavour."
+  },
+  {
+    id: "faq-9",
+    question: "Do you use Australian meat?",
+    answer: "Yes. We use premium Australian chicken and Australian lamb in our meat products, sourced from trusted Australian Halal certified suppliers."
+  },
+  {
+    id: "faq-10",
+    question: "Where can I buy Flavour & Co products?",
+    answer: "You can order directly through our website, and we're continuing to expand into selected retailers, gourmet food stores and specialty stockists across Australia."
+  },
+  {
+    id: "faq-11",
+    question: "Do you offer wholesale?",
+    answer: "Yes. We proudly supply cafés, caterers, food service providers, independent retailers and specialty stores across Australia.\n\nIf you're interested in becoming a stockist, we'd love to hear from you. Please visit our Wholesale page or contact us for more information."
+  },
+  {
+    id: "faq-12",
+    question: "Do you cater for corporate events?",
+    answer: "Yes. Our Mini Pies and Grazing Boxes are a popular choice for office lunches, meetings, client events, conferences and corporate celebrations.\n\nWe can accommodate both small and large orders with advance notice."
+  },
+  {
+    id: "faq-13",
+    question: "Can I include a gift message with a Grazing Box?",
+    answer: "Yes. If you're sending a Grazing Box as a gift, simply include your message at checkout and we'll ensure it's included with your order, making it even more special for the recipient."
+  },
+  {
+    id: "faq-14",
+    question: "What allergens do your products contain?",
+    answer: "Our products contain gluten (wheat) and may contain other allergens depending on the variety, including milk, egg, soy and sesame.\n\nPlease refer to the product packaging for the full ingredients list and allergen declaration before consuming. If you have a specific dietary concern, we're always happy to help."
+  },
+  {
+    id: "faq-15",
+    question: "Can I cook your pies in an air fryer?",
+    answer: "Absolutely. Our Mini Pies cook beautifully in an air fryer, giving you crisp, flaky pastry in less time than a conventional oven.\n\nFor best results, follow the heating instructions on the packaging."
+  },
+  {
+    id: "faq-16",
+    question: "How many people does a Grazing Box serve?",
+    answer: "Our Grazing Boxes include 30 Mini Pies, making them ideal for approximately 6–10 people, depending on the occasion and what else is being served.\n\nThey're perfect for entertaining, family gatherings, office lunches, celebrations and casual get-togethers."
+  },
+  {
+    id: "faq-17",
+    question: "What makes Flavour & Co different?",
+    answer: "At Flavour & Co, we combine bold, globally inspired flavours with premium Australian ingredients to create food that's both comforting and memorable.\n\nFrom our handcrafted Mini Pies to our ready-to-serve Grazing Boxes, every product is designed to make entertaining effortless without compromising on quality or flavour."
+  },
+  {
+    id: "faq-18",
+    question: "Are your products Halal?",
+    answer: "Our meat is sourced from suppliers who use Halal-certified meat. However, Flavour & Co products are prepared in a facility that also handles non-Halal ingredients, and our finished products are not Halal certified.\n\nIf you have any questions about our ingredients or production processes, please don't hesitate to contact us."
+  }
+];
+
 

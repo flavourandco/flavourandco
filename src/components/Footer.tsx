@@ -53,29 +53,6 @@ export default function Footer() {
             <p className="mt-5 text-sm leading-relaxed opacity-80">
               Flavour & Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian fusion pies Sydney-wide.
             </p>
-            <div className="mt-6 flex gap-4">
-              <a
-                href="https://instagram.com"
-                aria-label="Instagram"
-                className="opacity-60 transition-colors hover:opacity-100 hover:text-secondary"
-              >
-                <Share2 className="h-5 w-5" />
-              </a>
-              <a
-                href="https://facebook.com"
-                aria-label="Facebook"
-                className="opacity-60 transition-colors hover:opacity-100 hover:text-secondary"
-              >
-                <Globe className="h-5 w-5" />
-              </a>
-              <a
-                href="mailto:info@flavourandco.com.au"
-                aria-label="Email"
-                className="opacity-60 transition-colors hover:opacity-100 hover:text-secondary"
-              >
-                <Mail className="h-5 w-5" />
-              </a>
-            </div>
           </div>
 
             <div>
