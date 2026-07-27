@@ -155,7 +155,7 @@ export default function ProductDetailPage({
 
               {/* Side-by-Side Action Buttons & Perks Container */}
               <div className="bg-white rounded-md border border-[#c69c40]/20 p-4 shadow-sm space-y-4">
-                {/* Add to Cart & Buy Now side-by-side */}
+                {/* Add to Cart & Order Now side-by-side */}
                 <div className="flex flex-row gap-3">
                   <Button
                     onClick={() =>
@@ -180,7 +180,7 @@ export default function ProductDetailPage({
                     className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
                   >
                     <Zap className="h-3.5 w-3.5 fill-current shrink-0" />
-                    <span className="truncate">Buy Now</span>
+                    <span className="truncate">Order Now</span>
                   </Button>
                 </div>
 
