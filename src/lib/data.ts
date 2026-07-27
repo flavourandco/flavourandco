@@ -615,4 +615,58 @@ export const faqItems: FaqItem[] = [
   }
 ];
 
+export interface WholesaleBrand {
+  id: string;
+  name: string;
+  logo: string;
+  type?: "nike" | "adidas" | "channel7" | "sydneygourmet" | "plateoforigin" | "image";
+}
+
+export const wholesaleBrands: WholesaleBrand[] = [
+  { id: "b-1", name: "NIKE", logo: "/brands/nike.png", type: "nike" },
+  { id: "b-2", name: "ADIDAS", logo: "/brands/adidas.png", type: "adidas" },
+  { id: "b-3", name: "CHANNEL SEVEN", logo: "/brands/channel7.png", type: "channel7" },
+  { id: "b-4", name: "SYDNEY GOURMET", logo: "/brands/sydney-gourmet.png", type: "sydneygourmet" },
+  { id: "b-5", name: "PLATE OF ORIGIN", logo: "/brands/plate-of-origin.png", type: "plateoforigin" },
+];
+
+export interface WholesaleTestimonial {
+  id: string;
+  quote: string;
+  author: string;
+  role: string;
+  avatar: string;
+}
+
+export const wholesaleTestimonials: WholesaleTestimonial[] = [
+  {
+    id: "t-1",
+    quote: "“Admire your work!”",
+    author: "Julie Zhou",
+    role: "Founder, Sundial",
+    avatar: "/founder/simran-coloured.jpg",
+  },
+  {
+    id: "t-2",
+    quote: "“Fan of your pies!”",
+    author: "Brian Norgard",
+    role: "Ex-CPO Tinder, Norgard",
+    avatar: "/founder/simran-kitchen.jpg",
+  },
+  {
+    id: "t-3",
+    quote: "“Simran is a very talented baker!”",
+    author: "Conner Pope",
+    role: "Founder, AdTrace",
+    avatar: "/products/PHOTOS_Flavour&Co-3.jpg",
+  },
+  {
+    id: "t-4",
+    quote: "“Bakes & delivers FAST!”",
+    author: "Ramon Berrios",
+    role: "Founder, Castmagic",
+    avatar: "/products/PHOTOS_Flavour&Co-2.jpg",
+  },
+];
+
 
