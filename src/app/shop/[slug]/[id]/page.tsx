@@ -68,38 +68,16 @@ export default function ProductDetailPage({
 
   return (
     <PageLayout title={product.name} subtitle="" fullWidth hideHeader={true}>
-      <div className="bg-cream text-stone-800 min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-cream text-stone-800 min-h-screen mt-2 md:mt-12 pt-0 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          {/* Top Breadcrumb Navigation */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#c69c40]/20">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 text-[#6b1e30] hover:text-[#07402b] transition-colors text-xs font-extrabold uppercase tracking-wider"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to All Products</span>
-            </Link>
-            <div className="flex items-center gap-2 text-xs text-stone-500 font-medium">
-              <Link href="/shop" className="hover:text-[#6b1e30]">
-                Shop
-              </Link>
-              <span>/</span>
-              <span className="capitalize">{product.category.replace("-", " ")}</span>
-              <span>/</span>
-              <span className="text-[#07402b] font-semibold truncate max-w-[140px] sm:max-w-none">
-                {product.name}
-              </span>
-            </div>
-          </div>
-
           {/* Main Grid: STABLE Left Column (Image & Side-by-Side CTAs) vs SCROLLABLE Right Column (Details) */}
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-12 items-start">
-            
+
             {/* ───────────────────────────────────────────────────────────
                 LEFT COLUMN: Image Gallery & Side-by-Side Action CTAs (STABLE/STICKY)
                ─────────────────────────────────────────────────────────── */}
             <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4">
-              
+
               {/* Product Images Container */}
               <div className="space-y-3">
                 {/* Main Image Display */}
@@ -111,6 +89,7 @@ export default function ProductDetailPage({
                     className="object-cover transition-all duration-500 group-hover:scale-105"
                     sizes="(max-width: 1024px) 100vw, 35vw"
                     priority
+                    loading="eager"
                   />
                   {/* Category & Badge Overlay */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
@@ -134,17 +113,17 @@ export default function ProductDetailPage({
                       <button
                         key={i}
                         onClick={() => setActiveImageIdx(i)}
-                        className={`relative h-14 w-14 shrink-0 overflow-hidden rounded border transition-all cursor-pointer ${
-                          activeImageIdx === i
-                            ? "border-[#6b1e30] ring-1 ring-[#6b1e30] scale-105 shadow-sm"
-                            : "border-[#c69c40]/20 hover:border-[#c69c40] opacity-75 hover:opacity-100"
-                        }`}
+                        className={`relative h-14 w-14 shrink-0 overflow-hidden rounded border transition-all cursor-pointer ${activeImageIdx === i
+                          ? "border-[#6b1e30] ring-1 ring-[#6b1e30] scale-105 shadow-sm"
+                          : "border-[#c69c40]/20 hover:border-[#c69c40] opacity-75 hover:opacity-100"
+                          }`}
                         aria-label={`Switch to photo ${i + 1}`}
                       >
                         <Image
                           src={img}
                           alt={`${product.name} thumbnail ${i + 1}`}
                           fill
+                          sizes="56px"
                           className="object-cover"
                         />
                       </button>
@@ -191,9 +170,8 @@ export default function ProductDetailPage({
                     className="inline-flex items-center gap-1.5 hover:text-[#6b1e30] transition-colors cursor-pointer py-0.5"
                   >
                     <Heart
-                      className={`h-4 w-4 ${
-                        isWishlisted ? "fill-[#6b1e30] text-[#6b1e30]" : "text-stone-400"
-                      }`}
+                      className={`h-4 w-4 ${isWishlisted ? "fill-[#6b1e30] text-[#6b1e30]" : "text-stone-400"
+                        }`}
                     />
                     <span>{isWishlisted ? "Saved" : "Add to Wishlist"}</span>
                   </button>
@@ -238,19 +216,9 @@ export default function ProductDetailPage({
                 RIGHT COLUMN: Header, Top Price & Quantity, Clean Minimal Sections (SCROLABLE)
                ─────────────────────────────────────────────────────────── */}
             <div className="lg:col-span-7 xl:col-span-7 space-y-6">
-              
-              {/* Product Header Title & Category */}
-              <div className="space-y-2.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#6b1e30] bg-[#6b1e30]/10 px-2.5 py-0.5 rounded border border-[#6b1e30]/20">
-                    {product.category === "freshly-baked"
-                      ? "Freshly Baked"
-                      : product.category === "frozen"
-                      ? "Frozen Packs"
-                      : "Grazing Box"}
-                  </span>
-                </div>
 
+              {/* Product Header Title */}
+              <div className="space-y-2.5">
                 <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#07402b] leading-tight">
                   {product.name}
                 </h1>
@@ -304,10 +272,10 @@ export default function ProductDetailPage({
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
                     Quantity:
                   </span>
-                  <div className="flex items-center gap-1.5 border border-stone-200 rounded-md p-1 bg-cream/30">
+                  <div className="flex items-center gap-1.5 p-1 bg-transparent">
                     <button
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="h-7 w-7 rounded flex items-center justify-center bg-white border border-stone-300 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-colors cursor-pointer"
+                      className="h-7 w-7 rounded flex items-center justify-center bg-stone-100 hover:bg-[#6b1e30] text-[#6b1e30] hover:text-white transition-colors cursor-pointer"
                       aria-label="Decrease quantity"
                     >
                       <Minus className="h-3 w-3" />
@@ -317,7 +285,7 @@ export default function ProductDetailPage({
                     </span>
                     <button
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="h-7 w-7 rounded flex items-center justify-center bg-white border border-stone-300 text-[#6b1e30] hover:bg-[#6b1e30] hover:text-white transition-colors cursor-pointer"
+                      className="h-7 w-7 rounded flex items-center justify-center bg-stone-100 hover:bg-[#6b1e30] text-[#6b1e30] hover:text-white transition-colors cursor-pointer"
                       aria-label="Increase quantity"
                     >
                       <Plus className="h-3 w-3" />
@@ -365,11 +333,10 @@ export default function ProductDetailPage({
                           key={v.name}
                           type="button"
                           onClick={() => setSelectedVariantIdx(idx)}
-                          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider border transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-[#07402b] text-white border-[#07402b] shadow-sm"
-                              : "bg-white text-stone-700 border-stone-300 hover:border-[#07402b]"
-                          }`}
+                          className={`px-3.5 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider border transition-all cursor-pointer ${isSelected
+                            ? "bg-[#07402b] text-white border-[#07402b] shadow-sm"
+                            : "bg-white text-stone-700 border-stone-300 hover:border-[#07402b]"
+                            }`}
                         >
                           {v.name}
                         </button>
