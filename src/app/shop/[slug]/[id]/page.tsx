@@ -39,6 +39,33 @@ export default function ProductDetailPage({
   const [quantity, setQuantity] = useState<number>(1);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
 
+  // Touch Swipe Gesture State
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  const minSwipeDistance = 40;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX || !product || product.images.length <= 1) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > minSwipeDistance) {
+      // Swiped left -> next image
+      setActiveImageIdx((prev) => (prev + 1) % product.images.length);
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right -> previous image
+      setActiveImageIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
   if (!product) {
     return (
       <PageLayout
@@ -68,7 +95,7 @@ export default function ProductDetailPage({
 
   return (
     <PageLayout title={product.name} subtitle="" fullWidth hideHeader={true}>
-      <div className="bg-cream text-stone-800 min-h-screen mt-2 md:mt-12 pt-0 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="bg-cream text-stone-800 min-h-screen pt-4 sm:pt-6 md:pt-8 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Main Grid: STABLE Left Column (Image & Side-by-Side CTAs) vs SCROLLABLE Right Column (Details) */}
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-12 items-start">
@@ -80,8 +107,13 @@ export default function ProductDetailPage({
 
               {/* Product Images Container */}
               <div className="space-y-3">
-                {/* Main Image Display */}
-                <div className="relative aspect-[4/3] sm:aspect-square sm:max-h-[380px] w-full overflow-hidden rounded-md border border-[#c69c40]/20 shadow-sm bg-white group">
+                {/* Main Image Display with Touch Swipe Support */}
+                <div
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  className="relative aspect-[4/3] sm:aspect-square sm:max-h-[380px] w-full overflow-hidden rounded-md border border-[#c69c40]/20 shadow-sm bg-white group select-none touch-pan-y"
+                >
                   <Image
                     src={product.images[activeImageIdx] || product.image}
                     alt={product.name}
@@ -108,26 +140,31 @@ export default function ProductDetailPage({
 
                 {/* Thumbnails Row */}
                 {product.images.length > 1 && (
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                    {product.images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setActiveImageIdx(i)}
-                        className={`relative h-14 w-14 shrink-0 overflow-hidden rounded border transition-all cursor-pointer ${activeImageIdx === i
-                          ? "border-[#6b1e30] ring-1 ring-[#6b1e30] scale-105 shadow-sm"
-                          : "border-[#c69c40]/20 hover:border-[#c69c40] opacity-75 hover:opacity-100"
+                  <div className="flex items-center gap-3 overflow-x-auto py-2.5 px-1 -mx-1">
+                    {product.images.map((img, i) => {
+                      const isActive = activeImageIdx === i;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActiveImageIdx(i)}
+                          className={`relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-md transition-all duration-200 cursor-pointer ${
+                            isActive
+                              ? "border-2 border-[#6b1e30] ring-2 ring-[#6b1e30]/20 shadow-md scale-105"
+                              : "border-2 border-stone-200 hover:border-[#c69c40] opacity-75 hover:opacity-100"
                           }`}
-                        aria-label={`Switch to photo ${i + 1}`}
-                      >
-                        <Image
-                          src={img}
-                          alt={`${product.name} thumbnail ${i + 1}`}
-                          fill
-                          sizes="56px"
-                          className="object-cover"
-                        />
-                      </button>
-                    ))}
+                          aria-label={`Switch to photo ${i + 1}`}
+                        >
+                          <Image
+                            src={img}
+                            alt={`${product.name} thumbnail ${i + 1}`}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
