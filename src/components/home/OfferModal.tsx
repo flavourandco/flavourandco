@@ -7,7 +7,7 @@ import { media } from "@/lib/media";
 import { setWithTTL, hasExpired } from "@/lib/storage";
 
 const POPUP_KEY = "offer-popup-dismissed";
-const POPUP_TTL = 5 * 60 * 1000; // 5 minutes
+const POPUP_TTL = 10 * 60 * 1000; // 10 minutes
 
 const fraunces = Fraunces({
   subsets: ["latin"],
