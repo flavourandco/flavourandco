@@ -85,7 +85,7 @@ export default function HomeNavbar() {
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-[52px] sm:h-[60px] w-auto object-contain"
+                className="h-[40px] sm:h-[46px] w-auto object-contain"
               />
             </Link>
 
