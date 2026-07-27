@@ -1,5 +1,4 @@
 import HomeNavbar from "@/components/home/HomeNavbar";
-import SmoothScroll from "@/components/home/SmoothScroll";
 import HomeHero from "@/components/home/HomeHero";
 import HomeProducts from "@/components/home/HomeProducts";
 import HomeAbout from "@/components/home/HomeAbout";
@@ -12,16 +11,14 @@ export default function Home() {
     <>
       <OfferModal />
       <HomeNavbar />
-      <SmoothScroll>
-        <main className="pt-4 md:pt-0">
-          <HomeHero />
-          <HomeProducts />
-          <HomeAbout />
-          <HomeTestimonials />
-          <HomeBundleCTA />
-        </main>
-        <Footer />
-      </SmoothScroll>
+      <main className="pt-4 md:pt-0">
+        <HomeHero />
+        <HomeProducts />
+        <HomeAbout />
+        <HomeTestimonials />
+        <HomeBundleCTA />
+      </main>
+      <Footer />
     </>
   );
 }
