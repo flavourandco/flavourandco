@@ -45,7 +45,7 @@ export default function Footer() {
                 Join the Family
               </h3>
               <p className="mt-3 max-w-md opacity-80">
-                Subscribe for exclusive offers, seasonal fusion pie releases, and updates from Simran.
+                Subscribe for exclusive offers, seasonal pie releases, and updates from Flavour &amp; Co.
               </p>
             </div>
             <form className="flex flex-col gap-3 sm:flex-row">
@@ -81,7 +81,7 @@ export default function Footer() {
               className="h-32 lg:h-36 w-auto object-contain"
             />
             <p className="mt-4 text-sm leading-relaxed opacity-80">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian fusion pies Sydney-wide.
+              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function Footer() {
               className="h-24 w-auto object-contain"
             />
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian fusion pies Sydney-wide.
+              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
             </p>
           </div>
 
@@ -235,7 +235,7 @@ export default function Footer() {
             </div>
 
             <p className="text-[11px] opacity-60">
-              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved. Handcrafted Sydney-wide.
+              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved. Handcrafted Australia-wide.
             </p>
           </div>
 
@@ -244,7 +244,7 @@ export default function Footer() {
         {/* Desktop Copyright Bar */}
         <div className="hidden md:flex mt-12 items-center justify-between border-t border-secondary/20 pt-6 text-xs opacity-60">
           <p>&copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved.</p>
-          <p>Handcrafted by Simran • Sydney-Wide Delivery</p>
+          <p>Handcrafted by Simran • Australia-Wide Delivery</p>
         </div>
 
       </div>

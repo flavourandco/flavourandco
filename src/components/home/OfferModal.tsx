@@ -100,7 +100,7 @@ export default function OfferModal() {
             </div>
 
             <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mt-2 font-medium">
-              Join the Flavour &amp; Co. family! Subscribe to our newsletter to receive a <span className="text-[#6b1e30] font-extrabold">10% discount code</span> on your first box of handcrafted Indo-Australian fusion pies.
+              Join the Flavour &amp; Co. family! Subscribe to our newsletter to receive a <span className="text-[#6b1e30] font-extrabold">10% discount code</span> on your first order of handcrafted Indo-Australian pies.
             </p>
 
             <form

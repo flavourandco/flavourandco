@@ -25,47 +25,88 @@ const countryCodes = [
   { code: "+82", flag: "🇰🇷", name: "South Korea" },
 ];
 
-// Clean transparent vector logo marks for brands worked with
-function NikeSwooshLogo({ className = "h-8 w-auto" }: { className?: string }) {
+// Hotel & Brand Vector Logos
+function FullertonHotelLogo() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Nike">
-      <path d="M21.71 6.8c-2.3 2.1-7.1 5.9-10.4 8.2-1.9 1.3-3.8 2.2-5.4 2.2-1.6 0-2.8-.7-3.4-2.1-.6-1.4-.3-3.2.7-4.8 1.1-1.7 3-3.1 5.1-3.9 1.1-.4 1.7.3 1.2 1.3-.9 1.7-1.8 3.5-2.2 5.1-.3 1 .1 1.6.8 1.6 1.4 0 3.8-1.5 6.3-3.4 3.7-2.8 7.3-6.2 9.5-8.2.5-.4 1.1-.1.9.5z" />
-    </svg>
-  );
-}
-
-function AdidasLogo({ className = "h-8 w-auto" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 24" fill="currentColor" className={className} aria-label="Adidas">
-      <path d="M2 20h5.5L15.5 8h-5.5L2 20zm8.5 0h5.5L24 5h-5.5l-8 15zm8.5 0h5.5L31 2h-5.5l-6.5 18z" />
-    </svg>
-  );
-}
-
-function Channel7Logo({ className = "h-7 w-auto" }: { className?: string }) {
-  return (
-    <div className="flex items-center gap-1.5 font-bold tracking-tighter text-lg font-serif">
-      <span className="bg-[#6b1e30] text-cream px-2 py-0.5 rounded text-xs">7</span>
-      <span className="uppercase text-xs tracking-widest font-sans">CHANNEL SEVEN</span>
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <div className="text-[#c69c40] font-serif text-xl font-bold">F</div>
+      <div className="flex flex-col text-left">
+        <span className="font-serif font-extrabold text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">THE FULLERTON HOTEL</span>
+        <span className="text-[9px] font-sans font-semibold tracking-wider text-[#6b1e30] uppercase">SYDNEY • 5-STAR</span>
+      </div>
     </div>
   );
 }
 
-function SydneyGourmetLogo({ className = "h-7 w-auto" }: { className?: string }) {
+function SheratonGrandLogo() {
   return (
-    <div className="flex items-center gap-2 font-serif font-bold text-sm tracking-wider uppercase">
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <div className="w-6 h-6 rounded-full border-2 border-[#c69c40] flex items-center justify-center text-[#c69c40] font-serif text-xs font-bold">S</div>
+      <div className="flex flex-col text-left">
+        <span className="font-serif font-extrabold text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">SHERATON GRAND</span>
+        <span className="text-[9px] font-sans font-semibold tracking-wider text-[#6b1e30] uppercase">HYDE PARK SYDNEY</span>
+      </div>
+    </div>
+  );
+}
+
+function AmoraHotelLogo() {
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <span className="font-serif italic font-black text-lg text-[#6b1e30]">Amora</span>
+      <div className="flex flex-col text-left">
+        <span className="font-sans font-black text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">HOTEL JAMISON</span>
+        <span className="text-[9px] font-sans font-semibold tracking-wider text-[#c69c40] uppercase">SYDNEY • 5-STAR</span>
+      </div>
+    </div>
+  );
+}
+
+function NovotelLogo() {
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <div className="bg-[#07402b] text-white px-2.5 py-1 font-sans font-black text-xs tracking-widest uppercase rounded">
+        NOVOTEL
+      </div>
+      <span className="text-[10px] font-bold text-[#1c1410] tracking-wider uppercase">DARLING HARBOUR</span>
+    </div>
+  );
+}
+
+function ParkRoyalLogo() {
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <div className="text-[#6b1e30] font-serif text-base font-black tracking-tighter">PR</div>
+      <div className="flex flex-col text-left">
+        <span className="font-serif font-extrabold text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">PARKROYAL</span>
+        <span className="text-[9px] font-sans font-semibold tracking-wider text-[#6b1e30] uppercase">PARRAMATTA</span>
+      </div>
+    </div>
+  );
+}
+
+function Channel7PlateLogo() {
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
+      <span className="bg-[#6b1e30] text-cream px-2 py-0.5 rounded text-xs font-bold">7</span>
+      <div className="flex flex-col text-left">
+        <span className="font-sans font-black text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">CHANNEL SEVEN</span>
+        <span className="text-[9px] font-sans font-bold tracking-wider text-[#c69c40] uppercase">PLATE OF ORIGIN</span>
+      </div>
+    </div>
+  );
+}
+
+function CorporateCateringLogo() {
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-2 opacity-90 hover:opacity-100 transition-opacity">
       <svg className="w-5 h-5 text-[#c69c40]" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" />
       </svg>
-      <span>SYDNEY GOURMET</span>
-    </div>
-  );
-}
-
-function PlateOfOriginLogo({ className = "h-7 w-auto" }: { className?: string }) {
-  return (
-    <div className="flex items-center gap-2 font-sans font-extrabold text-xs tracking-widest uppercase">
-      <span className="border-2 border-[#1c1410]/60 px-2 py-0.5 rounded">PLATE OF ORIGIN</span>
+      <div className="flex flex-col text-left">
+        <span className="font-serif font-bold text-xs sm:text-sm tracking-widest text-[#1c1410] uppercase">CORPORATE CATERING</span>
+        <span className="text-[9px] font-sans font-semibold tracking-wider text-[#6b1e30] uppercase">FOODSERVICE PARTNERS</span>
+      </div>
     </div>
   );
 }
@@ -102,21 +143,21 @@ export default function WholesaleClient() {
 
   return (
     <div className="w-full bg-[#fdf8f3] text-[#1c1410]">
-      
+
       {/* 1. Hero Overview Section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 items-center">
-          
+
           {/* Left Column Text */}
           <div className="lg:col-span-6 text-left space-y-6">
             <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30]">
               Foodservice Partnerships
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410] leading-[1.15]">
-              Elevating Menus Across Sydney
+              Elevating Menus Nationwide
             </h2>
             <p className="text-sm sm:text-base text-[#1c1410]/80 leading-relaxed font-sans max-w-xl">
-              Flavour &amp; Co partners with cafés, caterers, hotels and foodservice venues to deliver premium Indo-fusion pies that stand out on any menu. Handcrafted with local Australian ingredients.
+              Flavour &amp; Co partners with cafés, caterers, 5-star hotels and foodservice key venues across Australia to deliver premium Indo-Australian pies that stand out on any menu. Handcrafted with local Australian ingredients and backed by nationwide logistics partners.
             </p>
             <div className="pt-2">
               <button
@@ -146,109 +187,107 @@ export default function WholesaleClient() {
         </div>
       </section>
 
-      {/* 2. Brands We Have Worked With Ticker Section & Manual Testimonial Carousel */}
-      <section className="w-full bg-[#f7efe6] py-10 overflow-hidden">
-        <div className="text-center mb-6">
+      {/* 2. Slowed Infinite Brand Logos Carousel (Above) */}
+      <section className="w-full bg-[#f7efe6] py-10 border-y border-[#ebe3d8] overflow-hidden">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-6 text-center">
           <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30]">
-            BRANDS WE HAVE WORKED WITH
+            PARTNERED HOTELS &amp; BRANDS
           </span>
         </div>
 
-        {/* Continuous Moving Brand Logo Marquee Ticker (Mapped dynamically from src/lib/data.ts) */}
-        <div className="flex whitespace-nowrap animate-marquee gap-16 text-[#1c1410]/70 items-center justify-around opacity-80 mb-10">
-          {[1, 2, 3, 4].map((groupKey) => (
-            <React.Fragment key={groupKey}>
-              {wholesaleBrands.map((brand) => (
-                <div key={`${groupKey}-${brand.id}`} className="shrink-0 flex items-center hover:opacity-100 transition-opacity">
-                  {brand.type === "nike" ? (
-                    <NikeSwooshLogo className="h-9 w-auto text-[#1c1410]" />
-                  ) : brand.type === "adidas" ? (
-                    <AdidasLogo className="h-8 w-auto text-[#1c1410]" />
-                  ) : brand.type === "channel7" ? (
-                    <Channel7Logo />
-                  ) : brand.type === "sydneygourmet" ? (
-                    <SydneyGourmetLogo />
-                  ) : brand.type === "plateoforigin" ? (
-                    <PlateOfOriginLogo />
-                  ) : (
-                    /* Custom Brand Logo Image File from src/lib/data.ts */
-                    <img src={brand.logo} alt={brand.name} className="h-8 w-auto object-contain max-w-[130px]" />
-                  )}
-                </div>
-              ))}
-            </React.Fragment>
-          ))}
+        {/* Slowed Infinite Marquee Carousel Track (45s speed) */}
+        <div className="relative w-full overflow-hidden py-2 cursor-grab active:cursor-grabbing">
+          {/* Gradient Fades */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-16 sm:w-32 bg-gradient-to-r from-[#f7efe6] to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-16 sm:w-32 bg-gradient-to-l from-[#f7efe6] to-transparent" />
+
+          {/* Marquee Track */}
+          <div className="animate-marquee flex items-center gap-10 whitespace-nowrap [animation-duration:45s]">
+            {[1, 2, 3].flatMap((repeat) => [
+              <FullertonHotelLogo key={`fullerton-${repeat}`} />,
+              <SheratonGrandLogo key={`sheraton-${repeat}`} />,
+              <AmoraHotelLogo key={`amora-${repeat}`} />,
+              <NovotelLogo key={`novotel-${repeat}`} />,
+              <ParkRoyalLogo key={`parkroyal-${repeat}`} />,
+              <Channel7PlateLogo key={`channel7-${repeat}`} />,
+              <CorporateCateringLogo key={`corporate-${repeat}`} />,
+            ])}
+          </div>
         </div>
+      </section>
 
-        {/* Testimonials Container */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 border-t border-[#ebe3d8]/60 pt-6 mt-6">
-          
-          {/* PC Desktop View: Fixed 4-Column Grid (No Carousel, No Borders, No Card Backgrounds, Tight Spacing) */}
-          <div className="hidden md:grid md:grid-cols-4 gap-6 text-left">
-            {wholesaleTestimonials.map((t) => (
-              <div key={t.id} className="space-y-2 bg-transparent border-0 p-0">
-                <p className="font-serif italic font-bold text-[#1c1410] text-sm leading-snug">
-                  {t.quote}
-                </p>
-
-                <div className="flex items-center gap-2.5 pt-1">
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[#c69c40]">
-                    <Image
-                      src={t.avatar}
-                      alt={t.author}
-                      fill
-                      className="object-cover"
-                      sizes="32px"
-                      quality={95}
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#6b1e30] leading-tight">{t.author}</h4>
-                    <p className="text-[10px] text-[#1c1410]/70 font-sans leading-tight">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+      {/* 3. WHERE WE'RE ALREADY TRUSTED Section (Below) */}
+      <section className="w-full bg-[#fdf8f3] py-16 md:py-20 border-b border-[#ebe3d8]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30]">
+              PROVEN B2B TRACK RECORD
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410]">
+              WHERE WE&apos;RE ALREADY TRUSTED
+            </h2>
+            <p className="text-xs sm:text-sm text-[#1c1410]/75 max-w-2xl mx-auto">
+              Flavour &amp; Co. products are currently on the menu at leading 5-star hotels and catering partners across banquet, buffet, and bar service:
+            </p>
           </div>
 
-          {/* Mobile View: Touch-Swipe Carousel (Content-based Width & Line Wrapping) */}
-          <div className="flex md:hidden overflow-x-auto snap-x snap-mandatory gap-6 py-1 scrollbar-none text-left">
-            {wholesaleTestimonials.map((t) => (
-              <div
-                key={t.id}
-                className="snap-start shrink-0 w-auto min-w-[150px] max-w-[75vw] bg-transparent border-0 p-0 flex flex-col justify-between space-y-2 whitespace-normal break-words"
-              >
-                <p className="font-serif italic font-bold text-[#1c1410] text-sm leading-snug">
-                  {t.quote}
-                </p>
+          {/* 5-Star Hotel Table / Grid */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">5-Star Hotel</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">The Fullerton Hotel Sydney</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Banquet pies, breakfast buffet items, and Chicken Tikka Samosas (bar menu).
+              </p>
+            </div>
 
-                <div className="flex items-center gap-2.5 pt-1">
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[#c69c40]">
-                    <Image
-                      src={t.avatar}
-                      alt={t.author}
-                      fill
-                      className="object-cover"
-                      sizes="32px"
-                      quality={95}
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#6b1e30] leading-tight">{t.author}</h4>
-                    <p className="text-[10px] text-[#1c1410]/70 font-sans leading-tight">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">5-Star Hotel</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">Sheraton Grand Sydney Hyde Park</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Banquet pies and event foodservice supply.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">5-Star Hotel</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">Amora Hotel Jamison Sydney</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Pies and gluten-free South Asian breakfast items.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">Harbour Venue</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">Novotel Sydney Darling Harbour</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Canapés for cocktail and function menus.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">5-Star Hotel</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">Park Royal Parramatta</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Pies and breakfast items.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-2 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded">Corporate Catering</span>
+              <h3 className="font-serif font-bold text-lg text-[#1c1410]">Corporate Catering Partners</h3>
+              <p className="text-xs text-[#1c1410]/75 leading-relaxed">
+                Full gourmet pie range, mini canapés, and grazing formats.
+              </p>
+            </div>
           </div>
-
         </div>
       </section>
 
       {/* 3. Why Work With Us Section (Compact Simran Kitchen Image) */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 items-center">
-          
+
           {/* Left Column: Compact Simran Kitchen Image */}
           <div className="lg:col-span-5 flex justify-center lg:justify-start order-last lg:order-first">
             <div className="relative aspect-[3/4] w-full max-w-[260px] sm:max-w-[300px] overflow-hidden rounded-xl shadow-lg border-4 border-white">
@@ -278,10 +317,10 @@ export default function WholesaleClient() {
               {/* Point 1 */}
               <div className="space-y-1 border-l-2 border-[#c69c40] pl-4">
                 <h3 className="font-serif text-xl font-bold text-[#1c1410]">
-                  Consistent Quality
+                  HACCP-Certified &amp; 12-Month Shelf Life
                 </h3>
                 <p className="text-xs sm:text-sm text-[#1c1410]/80 leading-relaxed font-sans">
-                  Built for reliability in foodservice, with consistent results across preparation, presentation and taste.
+                  Supplied frozen with a 12-month shelf life under strict HACCP accreditation for reliable stock holding and nationwide distribution.
                 </p>
               </div>
 
@@ -291,17 +330,17 @@ export default function WholesaleClient() {
                   Distinctive Range
                 </h3>
                 <p className="text-xs sm:text-sm text-[#1c1410]/80 leading-relaxed font-sans">
-                  A curated range of Indo-fusion pies that elevate traditional flavours into something modern, memorable and menu-worthy.
+                  A curated range of Indo-Australian pies, canapés, and gluten-free South Asian breakfast items that elevate traditional flavours into something modern and menu-worthy.
                 </p>
               </div>
 
               {/* Point 3 */}
               <div className="space-y-1 border-l-2 border-[#c69c40] pl-4">
                 <h3 className="font-serif text-xl font-bold text-[#1c1410]">
-                  Built for Service
+                  Built for Scale &amp; Key Venues
                 </h3>
                 <p className="text-xs sm:text-sm text-[#1c1410]/80 leading-relaxed font-sans">
-                  Designed for ease of preparation and consistency across service, with flexible storage that works for busy kitchens and events.
+                  Designed for ease of preparation and consistency across service for key venues, with flexible logistics serving clients Australia-wide.
                 </p>
               </div>
             </div>
@@ -325,7 +364,7 @@ export default function WholesaleClient() {
             <div className="text-left space-y-3 group">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm">
                 <Image
-                  src="/products/PHOTOS_Flavour&Co-2.jpg"
+                  src="/products/cabinet-display-pies.jpg"
                   alt="Perfect for cabinet display"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -416,7 +455,7 @@ export default function WholesaleClient() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
-            
+
             {/* Row 1: Name & Business Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-1">

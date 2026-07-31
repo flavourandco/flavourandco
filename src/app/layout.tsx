@@ -11,9 +11,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Flavour & Co. | Premium Indo-Fusion Artisan Pies by Simran",
+  title: "Flavour & Co. | Premium Indo-Australian Artisan Pies by Simran",
   description:
-    "Delicious Indo-Australian fusion pies created by Simran, showcased on Channel 7's Plate of Origin. Delivered Sydney-wide.",
+    "Delicious Indo-Australian pies created by Simran, showcased on Channel 7's Plate of Origin.",
 };
 
 export default function RootLayout({

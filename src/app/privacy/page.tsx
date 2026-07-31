@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | Flavour & Co.",
   description:
-    "Learn how Flavour & Co. collects, uses, and safeguards your personal information when ordering our artisan fusion pies.",
+    "Learn how Flavour & Co. collects, uses, and safeguards your personal information when ordering our artisan pies.",
 };
 
 export default function PrivacyPage() {
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Introduction</h2>
           <p>
-            Flavour &amp; Co. (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) is committed to protecting your privacy in compliance with the Privacy Act 1988 (Cth) and Australian Privacy Principles (APPs). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or order our gourmet fusion pies.
+            Flavour &amp; Co. (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) is committed to protecting your privacy in compliance with the Privacy Act 1988 (Cth) and Australian Privacy Principles (APPs). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or order our gourmet pies.
           </p>
         </section>
 

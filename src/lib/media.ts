@@ -5,7 +5,7 @@ export const media = {
   navbarLogo: "/navbar_brand_logo.png",
   footerLogo: "/footer_brand_logo.png",
   heroVideo: "/pies.mp4",
-  
+
   // Local high-quality pie and bakery images from /products/
   products: {
     butterChicken: "/products/PHOTOS_Flavour&Co-3.jpg",
@@ -24,7 +24,14 @@ export const media = {
   about: {
     kitchen: "/founder/simran-kitchen.jpg",
     baker: "/founder/simran-kitchen.jpg",
-  }
+  },
+
+  timeline: {
+    spark: "/founder/simran-kitchen.jpg",
+    plateOfOrigin: "/founder/simran-coloured.jpg",
+    myTeamIndia: "/products/PHOTOS_Flavour&Co-3.jpg",
+    wholesale: "/products/cabinet-display-pies.jpg",
+  },
 } as const;
 
 export default media;

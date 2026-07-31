@@ -55,7 +55,7 @@ export default function HomeAbout() {
             Made with <span className="italic font-medium text-secondary">Love</span>.
           </h2>
           <p className="mt-6 text-lg leading-relaxed opacity-85 font-medium">
-            Flavour & Co. is founded by Simran, whose love of Indian cuisine inspired these unique fusion pies, showcased on Channel 7&apos;s Plate of Origin.
+            Flavour & Co. is founded by Simran, whose love of Indian cuisine inspired these unique pies, showcased on Channel 7&apos;s Plate of Origin.
           </p>
           <p className="mt-4 text-base leading-relaxed opacity-70">
             Having grown up abroad after leaving India, we wanted our kids to grow up with the flavours we hold dear — so we baked our roots into every single pie.

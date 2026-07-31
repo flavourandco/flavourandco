@@ -128,7 +128,7 @@ export default function HomeMoods() {
             <span className="italic text-brand-gold">Match Moments</span>
           </h2>
           <p className="mt-6 text-sm leading-relaxed text-cream/70">
-            From lively Sunday dinners to cozy fireside conversations, our Indo-fusion recipes are blended to turn everyday plates into gatherings worth sharing.
+            From lively Sunday dinners to cozy fireside conversations, our Indo-Australian recipes are blended to turn everyday plates into gatherings worth sharing.
           </p>
           <div className="mt-8 hidden items-center gap-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand-gold/60 md:flex">
             <span>Scroll to explore</span>

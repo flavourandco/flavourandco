@@ -1,13 +1,14 @@
 import PageLayout from "@/components/PageLayout";
 import Image from "next/image";
 import Link from "next/link";
+import StoryTimeline from "@/components/StoryTimeline";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Meet Simran | Our Story | Flavour & Co.",
   description:
-    "More than food — a story of flavour and connection. Learn how Simran brings heritage into a modern context with Flavour & Co.'s artisan fusion pies.",
+    "More than food — a story of flavour and connection. Learn how Simran brings heritage into a modern context with Flavour & Co.'s artisan pies.",
 };
 
 /**
@@ -91,7 +92,7 @@ export default function OurStoryPage() {
       hideHeader={true}
     >
       <div className="bg-cream pb-0">
-        
+
         {/* Banner Section */}
         <div className="w-full relative h-48 md:h-64 lg:h-72 bg-[#07402b] flex items-center justify-center shadow-md">
           <div className="text-center px-6">
@@ -115,7 +116,7 @@ export default function OurStoryPage() {
               <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30] mb-3">
                 Meet Simran
               </p>
-              
+
               <h2 className="font-serif text-4xl sm:text-4.5xl md:text-5xl text-brand-green leading-[1.1] font-semibold">
                 More Than <span className="italic text-[#6b1e30]">Food</span>. <br />
                 A Story of Flavour and Connection.
@@ -129,7 +130,7 @@ export default function OurStoryPage() {
                 <p>
                   For Simran, food has always been more than just something on the table — it’s how stories are shared, traditions are carried forward, and people are brought together.
                 </p>
-                
+
                 <p className="font-serif italic text-lg text-brand-green leading-snug">
                   Raised in a home where recipes were passed down through generations, <span className="text-[#6b1e30] font-bold not-italic">she developed a deep appreciation for flavour, culture and the moments food creates.</span>
                 </p>
@@ -171,72 +172,8 @@ export default function OurStoryPage() {
           </div>
         </div>
 
-        {/* Section 2: Horizontal Timeline */}
-        <div className="relative">
-          <div className="text-cream">
-            <ScallopDivider flip="down" className="h-4 md:h-6" />
-          </div>
-
-          <div className="bg-brand-green text-white py-16 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-brand-gold/20 blur-3xl" />
-            </div>
-
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-              <span className="block text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold text-center mb-2">
-                Our Journey
-              </span>
-              <h3 className="font-serif text-2xl md:text-3.5xl text-white text-center mb-16 font-semibold">
-                How We Built the <span className="text-[#c69c40] italic font-medium">Brand</span>
-              </h3>
-
-              <div className="grid gap-8 md:grid-cols-4 relative">
-                <div className="hidden md:block absolute top-[28px] left-[12%] right-[12%] h-[2px] bg-brand-gold/20 -z-0" />
-
-                {(
-                  [
-                    {
-                      year: "2018",
-                      title: "The Spark",
-                      copy: "Simran starts fusing her heritage recipes with classic buttery pastry, right in her home kitchen.",
-                    },
-                    {
-                      year: "2020",
-                      title: "Plate of Origin",
-                      tag: "TV",
-                      copy: "Represents India on Channel 7's national cooking show, winning judges over with bold, familial flavours.",
-                    },
-                    {
-                      year: "2022",
-                      title: "Official Launch",
-                      copy: "Flavour & Co. launches, bringing gourmet pie packs to foodies across Sydney.",
-                    },
-                    {
-                      year: "2024+",
-                      title: "Wholesale",
-                      copy: "Expanding into wholesale supply, corporate catering, and bulk orders for premium venues.",
-                    },
-                  ] satisfies { year: string; title: string; tag?: string; copy: string }[]
-                ).map((item) => (
-                  <div key={item.year} className="relative z-10 text-center flex flex-col items-center group">
-                    <div className="h-14 w-14 rounded-full bg-brand-gold text-brand-green flex items-center justify-center font-bold text-sm border-4 border-brand-green shadow-md transition-transform duration-300 group-hover:scale-105">
-                      {item.year}
-                    </div>
-                    <h4 className="mt-4 font-bold text-brand-gold text-sm tracking-wider uppercase flex items-center gap-2">
-                      {item.title}
-                      {item.tag && (
-                        <Highlight tone="gold" className="text-[9px] tracking-wider py-[1px] normal-case">
-                          {item.tag}
-                        </Highlight>
-                      )}
-                    </h4>
-                    <p className="mt-2 text-xs text-cream/70 max-w-[200px] leading-relaxed">{item.copy}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Section 2: Story Timeline Component */}
+        <StoryTimeline />
 
         {/* Section 3: Our Approach (Dark Inset Background) */}
         <div className="relative overflow-hidden py-24 md:py-32 w-full bg-[#1c1410] text-white">
@@ -244,7 +181,7 @@ export default function OurStoryPage() {
           <div className="absolute inset-0 z-0">
             <Image
               src="/products/PHOTOS_Flavour&Co-4.jpg"
-              alt="Flavour & Co. Gourmet Fusion background"
+              alt="Flavour & Co. Gourmet background"
               fill
               className="object-cover opacity-50"
               sizes="100vw"

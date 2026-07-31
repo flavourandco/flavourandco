@@ -14,7 +14,7 @@ export default function Home() {
       <main className="pt-4 md:pt-0">
         <HomeHero />
         <HomeProducts />
-        <HomeAbout />
+        {/* <HomeAbout /> — hidden per request, may add back later */}
         <HomeTestimonials />
         <HomeBundleCTA />
       </main>

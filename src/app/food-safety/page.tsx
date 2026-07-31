@@ -92,7 +92,6 @@ export default function FoodSafetyPage() {
           <ul className="list-disc pl-5 space-y-2 text-stone-700">
             <li><strong>Oven (Recommended):</strong> Preheat oven to 180°C (350°F). Bake frozen pie for 25–30 minutes until golden and internal temperature reaches 75°C+.</li>
             <li><strong>Air Fryer:</strong> Bake at 170°C for 20 minutes for an ultra-flaky crust.</li>
-            <li><strong>Microwave:</strong> Thaw pie first, then microwave for 2 minutes and crisp in an oven or air fryer for 3 minutes.</li>
           </ul>
         </section>
 

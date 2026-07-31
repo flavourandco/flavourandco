@@ -1,7 +1,7 @@
 export const marqueeItems = [
   "plate of origin on channel 7",
-  "indo-australian fusion pies",
-  "delivering sydney-wide",
+  "indo-australian pies",
+  "australia-wide delivery",
   "handcrafted by simran",
   "authentic heritage spices",
   "made with love",
@@ -9,8 +9,8 @@ export const marqueeItems = [
 
 export const tickerItems = [
   "plate of origin",
-  "indo-australian fusion",
-  "sydney-wide delivery",
+  "indo-australian",
+  "australia-wide delivery",
   "heritage recipes",
   "flaky butter pastry",
   "made with love",
@@ -74,16 +74,16 @@ export const products: Product[] = [
   // ─────────────────────────────────────────────────────────
   {
     id: "mini-authentic-butter-chicken",
-    name: "Mini Butter Chicken Pies",
+    name: "Mini Authentic Butter Chicken Pies",
     tagline: "A crowd favourite, reimagined in bite-sized form.",
     shortDescription: "Slow-cooked chicken thigh fillets in a rich, velvety butter chicken sauce, wrapped in golden flaky pastry.",
     description:
-      "Our Mini Butter Chicken Pies combine slow-cooked chicken thigh fillets with a rich, velvety butter chicken sauce, wrapped in golden flaky pastry for the perfect balance of comfort and flavour. Ideal for entertaining, grazing tables, events, or elevated everyday snacking.",
+      "Our Mini Authentic Butter Chicken Pies combine slow-cooked chicken thigh fillets with a rich, velvety butter chicken sauce, wrapped in golden flaky pastry for the perfect balance of comfort and flavour. Ideal for entertaining, grazing tables, events, or elevated everyday snacking.",
     whyStandOut: [
       { title: "Slow-Cooked Flavour", text: "Tender chicken thigh fillets simmered in our signature butter chicken sauce for deep, layered flavour in every bite." },
       { title: "Made in Australia", text: "Crafted in small batches for quality you can taste." },
       { title: "No Artificial Preservatives", text: "Made with carefully selected ingredients and no unnecessary additives." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for effortless entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini pies per pack (55g each)",
@@ -118,7 +118,7 @@ export const products: Product[] = [
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "100% Vegetarian & Egg-Free", text: "Made to suit a wide range of dietary preferences without compromising on flavour." },
       { title: "No Artificial Preservatives", text: "Clean, quality ingredients with nothing unnecessary added." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for easy entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini pies per pack (55g each)",
@@ -143,7 +143,7 @@ export const products: Product[] = [
   },
   {
     id: "mini-lamb-keema",
-    name: "Mini Lamb Keema Pie",
+    name: "Mini Lamb Keema Pies",
     tagline: "Bold Indian flavours, wrapped in flaky golden pastry.",
     shortDescription: "Premium Australian lamb, gently cooked with aromatic herbs and spices, encased in crisp golden pastry.",
     description:
@@ -153,7 +153,7 @@ export const products: Product[] = [
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "Premium Australian Lamb", text: "Using quality Australian lamb to deliver a deliciously tender and flavourful filling." },
       { title: "No Artificial Preservatives", text: "Clean, quality ingredients with nothing unnecessary added." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for easy entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini pies per pack (55g each)",
@@ -177,11 +177,9 @@ export const products: Product[] = [
     ],
     preparationOptions: ["Freshly Baked", "Frozen"],
   },
-  // Note: no screenshot source for the 3 products below — copy kept in the
-  // house style/format but not verbatim-sourced. Flag if you have real copy.
   {
     id: "mini-achari-paneer-pie",
-    name: "Mini Achari Paneer Pie",
+    name: "Mini Achari Paneer Pies",
     tagline: "A tangy, spiced twist on a classic favourite.",
     shortDescription: "Cottage cheese cooked in aromatic pickled achari spices, wrapped in golden pastry.",
     description:
@@ -191,7 +189,7 @@ export const products: Product[] = [
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "100% Vegetarian", text: "Made to suit a wide range of dietary preferences without compromising on flavour." },
       { title: "No Artificial Preservatives", text: "Made with carefully selected ingredients and no unnecessary additives." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for effortless entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini pies per pack (55g each)",
@@ -216,7 +214,7 @@ export const products: Product[] = [
   },
   {
     id: "chicken-tikka-samosa",
-    name: "Chicken Tikka Samosa",
+    name: "Chicken Tikka Samosas",
     tagline: "Smoky, spiced chicken tikka in a crisp samosa shell.",
     shortDescription: "Succulent chicken tikka in a rich masala filling, wrapped in crispy triangle samosa pastry.",
     description:
@@ -225,7 +223,7 @@ export const products: Product[] = [
       { title: "Authentic Tikka Masala Flavour", text: "Chicken marinated and cooked in a rich, aromatic masala blend for deep flavour in every bite." },
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "No Artificial Preservatives", text: "Made with carefully selected ingredients and no unnecessary additives." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for effortless entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini samosas per pack (55g each)",
@@ -250,17 +248,17 @@ export const products: Product[] = [
   },
   {
     id: "paneer-empanada",
-    name: "Paneer Empanada",
-    tagline: "A fusion favourite, crimped to perfection.",
+    name: "Paneer Empanadas",
+    tagline: "A crowd favourite, crimped to perfection.",
     shortDescription: "Crimped crescent pastries stuffed with spiced paneer, green peas, onions, and herbs.",
     description:
-      "Our Paneer Empanadas are crimped crescent pastries stuffed with spiced paneer, green peas, onions, and traditional herbs — a fusion snack made for effortless entertaining. Ideal for grazing tables, events, or elevated everyday snacking.",
+      "Our Paneer Empanadas are crimped crescent pastries stuffed with spiced paneer, green peas, onions, and traditional herbs — an artisan snack made for effortless entertaining. Ideal for grazing tables, events, or elevated everyday snacking.",
     whyStandOut: [
-      { title: "Fusion-Inspired Filling", text: "A crescent pastry take on a classic paneer filling, blending Indian spice with empanada-style pastry." },
+      { title: "Heritage-Inspired Filling", text: "A crescent pastry take on a classic paneer filling, blending Indian spice with empanada-style pastry." },
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "100% Vegetarian", text: "Made to suit a wide range of dietary preferences without compromising on flavour." },
       { title: "No Artificial Preservatives", text: "Made with carefully selected ingredients and no unnecessary additives." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for effortless entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "12 mini empanadas per pack (55g each)",
@@ -289,7 +287,7 @@ export const products: Product[] = [
   // ─────────────────────────────────────────────────────────
   {
     id: "authentic-butter-chicken",
-    name: "Authentic Butter Chicken",
+    name: "Authentic Butter Chicken Pies - Individual",
     tagline: "A crowd favourite, reimagined.",
     shortDescription: "Slow-cooked chicken thigh fillets in a rich, velvety butter chicken sauce, wrapped in golden flaky pastry.",
     description:
@@ -298,7 +296,7 @@ export const products: Product[] = [
       { title: "Slow-Cooked Flavour", text: "Tender chicken thigh fillets simmered in our signature butter chicken sauce for deep, layered flavour in every bite." },
       { title: "Made in Australia", text: "Crafted in small batches for quality you can taste." },
       { title: "No Artificial Preservatives", text: "Made with carefully selected ingredients and no unnecessary additives." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for effortless entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "2 pies per pack (220g each)",
@@ -320,7 +318,7 @@ export const products: Product[] = [
   },
   {
     id: "100-vegetarian-samosa",
-    name: "Samosa Pie",
+    name: "Samosa Pies - Individual",
     tagline: "A modern take on a timeless favourite.",
     shortDescription: "Savoury spiced potato and green pea filling wrapped in flaky golden pastry.",
     description:
@@ -330,7 +328,7 @@ export const products: Product[] = [
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "100% Vegetarian & Egg-Free", text: "Made to suit a wide range of dietary preferences without compromising on flavour." },
       { title: "No Artificial Preservatives", text: "Clean, quality ingredients with nothing unnecessary added." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for easy entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "2 pies per pack (220g each)",
@@ -352,7 +350,7 @@ export const products: Product[] = [
   },
   {
     id: "lamb-keema",
-    name: "Lamb Keema Pie",
+    name: "Lamb Keema Pies - Individual",
     tagline: "Bold Indian flavours, wrapped in flaky golden pastry.",
     shortDescription: "Premium Australian lamb, gently cooked with aromatic herbs and spices, encased in crisp golden pastry.",
     description:
@@ -362,7 +360,7 @@ export const products: Product[] = [
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "Premium Australian Lamb", text: "Using quality Australian lamb to deliver a deliciously tender and flavourful filling." },
       { title: "No Artificial Preservatives", text: "Clean, quality ingredients with nothing unnecessary added." },
-      { title: "Heat & Serve Convenience", text: "Available fresh or frozen for easy entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "2 pies per pack (220g each)",
@@ -400,7 +398,7 @@ export const products: Product[] = [
       { title: "Try the Full Range", text: "One of each flavour, so there's no need to choose just one." },
       { title: "Crafted in Small Batches", text: "Made with carefully selected ingredients for quality you can taste." },
       { title: "No Artificial Preservatives", text: "Clean, quality ingredients with nothing unnecessary added." },
-      { title: "Heat & Serve Convenience", text: "Frozen for easy entertaining — oven, air fryer, or microwave ready." },
+      { title: "Handcrafted", text: "Handcrafted in small batches using premium Australian ingredients for quality you can taste in every crimp." },
     ],
     productDetails: [
       "3 pies per pack (220g each)",
@@ -459,7 +457,7 @@ export const products: Product[] = [
 export const testimonials = [
   {
     quote:
-      "Simran's butter chicken pie is the best fusion food I've ever tasted. The pastry is incredibly flaky and the filling is rich and authentic.",
+      "Simran's butter chicken pie is the best food I've ever tasted. The pastry is incredibly flaky and the filling is rich and authentic.",
     author: "Monica G. (Sydney)",
     rating: 5,
   },
@@ -471,7 +469,7 @@ export const testimonials = [
   },
   {
     quote:
-      "Representing India on Plate of Origin was no fluke — these pies are pure culinary magic. A perfect blend of Indian spices and classic Aussie pies.",
+      "Representing India on Plate of Origin was no fluke — these pies are pure culinary magic. A perfect blend of Indian spices and classic Australian pies.",
     author: "David L. (Surry Hills)",
     rating: 5,
   },
@@ -531,7 +529,7 @@ export const faqItems: FaqItem[] = [
   {
     id: "faq-2",
     question: "How do I heat my pies?",
-    answer: "Our pies are designed for convenience and can be heated in the oven, air fryer or microwave.\n\nFor the best flaky pastry, we recommend heating them in the oven or air fryer. Heating instructions are provided on every pack."
+    answer: "Our pies are best heated in a conventional oven or air fryer for peak flaky pastry texture.\n\nPlease note: We do not recommend using a microwave at all due to food safety reasons and to preserve the crisp quality of the pastry. Detailed heating instructions for oven and air fryer are provided on every pack."
   },
   {
     id: "faq-3",
@@ -541,12 +539,12 @@ export const faqItems: FaqItem[] = [
   {
     id: "faq-4",
     question: "What comes in your Grazing Boxes?",
-    answer: "Each Grazing Box includes 30 handcrafted Mini Pies and our signature chutney for dipping.\n\nChoose from:\n• Mini Samosa Pies\n• Mini Butter Chicken Pies\n• Mini Lamb Keema Pies\n• Flavour Selection (a mix of all three)\n\nPerfect for sharing, entertaining or gifting."
+    answer: "Each Grazing Box includes 30 handcrafted Mini Pies and our signature chutney for dipping.\n\nChoose from:\n• Mini Samosa Pies\n• Mini Authentic Butter Chicken Pies\n• Mini Lamb Keema Pies\n• Flavour Selection (a mix of all three)\n\nPerfect for sharing, entertaining or gifting."
   },
   {
     id: "faq-5",
     question: "What are the delivery cost?",
-    answer: "We currently offer delivery across Greater Sydney, with options for various locations and order values:\n\n• Local Delivery (within 10km radius of Norwest, NSW): $9.95 (if not in the free delivery area)\n• Greater Sydney Delivery (11km-45km radius from Norwest, NSW): $14.95\n• Free Local Delivery: For orders over $25 to the following suburbs: Kellyville, North Kellyville, Castle Hill, Baulkam Hills, Bella Vista, Glenwood, Parklea, Stanhope Gardens, Quakers Hill, Marayong, Colebee, Marsden Park, Schofields, Riverstone, The Ponds, and Rouse Hill.\n• Free Greater Sydney Delivery: For orders over $200 (up to 50km from Norwest, NSW)."
+    answer: "We currently offer express delivery Australia-wide through trusted logistics partners, with options for various locations and order values:\n\n• Standard Express Delivery: $15 AUD\n• Free Express Shipping: For orders over $200 nationwide."
   },
   {
     id: "faq-6",

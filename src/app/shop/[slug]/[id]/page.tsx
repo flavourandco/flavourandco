@@ -233,7 +233,7 @@ export default function ProductDetailPage({
                 <div className="bg-cream/60 rounded p-3 border border-[#c69c40]/15 space-y-2 text-[11px] text-stone-700">
                   <div className="flex items-center gap-2">
                     <Truck className="h-3.5 w-3.5 text-[#07402b] shrink-0" />
-                    <span><strong>Sydney-Wide Delivery</strong> (Fresh & Frozen)</span>
+                    <span><strong>Australia-Wide Delivery</strong> (Fresh & Frozen)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Flame className="h-3.5 w-3.5 text-[#6b1e30] shrink-0" />
@@ -445,7 +445,7 @@ export default function ProductDetailPage({
                   Heating & Serving Instructions
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-stone-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-stone-700">
                   <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
                     <span className="font-bold text-[#07402b] uppercase block">Oven</span>
                     <p>Preheat to 180°C. Bake for 12–15 mins (fresh) or 20–25 mins (frozen).</p>
@@ -454,11 +454,6 @@ export default function ProductDetailPage({
                   <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
                     <span className="font-bold text-[#07402b] uppercase block">Air Fryer</span>
                     <p>Air fry at 170°C for 8–10 mins until golden and steaming hot.</p>
-                  </div>
-
-                  <div className="bg-white p-3.5 rounded-md border border-stone-200/80 space-y-1 shadow-sm">
-                    <span className="font-bold text-[#07402b] uppercase block">Microwave</span>
-                    <p>Heat on High for 60–90 seconds (quick option for soft warm pie).</p>
                   </div>
                 </div>
               </div>

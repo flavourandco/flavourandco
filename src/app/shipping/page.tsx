@@ -4,16 +4,16 @@ import { Truck, RefreshCw, ShieldCheck, Clock } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Shipping & Returns Policy | Flavour & Co.",
+  title: "Shipping & Delivery Policy | Flavour & Co.",
   description:
-    "Learn about Flavour & Co's Sydney-wide express delivery schedule, cold-chain packaging, and return policy for artisan fusion pies.",
+    "Learn about Flavour & Co's express delivery schedule, cold-chain packaging, and return policy for artisan pies.",
 };
 
 export default function ShippingPage() {
   return (
     <PageLayout
       title="Shipping & Returns"
-      subtitle="Sydney-wide express delivery schedule, cold-chain packaging, and quality guarantees."
+      subtitle="Australia-wide express delivery schedule, cold-chain packaging, and quality guarantees."
     >
       <div className="max-w-4xl mx-auto space-y-10 text-stone-800 text-sm sm:text-base leading-relaxed py-4 text-left">
         
@@ -24,8 +24,8 @@ export default function ShippingPage() {
               <Truck className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-primary text-base">Sydney-Wide Express</h3>
-              <p className="text-xs text-stone-600 mt-1">Refrigerated express shipping across greater Sydney metropolitan areas.</p>
+              <h3 className="font-bold text-primary text-base">Australia-Wide Express</h3>
+              <p className="text-xs text-stone-600 mt-1">Refrigerated express shipping across Australia with cold-chain logistics partners.</p>
             </div>
           </div>
 
@@ -45,7 +45,7 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Cold-Chain Guarantee</h3>
-              <p className="text-xs text-stone-600 mt-1">Pies are packed with gel coolants to stay frozen or chilled until unpacking.</p>
+              <p className="text-xs text-stone-600 mt-1">Pies are packed with cold-chain protection to stay frozen or chilled until unpacking.</p>
             </div>
           </div>
 
@@ -64,24 +64,16 @@ export default function ShippingPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Delivery Zones & Rates</h2>
           <p>
-            Flavour &amp; Co. delivers fresh and frozen handcrafted fusion pies across metropolitan Sydney and select regional outskirts. Standard express delivery is $15 AUD, and orders over $100 receive <strong>Free Express Shipping</strong>.
+            Flavour &amp; Co. delivers fresh and frozen handcrafted pies Australia-wide. Standard express delivery is $15 AUD, and orders over $200 receive <strong>Free Express Shipping</strong>.
           </p>
           <p>
-            For wholesale or high-volume catering orders, custom courier logistics are arranged directly upon checkout confirmation.
+            For wholesale or high-volume orders, shipping is arranged via 3rd party courier (not directly at checkout); our team will reach out directly to coordinate delivery.
           </p>
         </section>
 
         {/* Section 2 */}
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">2. Packaging & Thermal Preservation</h2>
-          <p>
-            To ensure zero loss of artisanal quality, every pie order is packed inside reusable eco-friendly thermal insulated cartons with food-grade gel ice packs. Your products will remain chilled and safe even if left at your doorstep for up to 4 hours after delivery.
-          </p>
-        </section>
-
-        {/* Section 3 */}
-        <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">3. Returns & Refunds Policy</h2>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">2. Returns & Refunds Policy</h2>
           <p>
             Due to strict food safety standards, we cannot accept physical returns of perishable food items once delivered. However, if your items arrive damaged, defrosted inappropriately, or incorrect:
           </p>
@@ -92,9 +84,9 @@ export default function ShippingPage() {
           </ul>
         </section>
 
-        {/* Section 4 */}
+        {/* Section 3 */}
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">4. Order Cancellations & Modifying Orders</h2>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">3. Order Cancellations & Modifying Orders</h2>
           <p>
             Modifications or cancellations must be submitted at least 24 hours prior to your scheduled dispatch date. Once pies are baked and packed in cold-chain logistics, cancellations cannot be honored.
           </p>

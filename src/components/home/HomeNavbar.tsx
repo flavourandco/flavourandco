@@ -40,16 +40,16 @@ export default function HomeNavbar() {
         {/* Top Free Shipping Announcement Bar */}
         {/* PC View: Static and Centered */}
         <div className="hidden md:block bg-brand-green py-1.5 px-4 text-center text-brand-gold text-[11px] font-bold uppercase tracking-[0.2em]">
-          Free Express Shipping on Orders Over $100 | Handcrafted Sydney-Wide
+          Free Express Shipping on Orders Over $200 | Handcrafted Gourmet Pies
         </div>
 
         {/* Mobile View: Continuous Infinite Marquee Ticker */}
         <div className="md:hidden overflow-hidden bg-brand-green py-1.5 text-brand-gold text-[10px] font-bold uppercase tracking-[0.18em]">
           <div className="animate-ticker flex whitespace-nowrap">
-            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
-            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
-            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
-            <span className="px-4">Free Express Shipping on Orders Over $100 • Handcrafted Sydney-Wide</span>
+            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
+            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
+            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
+            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
           </div>
         </div>
 
@@ -298,7 +298,7 @@ export default function HomeNavbar() {
             {/* Handcrafted Tagline */}
             <div className="text-center">
               <p className="font-fraunces text-xs italic text-primary/70">
-                Handcrafted Fusion Pies • Sydney-Wide Express
+                Handcrafted Pies • Express Delivery
               </p>
               <p className="text-[10px] text-primary/40 uppercase tracking-widest mt-1">
                 Flavour & Co. Artisanal Bakery
@@ -351,7 +351,7 @@ export default function HomeNavbar() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search fusion pies, grazing packs, recipes..."
+                  placeholder="Search pies, grazing packs, recipes..."
                   className="w-full rounded-none border-2 border-secondary/40 bg-base-200 px-5 py-4 pl-12 text-sm sm:text-base text-base-content placeholder:text-base-content/50 focus:border-secondary focus:outline-none transition-all"
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary" />
@@ -416,7 +416,7 @@ export default function HomeNavbar() {
 
           {/* Drawer Footer */}
           <div className="pt-6 mt-8 border-t border-secondary/15 flex items-center justify-between text-xs opacity-70">
-            <span>Handcrafted Fusion Pies Sydney</span>
+            <span>Handcrafted Gourmet Pies</span>
             <Link
               href="/shop"
               onClick={() => setSearchOpen(false)}

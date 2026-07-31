@@ -132,12 +132,7 @@ export default function HomeProducts() {
           </p>
           <h2 className="mt-4 font-fraunces text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-primary">
             Our Indo-Australian <span className="italic font-medium text-secondary">Pies</span>
-            <br />
-            <span className="text-secondary">Delivering Sydney-Wide</span>
           </h2>
-          <p className="mt-5 text-base leading-relaxed opacity-75">
-            Created by Simran, representing Flavour & Co. on Channel 7&apos;s Plate of Origin. Try our award-winning butter chicken, keema lamb, and samosa pies today!
-          </p>
         </div>
 
         {/* Carousel Container */}

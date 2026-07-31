@@ -3,16 +3,16 @@ import WholesaleClient from "@/components/WholesaleClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Wholesale & Foodservice | Flavour & Co. Sydney",
+  title: "Wholesale & Foodservice | Flavour & Co. Australia",
   description:
-    "Partner with Flavour & Co. We supply premium Indo-Australian fusion pies to cafés, caterers, hotels, and foodservice venues across Australia.",
+    "Partner with Flavour & Co. We supply premium Indo-Australian pies to cafés, caterers, hotels, and foodservice key venues across Australia.",
 };
 
 export default function WholesalePage() {
   return (
     <PageLayout
       title="Wholesale & Foodservice"
-      subtitle="Partner with Flavour & Co to deliver premium Indo-fusion pies across cafés, hotels, caterers and venues."
+      subtitle="Partner with Flavour & Co to deliver premium Indo-Australian pies across cafés, hotels, caterers and key venues nationwide."
       fullWidth
     >
       <WholesaleClient />

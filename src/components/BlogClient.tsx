@@ -16,8 +16,8 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
-    id: "art-of-fusion-pastry",
-    title: "The Art of Indo-Australian Fusion Pastry: Fusing Spice with Tradition",
+    id: "art-of-pastry",
+    title: "The Art of Indo-Australian Pastry: Blending Spice with Tradition",
     date: "July 24, 2026",
     category: "Craft & Story",
     image: "/products/PHOTOS_Flavour&Co-1.jpg",
@@ -62,7 +62,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: "wholesale-cafe-partnerships",
-    title: "Wholesale Partnerships: Elevating Café Menus Across Sydney",
+    title: "Wholesale Partnerships: Elevating Café Menus Across Australia",
     date: "June 02, 2026",
     category: "Foodservice",
     image: "/founder/simran-coloured.jpg",

@@ -107,7 +107,7 @@ export default function HomeHero() {
               <span className="italic font-medium text-[#E3A72B]">Indo-Australian</span>
             </span>
             <span className="hero-title-line mt-1 block font-bold">
-              Gourmet Fusion Pies
+              Gourmet Pies
             </span>
           </h1>
 
@@ -127,7 +127,7 @@ export default function HomeHero() {
 
           <p className="hero-subtext mt-6 max-w-xl text-sm font-normal leading-relaxed text-[#F2E6D3]/85 sm:text-base">
             Baking our roots into every pie. Rich, slow-cooked Indian spiced fillings, wrapped
-            in light, multi-layered flaky Aussie pastry — made by hand, one crimp at a time.
+            in light, multi-layered flaky Australian pastry — made by hand, one crimp at a time.
           </p>
 
           <div className="hero-ingredients mt-6 flex flex-wrap items-center gap-y-2 font-mono text-[11px] uppercase tracking-[0.15em]">

@@ -3,7 +3,7 @@ import ContactForm from "@/components/ContactForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Flavour & Co. | Artisan Fusion Pies",
+  title: "Contact Us | Flavour & Co. | Artisan Pies",
   description:
     "Get in touch with Flavour & Co. Reach out to Simran and our team for event catering, wholesale inquiries, or general pie questions.",
 };

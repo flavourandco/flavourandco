@@ -255,7 +255,7 @@ export default function ContactForm() {
                   Interested in <span className="text-[#6b1e30] font-semibold not-italic">connecting?</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-[#1c1410]/80 leading-relaxed font-sans">
-                  Simran is passionate about food heritage, fusion baking, and community. She is open to media interviews, podcast features, guest blog collaborations, speaking opportunities, and joint ventures across Sydney and beyond.
+                  Simran is passionate about food heritage, artisan baking, and community. She is open to media interviews, podcast features, guest blog collaborations, speaking opportunities, and joint ventures across Sydney and beyond.
                 </p>
               </div>
             </div>
