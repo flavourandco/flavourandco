@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
-  const [activeModal, setActiveModal] = useState<"product" | "blog" | "media" | null>(null);
+  const [activeModal, setActiveModal] = useState<"product" | "blog" | null>(null);
 
   // 1. Recent Purchases (Bakery E-Commerce Orders)
   const recentPurchases = [
@@ -157,7 +157,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setActiveModal("product")}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-md transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-md transition-colors shadow-sm cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Product</span>
@@ -165,18 +165,10 @@ export default function AdminDashboardPage() {
 
           <button
             onClick={() => setActiveModal("blog")}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-md transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-md transition-colors shadow-sm cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5 text-slate-500" />
             <span>New Blog</span>
-          </button>
-
-          <button
-            onClick={() => setActiveModal("media")}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-md transition-colors shadow-sm"
-          >
-            <Upload className="w-3.5 h-3.5 text-slate-500" />
-            <span>Upload Media</span>
           </button>
         </div>
       </div>
@@ -467,11 +459,10 @@ export default function AdminDashboardPage() {
               <h3 className="text-base font-bold text-slate-900">
                 {activeModal === "product" && "Add New Bakery Product"}
                 {activeModal === "blog" && "Create New Blog Article"}
-                {activeModal === "media" && "Upload Product Media"}
               </h3>
               <button
                 onClick={() => setActiveModal(null)}
-                className="text-slate-400 hover:text-slate-700 text-sm font-bold"
+                className="text-slate-400 hover:text-slate-700 text-sm font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -508,29 +499,23 @@ export default function AdminDashboardPage() {
                   </div>
                 </>
               )}
-              {activeModal === "media" && (
-                <div className="border-2 border-dashed border-slate-200 rounded-md p-8 text-center text-slate-400">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                  <span>Drag and drop high-res pie photos or videos here</span>
-                </div>
-              )}
             </div>
 
             <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded"
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  alert(`${activeModal.toUpperCase()} saved successfully!`);
+                  alert(`${activeModal ? activeModal.toUpperCase() : ""} saved successfully!`);
                   setActiveModal(null);
                 }}
-                className="px-4 py-1.5 text-xs font-semibold bg-slate-900 text-white hover:bg-black rounded shadow-sm"
+                className="px-4 py-1.5 text-xs font-semibold bg-slate-900 text-white hover:bg-black rounded shadow-sm cursor-pointer"
               >
-                Save Product
+                Save
               </button>
             </div>
           </div>

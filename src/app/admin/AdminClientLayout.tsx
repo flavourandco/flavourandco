@@ -18,8 +18,6 @@ import {
   X,
   ExternalLink,
   LogOut,
-  Search,
-  Bell,
 } from "lucide-react";
 
 export default function AdminClientLayout({ children }: { children: React.ReactNode }) {
@@ -64,11 +62,8 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
       <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-slate-200/80 fixed left-0 top-0 bottom-0 z-40 justify-between select-none">
         <div className="flex flex-col h-full overflow-hidden">
           {/* Brand Header */}
-          <Link href="/admin/dashboard" className="h-16 flex items-center justify-between px-5 border-b border-slate-100 shrink-0 hover:opacity-90 transition-opacity">
-            <img src={media.navbarLogo} alt="Flavour & Co." className="h-8 w-auto object-contain" />
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-              Admin
-            </span>
+          <Link href="/admin/dashboard" className="h-20 flex items-center justify-center px-4 border-b border-slate-100 shrink-0 hover:opacity-90 transition-opacity">
+            <img src={media.navbarLogo} alt="Flavour & Co." className="h-14 w-auto max-w-[190px] object-contain mx-auto" />
           </Link>
 
           {/* Clean Sidebar Navigation Items */}
@@ -82,7 +77,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
                     isActive
                       ? "bg-slate-900 text-white"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -97,15 +92,16 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
         </div>
 
         {/* Sidebar Bottom Controls */}
-        <div className="p-3 border-t border-slate-100 space-y-1 shrink-0 bg-slate-50/50">
+        <div className="p-3 border-t border-slate-100 space-y-2 shrink-0 bg-slate-50/50">
           <Link
             href="/"
             target="_blank"
-            className="w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-200/60 transition-colors"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
-            <span>View Main Store</span>
+            <span>Visit Main Store</span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </Link>
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
@@ -113,18 +109,35 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
+
+          {/* User Profile Card at bottom */}
+          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md bg-white border border-slate-200/80 shadow-2xs">
+            {user?.imageUrl ? (
+              <img
+                src={user.imageUrl}
+                alt={adminName}
+                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                {userInitial}
+              </div>
+            )}
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-xs font-bold text-slate-900 truncate">{adminName}</span>
+              <span className="text-[10px] text-slate-400 font-medium truncate">Administrator</span>
+            </div>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
         {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between bg-white px-4 h-14 border-b border-slate-200 sticky top-0 z-30">
-          <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <img src={media.navbarLogo} alt="Flavour & Co." className="h-7 w-auto object-contain" />
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-              Admin
-            </span>
+        <header className="lg:hidden flex items-center justify-between bg-white px-4 h-16 border-b border-slate-200 sticky top-0 z-30">
+          <div className="w-8"></div> {/* Spacer for symmetry */}
+          <Link href="/admin/dashboard" className="flex items-center justify-center">
+            <img src={media.navbarLogo} alt="Flavour & Co." className="h-11 w-auto object-contain mx-auto" />
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -164,42 +177,6 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
             </div>
           </div>
         )}
-
-        {/* Desktop Top Header Navbar */}
-        <header className="hidden lg:flex items-center justify-between px-8 h-16 bg-white border-b border-slate-200/80 sticky top-0 z-30">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <span className="text-slate-400">Admin</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-900 font-bold">{getBreadcrumbTitle()}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-52 bg-slate-50 border border-slate-200 rounded-md py-1.5 pl-3 pr-8 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all"
-              />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5" />
-            </div>
-
-            <button className="p-2 text-slate-500 hover:text-slate-900 rounded-md hover:bg-slate-100 transition-colors relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-            </button>
-
-            <div className="flex items-center gap-2 border-l border-slate-200 pl-3 ml-1">
-              {user?.imageUrl ? (
-                <img src={user.imageUrl} alt={adminName} className="w-7 h-7 rounded-full object-cover border border-slate-200" />
-              ) : (
-                <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                  {userInitial}
-                </div>
-              )}
-              <span className="text-xs font-semibold text-slate-700">{adminName}</span>
-            </div>
-          </div>
-        </header>
 
         {/* Main Content Area */}
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
