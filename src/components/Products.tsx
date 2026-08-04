@@ -1,10 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 import { products } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 
 export default function Products() {
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [showWishlistOnly, setShowWishlistOnly] = useState(false);
+
+  const toggleWishlist = (id: string) => {
+    setWishlist((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const displayedProducts = showWishlistOnly
+    ? products.filter((p) => wishlist.includes(p.id))
+    : products;
+
   return (
     <section className="bg-cream pt-0 pb-16 md:pb-24">
       {/* Banner Image - Full Screen Width, Thinner Height, No Rounded Corners */}
@@ -21,19 +36,61 @@ export default function Products() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-10">
-        {/* Main Header */}
-        <div className="text-left mb-10 pb-6 border-b border-[#c69c40]/25">
-          <h1 className="font-serif text-3xl md:text-4xl text-brand-green font-bold uppercase tracking-wider">
-            All Products
+        {/* Main Header with Wishlist Button on the opposite side */}
+        <div className="flex items-center justify-between mb-10 pb-6 border-b border-[#c69c40]/25">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-brand-green font-bold uppercase tracking-wider">
+            {showWishlistOnly ? "My Wishlist" : "All Products"}
           </h1>
+
+          {/* Wishlist Button on the other side of All Products header */}
+          <button
+            onClick={() => setShowWishlistOnly(!showWishlistOnly)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              showWishlistOnly
+                ? "bg-brand-green text-white shadow-xs"
+                : "bg-white text-brand-green border border-brand-green/30 hover:border-brand-green hover:bg-brand-green/5"
+            }`}
+          >
+            <Heart
+              className={`h-4 w-4 ${
+                wishlist.length > 0 ? "fill-brand-gold text-brand-gold" : "text-brand-green"
+              }`}
+            />
+            <span>
+              {showWishlistOnly ? "Show All Products" : `Wishlist (${wishlist.length})`}
+            </span>
+          </button>
         </div>
 
-        {/* All Product Cards Grid (No Sidebar, No Filters, No Pagination) */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {/* Product Cards Grid */}
+        {displayedProducts.length > 0 ? (
+          <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+            {displayedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                isWishlisted={wishlist.includes(product.id)}
+                onToggleWishlist={() => toggleWishlist(product.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white/60 rounded-2xl border border-stone-200/60 p-8">
+            <Heart className="h-10 w-10 text-stone-300 mx-auto mb-3" />
+            <h3 className="font-serif text-xl font-bold text-stone-700 mb-1">
+              Your Wishlist is Empty
+            </h3>
+            <p className="text-xs text-stone-500 max-w-sm mx-auto mb-6">
+              Click the heart icon on any product card to save your favorite pies here.
+            </p>
+            <button
+              onClick={() => setShowWishlistOnly(false)}
+              className="bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full hover:bg-brand-gold hover:text-brand-green transition-all cursor-pointer"
+            >
+              Explore All Products
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

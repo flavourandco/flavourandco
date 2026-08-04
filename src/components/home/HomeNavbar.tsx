@@ -166,11 +166,11 @@ export default function HomeNavbar() {
             </nav>
 
             {/* Right: Actions & Auth Buttons */}
-            <div className="flex items-center gap-3 sm:gap-4 text-primary">
+            <div className="flex items-center gap-3 sm:gap-5 text-brand-green">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="p-2 hover:text-secondary transition-colors cursor-pointer"
+                className="p-1.5 text-stone-700 hover:text-brand-green transition-colors cursor-pointer"
                 aria-label="Open search drawer"
               >
                 <Search className="h-5 w-5" />
@@ -178,56 +178,48 @@ export default function HomeNavbar() {
 
               <Link
                 href="/shop"
-                className="p-2 hover:text-secondary transition-colors"
-                aria-label="Wishlist"
-              >
-                <Heart className="h-5 w-5" />
-              </Link>
-
-              <Link
-                href="/shop"
-                className="relative p-2 hover:text-secondary transition-colors"
+                className="relative p-1.5 text-stone-700 hover:text-brand-green transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
+                <span className="absolute -top-0.5 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-gold text-[9px] font-extrabold text-brand-green shadow-xs">
                   0
                 </span>
               </Link>
 
-              {/* Authentication Buttons / User Profile Redirection Pill */}
+              {/* Minimal Authentication Buttons / User Profile */}
               {isLoaded && isSignedIn ? (
                 <Link
                   href="/profile"
-                  className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-green/30 bg-brand-green/5 hover:bg-brand-green/10 transition-all group cursor-pointer"
+                  className="ml-1 flex items-center gap-2 py-1 px-1 rounded-full hover:opacity-80 transition-all cursor-pointer"
+                  title="View Profile"
                 >
                   {user?.imageUrl ? (
                     <img
                       src={user.imageUrl}
                       alt={firstName}
-                      className="h-7 w-7 rounded-full object-cover border border-brand-gold/50 shadow-xs"
+                      className="h-8 w-8 rounded-full object-cover shadow-xs"
                     />
                   ) : (
-                    <div className="h-7 w-7 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs shadow-xs">
+                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs shadow-xs">
                       {userInitial}
                     </div>
                   )}
-                  <span className="text-xs font-bold text-brand-green tracking-wide">
-                    Hey, {firstName}
+                  <span className="text-xs font-bold text-stone-800 tracking-tight hidden lg:inline-block">
+                    {firstName}
                   </span>
-                  <ChevronRight className="h-3.5 w-3.5 text-brand-green/60 group-hover:text-brand-green group-hover:translate-x-0.5 transition-all" />
                 </Link>
               ) : (
-                <div className="flex items-center gap-2 ml-2">
+                <div className="flex items-center gap-3 ml-2">
                   <Link
                     href="/sign-in"
-                    className="text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-md border border-brand-green text-brand-green hover:bg-brand-green/10 transition-all cursor-pointer inline-block"
+                    className="text-xs font-extrabold uppercase tracking-wider text-stone-700 hover:text-brand-green transition-colors cursor-pointer"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-md bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm cursor-pointer inline-block"
+                    className="text-xs font-extrabold uppercase tracking-wider px-4 py-2 rounded-full bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green transition-all shadow-xs cursor-pointer inline-block"
                   >
                     Sign Up
                   </Link>
@@ -276,23 +268,6 @@ export default function HomeNavbar() {
               </button>
             </div>
 
-            {/* Wishlist Highlight Card inside Sidebar */}
-            <div className="mt-6">
-              <Link
-                href="/shop"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between rounded-none border border-secondary/30 bg-secondary/10 p-3.5 text-primary hover:bg-secondary hover:text-secondary-content transition-all duration-200 group"
-              >
-                <div className="flex items-center gap-3">
-                  <Heart className="h-5 w-5 text-secondary group-hover:text-secondary-content transition-colors fill-secondary/20" />
-                  <span className="text-xs font-bold uppercase tracking-wider">My Wishlist</span>
-                </div>
-                <span className="rounded-none bg-secondary group-hover:bg-primary group-hover:text-white px-2.5 py-0.5 text-[10px] font-bold text-secondary-content transition-colors">
-                  0 Saved
-                </span>
-              </Link>
-            </div>
-
             {/* Navigation Links */}
             <nav className="mt-6">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 block mb-2">
@@ -328,11 +303,11 @@ export default function HomeNavbar() {
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between py-3 px-4 bg-brand-green/10 border border-brand-green/20 rounded-md text-brand-green"
+                className="flex items-center justify-between py-2 px-1 text-brand-green hover:opacity-80 transition-all"
               >
                 <div className="flex items-center gap-3">
                   {user?.imageUrl ? (
-                    <img src={user.imageUrl} alt={firstName} className="h-8 w-8 rounded-full object-cover border border-brand-gold" />
+                    <img src={user.imageUrl} alt={firstName} className="h-8 w-8 rounded-full object-cover shadow-xs" />
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs">
                       {userInitial}
@@ -340,7 +315,7 @@ export default function HomeNavbar() {
                   )}
                   <div className="text-left">
                     <span className="text-xs font-bold uppercase tracking-wider block text-brand-green">
-                      Hey, {firstName}
+                      {firstName}
                     </span>
                     <span className="text-[10px] text-stone-500 block">View Profile &amp; Orders</span>
                   </div>

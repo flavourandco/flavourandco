@@ -65,12 +65,12 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Main Grid: Left Column Profile Card & Right Column Recent Orders */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Profile Card */}
-            <div className="md:col-span-4 bg-white p-6 sm:p-8 rounded-2xl border border-stone-200/80 shadow-sm flex flex-col items-center text-center">
-              {/* Profile Avatar Box */}
-              <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl bg-brand-green text-brand-gold flex items-center justify-center text-6xl font-serif font-bold shadow-md overflow-hidden mb-6 border-2 border-brand-gold/30">
+          {/* Main Grid: Left Column Profile & Right Column Recent Orders */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+            {/* Left Column: Minimal Profile */}
+            <div className="md:col-span-4 flex flex-col items-center text-center p-4">
+              {/* Minimal Avatar */}
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden mb-5 shadow-sm bg-brand-green text-brand-gold flex items-center justify-center text-4xl font-serif font-bold">
                 {user?.imageUrl ? (
                   <img
                     src={user.imageUrl}
@@ -83,21 +83,21 @@ export default function ProfilePage() {
               </div>
 
               {/* Welcome text & User info */}
-              <span className="text-xs uppercase tracking-widest text-stone-500 font-sans">
-                Welcome,
+              <span className="text-[11px] font-bold uppercase tracking-widest text-stone-400 font-sans">
+                Welcome
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-brand-green mt-1 mb-1 tracking-tight">
                 {fullName}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-500 font-sans mb-8 break-all">
+              <p className="text-xs text-stone-500 font-sans mb-6 break-all">
                 {userEmail}
               </p>
 
-              {/* Sign Out Button */}
+              {/* Minimal Sign Out Button */}
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="w-full flex items-center justify-center gap-2 border border-brand-green text-brand-green font-bold text-xs uppercase tracking-widest py-3 px-6 rounded-md hover:bg-brand-green hover:text-white transition-all cursor-pointer shadow-xs"
+                className="flex items-center justify-center gap-2 text-stone-600 hover:text-rose-600 font-bold text-xs uppercase tracking-widest py-2 px-4 transition-colors cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out
@@ -106,41 +106,41 @@ export default function ProfilePage() {
 
             {/* Right Column: Recent Orders */}
             <div className="md:col-span-8 space-y-6">
-              <div className="bg-white p-6 sm:p-8 rounded-2xl border border-stone-200/80 shadow-sm">
-                <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-200">
-                  <h3 className="font-serif text-2xl font-bold text-brand-green flex items-center gap-3">
-                    <ShoppingBag className="h-6 w-6 text-brand-gold" />
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-200/80">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-brand-green flex items-center gap-2.5">
+                    <ShoppingBag className="h-5 w-5 text-brand-gold" />
                     My Recent Orders
                   </h3>
-                  <span className="text-xs font-bold uppercase tracking-wider text-stone-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
                     Order History
                   </span>
                 </div>
 
-                {/* Empty State Card matching requested UI */}
-                <div className="bg-[#fcfaf7] border border-stone-200/60 rounded-xl p-8 sm:p-12 text-center flex flex-col items-center justify-center">
-                  <div className="h-16 w-16 rounded-full bg-brand-gold/15 flex items-center justify-center text-brand-green mb-4">
-                    <BookOpen className="h-8 w-8 stroke-[1.5]" />
+                {/* Minimal Empty State Card */}
+                <div className="py-12 text-center flex flex-col items-center justify-center">
+                  <div className="h-14 w-14 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 mb-4">
+                    <BookOpen className="h-7 w-7 stroke-[1.5]" />
                   </div>
 
-                  <h4 className="font-serif text-2xl font-bold text-stone-800 mb-2">
+                  <h4 className="font-serif text-xl font-bold text-stone-800 mb-2">
                     Your Gourmet Journey Awaits
                   </h4>
 
-                  <p className="text-stone-600 text-xs sm:text-sm max-w-md mx-auto leading-relaxed mb-8">
+                  <p className="text-stone-500 text-xs sm:text-sm max-w-md mx-auto leading-relaxed mb-6">
                     You haven&apos;t placed any pie orders yet. Discover our handcrafted Indo-Australian pies and artisanal bakery selections today.
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                     <Link
                       href="/shop"
-                      className="w-full sm:w-auto bg-brand-green text-white font-bold text-xs uppercase tracking-widest px-6 py-3.5 rounded-md hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm text-center"
+                      className="w-full sm:w-auto bg-brand-green text-white font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-brand-gold hover:text-brand-green transition-all text-center cursor-pointer shadow-xs"
                     >
                       Explore Menu
                     </Link>
                     <Link
                       href="/blog"
-                      className="w-full sm:w-auto border border-stone-300 text-stone-700 font-bold text-xs uppercase tracking-widest px-6 py-3.5 rounded-md hover:bg-stone-100 transition-all text-center"
+                      className="w-full sm:w-auto text-stone-600 font-bold text-xs uppercase tracking-widest px-6 py-3 transition-colors text-center hover:text-brand-green cursor-pointer"
                     >
                       Read Blogs
                     </Link>
