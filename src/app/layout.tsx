@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScroll from "@/components/home/SmoothScroll";
 import FloatingAdminButton from "@/components/FloatingAdminButton";
+import UserSyncListener from "@/components/UserSyncListener";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -47,6 +48,7 @@ export default function RootLayout({
           />
         </head>
         <body className="min-h-full flex flex-col font-serif">
+          <UserSyncListener />
           <SmoothScroll>{children}</SmoothScroll>
           <FloatingAdminButton />
         </body>

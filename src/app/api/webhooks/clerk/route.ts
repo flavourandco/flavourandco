@@ -107,11 +107,15 @@ export async function POST(req: Request) {
         { onConflict: "clerk_user_id" }
       );
 
-      // If error occurs (e.g. image_url column not created yet in DB schema), retry without optional image_url
-      if (error && error.message?.includes("image_url")) {
-        delete userRecord.image_url;
+      // If error occurs (e.g. extra columns like image_url or role not created yet in DB schema), retry with minimal fields
+      if (error) {
+        const minimalRecord = {
+          clerk_user_id: clerkUserId,
+          email,
+          name,
+        };
         const retryResult = await supabase.from("users").upsert(
-          userRecord,
+          minimalRecord,
           { onConflict: "clerk_user_id" }
         );
         error = retryResult.error;

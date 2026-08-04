@@ -80,13 +80,18 @@ export async function POST() {
       onConflict: "clerk_user_id",
     });
 
-    // Fallback if image_url column doesn't exist yet
-    if (error && error.message?.includes("image_url")) {
-      const recordsWithoutImage = recordsToSync.map(({ image_url, ...rest }) => rest);
-      const retryResult = await supabase.from("users").upsert(recordsWithoutImage, {
+    // Fallback if schema is minimal (e.g. only clerk_user_id, email, name exist)
+    if (error) {
+      console.warn("Full schema upsert failed, trying minimal fields fallback:", error.message);
+      const minimalRecords = recordsToSync.map((r: any) => ({
+        clerk_user_id: r.clerk_user_id,
+        email: r.email,
+        name: r.name,
+      }));
+      const retryMinimal = await supabase.from("users").upsert(minimalRecords, {
         onConflict: "clerk_user_id",
       });
-      error = retryResult.error;
+      error = retryMinimal.error;
     }
 
     if (error) {

@@ -205,9 +205,10 @@ export default function HomeNavbar() {
                       {userInitial}
                     </div>
                   )}
-                  <span className="text-xs font-bold text-stone-800 tracking-tight hidden lg:inline-block">
-                    {firstName}
-                  </span>
+                  <div className="hidden lg:flex flex-col text-left leading-none text-stone-800">
+                    <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Hey,</span>
+                    <span className="text-xs font-extrabold tracking-tight">{firstName}</span>
+                  </div>
                 </Link>
               ) : (
                 <div className="flex items-center gap-3 ml-2">
@@ -313,11 +314,9 @@ export default function HomeNavbar() {
                       {userInitial}
                     </div>
                   )}
-                  <div className="text-left">
-                    <span className="text-xs font-bold uppercase tracking-wider block text-brand-green">
-                      {firstName}
-                    </span>
-                    <span className="text-[10px] text-stone-500 block">View Profile &amp; Orders</span>
+                  <div className="text-left flex flex-col leading-none text-brand-green">
+                    <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Hey,</span>
+                    <span className="text-xs font-extrabold tracking-tight">{firstName}</span>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-brand-green" />
