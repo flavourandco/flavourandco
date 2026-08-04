@@ -25,7 +25,12 @@ export async function POST() {
 
     const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
     const name = fullName || user.username || (primaryEmail ? primaryEmail.split("@")[0] : "User");
-    const role = (user.publicMetadata?.role as string) || "user";
+    const rawRole =
+      (user.publicMetadata as any)?.role ||
+      (user as any).public_metadata?.role ||
+      (user as any).unsafeMetadata?.role ||
+      "user";
+    const role = String(rawRole).toLowerCase();
     const imageUrl = user.imageUrl || "";
     const now = new Date().toISOString();
 

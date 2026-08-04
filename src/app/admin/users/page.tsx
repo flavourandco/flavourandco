@@ -98,18 +98,19 @@ export default function AdminUsersPage() {
 
   // Filtering
   const filteredUsers = users.filter((u) => {
+    const userRole = String(u.role || "user").toLowerCase();
     const matchesSearch =
       u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.clerk_user_id.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesRole = roleFilter === "all" ? true : u.role === roleFilter;
+    const matchesRole = roleFilter === "all" ? true : userRole === roleFilter;
 
     return matchesSearch && matchesRole;
   });
 
   const totalUsersCount = users.length;
-  const adminUsersCount = users.filter((u) => u.role === "admin").length;
+  const adminUsersCount = users.filter((u) => String(u.role || "user").toLowerCase() === "admin").length;
   const customerUsersCount = totalUsersCount - adminUsersCount;
 
   return (
@@ -322,16 +323,22 @@ export default function AdminUsersPage() {
 
                       {/* Role */}
                       <td className="py-3">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
-                            u.role === "admin"
-                              ? "bg-purple-50 text-purple-700 border border-purple-200"
-                              : "bg-slate-100 text-slate-700 border border-slate-200"
-                          }`}
-                        >
-                          {u.role === "admin" && <ShieldCheck className="w-3 h-3" />}
-                          {u.role}
-                        </span>
+                        {(() => {
+                          const displayRole = String(u.role || "user").toLowerCase();
+                          const isAdminRole = displayRole === "admin";
+                          return (
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                isAdminRole
+                                  ? "bg-purple-50 text-purple-700 border border-purple-200"
+                                  : "bg-slate-100 text-slate-700 border border-slate-200"
+                              }`}
+                            >
+                              {isAdminRole && <ShieldCheck className="w-3 h-3" />}
+                              {displayRole}
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       {/* Clerk ID */}

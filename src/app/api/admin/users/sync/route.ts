@@ -64,11 +64,18 @@ export async function POST() {
       const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
       const name = fullName || user.username || (primaryEmail ? primaryEmail.split("@")[0] : "User");
 
+      const rawRole =
+        user.public_metadata?.role ||
+        user.publicMetadata?.role ||
+        user.unsafe_metadata?.role ||
+        "user";
+      const role = String(rawRole).toLowerCase();
+
       return {
         clerk_user_id: user.id,
         email: primaryEmail,
         name,
-        role: user.public_metadata?.role || "user",
+        role,
         image_url: user.image_url || user.profile_image_url || null,
         created_at: new Date(user.created_at).toISOString(),
         updated_at: now,

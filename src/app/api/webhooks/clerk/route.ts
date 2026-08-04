@@ -82,7 +82,12 @@ export async function POST(req: Request) {
   const lastName = data.last_name || "";
   const fullName = `${firstName} ${lastName}`.trim();
   const name = fullName || data.username || (email ? email.split("@")[0] : "User");
-  const role = data.public_metadata?.role || "user";
+  const rawRole =
+    data.public_metadata?.role ||
+    data.publicMetadata?.role ||
+    data.unsafe_metadata?.role ||
+    "user";
+  const role = String(rawRole).toLowerCase();
   const imageUrl = data.image_url || data.profile_image_url || "";
   const now = new Date().toISOString();
 
