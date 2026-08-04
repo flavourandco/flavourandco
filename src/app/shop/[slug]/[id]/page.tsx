@@ -22,6 +22,8 @@ import {
 import { products } from "@/lib/data";
 import PageLayout from "@/components/PageLayout";
 import Button from "@/components/Button";
+import ProductReviews from "@/components/ProductReviews";
+import RelatedProducts from "@/components/RelatedProducts";
 
 export default function ProductDetailPage({
   params,
@@ -461,6 +463,12 @@ export default function ProductDetailPage({
             </div>
 
           </div>
+
+          {/* Customer Written Reviews Section */}
+          <ProductReviews productId={product.id} productName={product.name} />
+
+          {/* Related Products Section with Reusable ShowMore Component */}
+          <RelatedProducts currentProduct={product} initialCount={4} />
 
         </div>
       </div>
