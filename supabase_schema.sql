@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     email TEXT NOT NULL,
     name TEXT,
     role TEXT DEFAULT 'user',
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -100,9 +101,14 @@ CREATE POLICY "Service Role Contact All" ON public.contact_inquiries FOR ALL USI
 -- Orders: Service Role can ALL, Public restricted
 CREATE POLICY "Service Role Orders All" ON public.orders FOR ALL USING (auth.role() = 'service_role');
 
--- Users: Allow read and webhook upsert operations
-CREATE POLICY "Public Users Read" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Public Users Upsert" ON public.users FOR ALL USING (true);
+-- Users: Allow read and webhook upsert operations for all
+DROP POLICY IF EXISTS "Public Users Read" ON public.users;
+DROP POLICY IF EXISTS "Public Users Upsert" ON public.users;
+
+CREATE POLICY "Public Users Select" ON public.users FOR SELECT USING (true);
+CREATE POLICY "Public Users Insert" ON public.users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Users Update" ON public.users FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Public Users Delete" ON public.users FOR DELETE USING (true);
 
 
 

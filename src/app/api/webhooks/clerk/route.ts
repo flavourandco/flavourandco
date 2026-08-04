@@ -83,25 +83,49 @@ export async function POST(req: Request) {
   const fullName = `${firstName} ${lastName}`.trim();
   const name = fullName || data.username || (email ? email.split("@")[0] : "User");
   const role = data.public_metadata?.role || "user";
+  const imageUrl = data.image_url || data.profile_image_url || "";
   const now = new Date().toISOString();
 
   if (isSupabaseConfigured()) {
     const supabase = getSupabaseServerClient();
     if (supabase) {
-      const { error } = await supabase.from("users").upsert(
-        {
-          clerk_user_id: clerkUserId,
-          email,
-          name,
-          role,
-          updated_at: now,
-        },
+      // Build record to upsert (omitting image_url if empty string/null fallback)
+      const userRecord: Record<string, any> = {
+        clerk_user_id: clerkUserId,
+        email,
+        name,
+        role,
+        updated_at: now,
+      };
+
+      if (imageUrl) {
+        userRecord.image_url = imageUrl;
+      }
+
+      let { error } = await supabase.from("users").upsert(
+        userRecord,
         { onConflict: "clerk_user_id" }
       );
 
+      // If error occurs (e.g. image_url column not created yet in DB schema), retry without optional image_url
+      if (error && error.message?.includes("image_url")) {
+        delete userRecord.image_url;
+        const retryResult = await supabase.from("users").upsert(
+          userRecord,
+          { onConflict: "clerk_user_id" }
+        );
+        error = retryResult.error;
+      }
+
       if (error) {
         console.error("Error upserting user to Supabase:", error.message);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Supabase save failed: ${error.message}. Please verify RLS policies in Supabase.`,
+          },
+          { status: 500 }
+        );
       }
     }
   }
@@ -109,6 +133,6 @@ export async function POST(req: Request) {
   return NextResponse.json({
     success: true,
     message: `User ${clerkUserId} synced successfully`,
-    data: { clerkUserId, email, name, role },
+    data: { clerkUserId, email, name, role, imageUrl },
   });
 }

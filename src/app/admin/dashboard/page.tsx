@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DollarSign,
   Package,
@@ -100,43 +100,44 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  // 3. Recent Customers
-  const recentCustomers = [
+  // Real Users state from API
+  const [realUsers, setRealUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const res = await fetch("/api/admin/users", { cache: "no-store" });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.users)) {
+          setRealUsers(data.users);
+        }
+      } catch (err) {
+        console.error("Dashboard failed to load real users:", err);
+      } finally {
+        setLoadingUsers(false);
+      }
+    }
+    loadUsers();
+  }, []);
+
+  // Fallback dummy customers if database has no users yet
+  const defaultCustomers = [
     {
-      id: 1,
+      id: "1",
       name: "Hannah Abbott",
       email: "hannah@abbott.io",
       joined: "Aug 04, 2026",
-      spent: 240.00,
       initials: "HA",
       bg: "bg-slate-900 text-white",
     },
     {
-      id: 2,
+      id: "2",
       name: "Liam O'Connor",
       email: "liam.oc@example.com",
       joined: "Aug 03, 2026",
-      spent: 310.50,
       initials: "LO",
       bg: "bg-emerald-600 text-white",
-    },
-    {
-      id: 3,
-      name: "Victoria Sterling",
-      email: "victoria@sterling.com",
-      joined: "Aug 03, 2026",
-      spent: 1250.00,
-      initials: "VS",
-      bg: "bg-amber-600 text-white",
-    },
-    {
-      id: 4,
-      name: "Oliver Vance",
-      email: "oliver@vance.org",
-      joined: "Aug 02, 2026",
-      spent: 180.00,
-      initials: "OV",
-      bg: "bg-indigo-600 text-white",
     },
   ];
 
@@ -376,27 +377,85 @@ export default function AdminDashboardPage() {
       <div className="bg-white rounded-md border border-slate-200/80 p-5 space-y-4 shadow-2xs">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Recent Customers</h2>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">New customer registrations &amp; lifetime spend</p>
+            <h2 className="text-sm font-bold text-slate-900">Recent Registrations</h2>
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">Live Clerk user accounts synced to database</p>
           </div>
+          <a
+            href="/admin/users"
+            className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors"
+          >
+            <span>Manage All Users</span>
+            <ChevronRight className="w-3 h-3" />
+          </a>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {recentCustomers.map((cust) => (
-            <div key={cust.id} className="p-4 bg-slate-50/70 rounded border border-slate-100 flex items-center gap-3.5">
-              <div className={`w-9 h-9 rounded-md ${cust.bg} flex items-center justify-center font-bold text-xs shrink-0`}>
-                {cust.initials}
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="font-bold text-xs text-slate-900 truncate block">{cust.name}</span>
-                <span className="text-[10px] text-slate-400 truncate block">{cust.email}</span>
-                <div className="flex items-center justify-between mt-1 text-[10px]">
-                  <span className="text-slate-500 font-medium">Joined {cust.joined}</span>
-                  <span className="font-bold text-emerald-700">${cust.spent.toFixed(2)}</span>
+          {loadingUsers ? (
+            <div className="col-span-full py-6 text-center text-xs text-slate-400">
+              Loading recent users...
+            </div>
+          ) : realUsers.length > 0 ? (
+            realUsers.slice(0, 4).map((u) => {
+              const initial = (u.name?.[0] || u.email?.[0] || "U").toUpperCase();
+              const dateStr = u.created_at
+                ? new Date(u.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "Recent";
+
+              return (
+                <div
+                  key={u.clerk_user_id || u.id}
+                  className="p-3.5 bg-slate-50/70 rounded border border-slate-100 flex items-center gap-3"
+                >
+                  {u.image_url ? (
+                    <img
+                      src={u.image_url}
+                      alt={u.name}
+                      className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                      {initial}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="font-bold text-xs text-slate-900 truncate block">
+                      {u.name}
+                    </span>
+                    <span className="text-[10px] text-slate-400 truncate block">{u.email}</span>
+                    <div className="flex items-center justify-between mt-1 text-[10px]">
+                      <span className="text-slate-500 font-medium">Joined {dateStr}</span>
+                      <span className="font-semibold text-slate-600 uppercase text-[9px] bg-slate-200/60 px-1.5 py-0.5 rounded">
+                        {u.role || "user"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            defaultCustomers.map((cust) => (
+              <div
+                key={cust.id}
+                className="p-3.5 bg-slate-50/70 rounded border border-slate-100 flex items-center gap-3"
+              >
+                <div
+                  className={`w-9 h-9 rounded-md ${cust.bg} flex items-center justify-center font-bold text-xs shrink-0`}
+                >
+                  {cust.initials}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="font-bold text-xs text-slate-900 truncate block">{cust.name}</span>
+                  <span className="text-[10px] text-slate-400 truncate block">{cust.email}</span>
+                  <div className="flex items-center justify-between mt-1 text-[10px]">
+                    <span className="text-slate-500 font-medium">Joined {cust.joined}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

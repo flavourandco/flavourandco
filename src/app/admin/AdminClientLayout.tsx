@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
+import { media } from "@/lib/media";
 import {
   LayoutDashboard,
   Package,
   ShoppingBag,
+  Users,
   FileSpreadsheet,
   Mail,
   Star,
@@ -32,6 +34,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
 
   const navItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Users", href: "/admin/users", icon: Users },
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
     { label: "Wholesale", href: "/admin/wholesale", icon: FileSpreadsheet },
@@ -42,6 +45,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
 
   const getBreadcrumbTitle = () => {
     if (pathname === "/admin/dashboard" || pathname === "/admin") return "Dashboard";
+    if (pathname.includes("/admin/users")) return "Users";
     if (pathname.includes("/admin/products")) return "Products";
     if (pathname.includes("/admin/orders")) return "Orders";
     if (pathname.includes("/admin/wholesale")) return "Wholesale";
@@ -60,19 +64,12 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
       <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-slate-200/80 fixed left-0 top-0 bottom-0 z-40 justify-between select-none">
         <div className="flex flex-col h-full overflow-hidden">
           {/* Brand Header */}
-          <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-100 shrink-0">
-            <div className="w-7 h-7 rounded-md bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-              FC
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-sm tracking-tight text-slate-900">
-                Flavour &amp; Co.
-              </span>
-              <span className="text-[10px] text-slate-400 font-medium">
-                Admin Control
-              </span>
-            </div>
-          </div>
+          <Link href="/admin/dashboard" className="h-16 flex items-center justify-between px-5 border-b border-slate-100 shrink-0 hover:opacity-90 transition-opacity">
+            <img src={media.navbarLogo} alt="Flavour & Co." className="h-8 w-auto object-contain" />
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+              Admin
+            </span>
+          </Link>
 
           {/* Clean Sidebar Navigation Items */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-hidden">
@@ -123,12 +120,12 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between bg-white px-4 h-14 border-b border-slate-200 sticky top-0 z-30">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-              FC
-            </div>
-            <span className="font-bold text-sm text-slate-900">Admin Dashboard</span>
-          </div>
+          <Link href="/admin/dashboard" className="flex items-center gap-2">
+            <img src={media.navbarLogo} alt="Flavour & Co." className="h-7 w-auto object-contain" />
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+              Admin
+            </span>
+          </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-1.5 text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
