@@ -9,7 +9,6 @@ import {
   Users,
   Plus,
   FileText,
-  Upload,
   ArrowUpRight,
   ChevronRight,
   FileSpreadsheet,
