@@ -29,10 +29,10 @@ export default function AnnouncementBar() {
       <div ref={trackRef} className="flex w-max items-center gap-10 whitespace-nowrap">
         {items.map((item, i) => (
           <span key={`${item}-${i}`} className="flex items-center gap-10">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-gold">
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#E3A72B]">
               {item}
             </span>
-            <span className="text-brand-gold/60" aria-hidden="true">
+            <span className="text-[#E3A72B]/60" aria-hidden="true">
               ✦
             </span>
           </span>

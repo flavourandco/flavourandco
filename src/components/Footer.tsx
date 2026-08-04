@@ -78,11 +78,36 @@ export default function Footer() {
             <img
               src={media.footerLogo}
               alt="Flavour & Co. Logo"
-              className="h-32 lg:h-36 w-auto object-contain"
+              className="h-32 lg:h-36 w-auto object-contain mb-4"
             />
-            <p className="mt-4 text-sm leading-relaxed opacity-80">
+            <p className="text-sm leading-relaxed opacity-80">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
             </p>
+            
+            {/* Desktop Social Links */}
+            <div className="mt-8 flex items-center gap-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-secondary">Follow Us</span>
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://www.instagram.com/plateteamindia?utm_source=qr"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 rounded-full bg-white/10 hover:bg-secondary hover:text-brand-green text-white transition-all hover:scale-105"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://www.facebook.com/share/1DQUjBQw5r/?mibextid=wwXIfr"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 rounded-full bg-white/10 hover:bg-secondary hover:text-brand-green text-white transition-all hover:scale-105"
+                  aria-label="Facebook"
+                >
+                  <FacebookIcon className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Column 3: Quick Links */}
@@ -144,11 +169,11 @@ export default function Footer() {
         <div className="flex md:hidden flex-col space-y-8">
           
           {/* Section 1: Brand Logo & Overview */}
-          <div className="space-y-3 text-left">
+          <div className="space-y-4 text-left">
             <img
               src={media.footerLogo}
               alt="Flavour & Co. Logo"
-              className="h-24 w-auto object-contain"
+              className="h-24 w-auto object-contain mb-3"
             />
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
@@ -209,24 +234,24 @@ export default function Footer() {
           </div>
 
           {/* Section 4: Socials & Contact */}
-          <div className="pt-4 border-t border-secondary/20 flex flex-col items-start gap-4">
+          <div className="pt-6 border-t border-secondary/20 flex flex-col items-start gap-5">
             <div className="flex items-center gap-4">
               <span className="text-xs font-bold uppercase tracking-wider text-secondary">Follow Us</span>
-              <div className="flex items-center gap-3 text-secondary">
+              <div className="flex items-center gap-3.5 text-secondary">
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/plateteamindia?utm_source=qr"
                   target="_blank"
                   rel="noreferrer"
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
                   aria-label="Instagram"
                 >
                   <InstagramIcon className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/share/1DQUjBQw5r/?mibextid=wwXIfr"
                   target="_blank"
                   rel="noreferrer"
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
                   aria-label="Facebook"
                 >
                   <FacebookIcon className="h-4 w-4" />

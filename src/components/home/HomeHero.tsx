@@ -130,12 +130,12 @@ export default function HomeHero() {
             in light, multi-layered flaky Australian pastry — made by hand, one crimp at a time.
           </p>
 
-          <div className="hero-ingredients mt-6 flex flex-wrap items-center gap-y-2 font-mono text-[11px] uppercase tracking-[0.15em]">
-            <span className="text-[#c69c40] font-bold">Handcrafted</span>
-            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
-            <span className="text-[#c69c40] font-bold">No Preservatives</span>
-            <span className="mx-3 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
-            <span className="text-[#c69c40] font-bold">Australian Owned</span>
+          <div className="hero-ingredients mt-5 flex items-center flex-nowrap whitespace-nowrap gap-0 font-sans text-[10px] sm:text-[15px] uppercase tracking-widest font-semibold sm:font-bold">
+            <span className="text-[#E3A72B] shrink-0">Handcrafted</span>
+            <span className="mx-1 sm:mx-1.5 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+            <span className="text-[#E3A72B] shrink-0">No Preservatives</span>
+            <span className="mx-1 sm:mx-1.5 h-1.5 w-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+            <span className="text-[#E3A72B] shrink-0">Australian Owned</span>
           </div>
         </div>
 

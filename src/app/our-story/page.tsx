@@ -113,30 +113,36 @@ export default function OurStoryPage() {
           <div className="grid gap-16 lg:grid-cols-12 lg:gap-20 items-center">
             {/* Left Column: Text content */}
             <div className="lg:col-span-6 text-left order-last lg:order-first">
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30] mb-3">
-                Meet Simran
-              </p>
-
-              <h2 className="font-serif text-4xl sm:text-4.5xl md:text-5xl text-brand-green leading-[1.1] font-semibold">
-                More Than <span className="italic text-[#6b1e30]">Food</span>. <br />
-                A Story of Flavour and Connection.
-              </h2>
-
-              <div className="text-[#6b1e30] mt-4 w-24">
-                <SquiggleDivider />
+              {/* Subtitle with Garnet Dot above "More Than Food." */}
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="h-2 w-2 rounded-full bg-[#6b1e30] shrink-0" />
+                <p className="font-serif italic text-stone-800 text-2xl sm:text-3xl font-normal">
+                  Meet Simran
+                </p>
               </div>
 
-              <div className="mt-8 space-y-6 text-base sm:text-lg leading-relaxed text-stone-600">
+              {/* Main Headline in Gold with Garnet period */}
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#c69c40] font-normal leading-[1.1] tracking-tight">
+                More Than Food<span className="text-[#6b1e30] font-bold">.</span>
+              </h2>
+
+              {/* Credentials / Sub-tag line with sharp gray highlight background */}
+              <div className="mt-4 mb-6 inline-block bg-[#e5e1d8] rounded-none px-3 py-1.5">
+                <p className="text-[11px] font-mono uppercase tracking-[0.3em] font-bold leading-none">
+                  <span className="text-[#6b1e30]">HERITAGE</span>
+                  <span className="text-[#c69c40] mx-2.5 text-sm">•</span>
+                  <span className="text-[#6b1e30]">FLAVOUR &amp; CONNECTION</span>
+                </p>
+              </div>
+
+              {/* Story text with editorial serif italics matching reference */}
+              <div className="space-y-5 font-serif text-base sm:text-lg text-stone-700 leading-relaxed font-normal">
+                <p className="italic text-lg sm:text-xl text-stone-800 leading-snug">
+                  “For Simran, food has always been more than just something on the table — it’s how stories are shared, traditions are carried forward, and people are brought together.”
+                </p>
+
                 <p>
-                  For Simran, food has always been more than just something on the table — it’s how stories are shared, traditions are carried forward, and people are brought together.
-                </p>
-
-                <p className="font-serif italic text-lg text-brand-green leading-snug">
-                  Raised in a home where recipes were passed down through generations, <span className="text-[#6b1e30] font-bold not-italic">she developed a deep appreciation for flavour, culture and the moments food creates.</span>
-                </p>
-
-                <p className="text-xs font-bold uppercase tracking-wider text-brand-gold leading-relaxed">
-                  BRINGING HERITAGE INTO A MODERN CONTEXT.
+                  Raised in a home where recipes were passed down through generations, she developed a deep appreciation for flavour, culture and the moments food creates.
                 </p>
 
                 <p>
@@ -145,27 +151,17 @@ export default function OurStoryPage() {
               </div>
             </div>
 
-            {/* Right Column: Overlapping images */}
-            <div className="lg:col-span-6 relative pb-16 pr-10 order-first lg:order-last">
-              <div className="relative aspect-[3/4] w-[88%] overflow-hidden shadow-xl border border-brand-gold/20 rounded-xl">
+            {/* Right Column: Simran Photo */}
+            <div className="lg:col-span-6 order-first lg:order-last flex justify-center">
+              <div className="relative aspect-[3/4] w-full max-w-md overflow-hidden shadow-xl border border-brand-gold/20 rounded-xl">
                 <Image
                   src="/founder/simran-kitchen.jpg"
                   alt="Simran in her kitchen — Founder of Flavour & Co."
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                   quality={95}
                   priority
-                />
-              </div>
-              <div className="absolute bottom-0 right-0 w-[58%] aspect-[4/3] overflow-hidden shadow-xl border-[6px] border-cream rounded-xl">
-                <Image
-                  src="/products/PHOTOS_Flavour&Co-3.jpg"
-                  alt="Crafting gourmet pies"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 80vw, (max-width: 1200px) 40vw, 500px"
-                  quality={95}
                 />
               </div>
             </div>
