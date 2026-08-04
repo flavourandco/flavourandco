@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import { Playfair_Display, Geist } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScroll from "@/components/home/SmoothScroll";
+import FloatingAdminButton from "@/components/FloatingAdminButton";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
+});
+
+const geist = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -22,13 +29,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${playfair.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col font-serif">
-        <SmoothScroll>{children}</SmoothScroll>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${playfair.variable} ${geist.variable} h-full antialiased`}
+      >
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="anonymous"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body className="min-h-full flex flex-col font-serif">
+          <SmoothScroll>{children}</SmoothScroll>
+          <FloatingAdminButton />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

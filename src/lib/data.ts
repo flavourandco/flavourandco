@@ -508,7 +508,6 @@ export const footerLinks = {
   ],
   company: [
     { label: "Contact Us", href: "/contact" },
-    { label: "My Account", href: "/login" },
   ],
 } as const;
 

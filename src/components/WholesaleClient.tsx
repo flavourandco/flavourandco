@@ -125,13 +125,34 @@ export default function WholesaleClient() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("/api/wholesale", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contactName: formData.name,
+          businessName: formData.businessName,
+          email: formData.email,
+          phone: `${formData.countryCode} ${formData.phone}`,
+          businessType: formData.venueType,
+          message: formData.message,
+        }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        alert("Failed to submit inquiry. Please try again.");
+      }
+    } catch {
+      alert("Submission error. Please check your connection.");
+    } finally {
       setLoading(false);
-      setSubmitted(true);
-    }, 800);
+    }
   };
 
   const scrollToForm = () => {

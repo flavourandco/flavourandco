@@ -22,7 +22,8 @@
 
   --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
   --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
-  --font-sans: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-geist: "Geist", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Geist", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
@@ -44,22 +45,22 @@
   --color-base-content: #1c1410;
 }
 
-/* Global Font Enforcement: Playfair Display across whole website */
-html,
-body,
-*,
-*::before,
-*::after {
-  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+/* Public Website Font: Playfair Display */
+body:not(.admin-scope) {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
 }
 
-.font-trivane-retro,
-.font-fraunces,
-.font-serif,
-.font-sans,
-.font-mono {
-  font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+/* Admin Dashboard Font: Geist Sans */
+.admin-scope,
+.admin-scope *,
+.admin-scope input,
+.admin-scope button,
+.admin-scope select,
+.admin-scope textarea {
+  font-family: "Geist", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
+
+
 
 .trivane-hero-title {
   font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
@@ -104,7 +105,7 @@ body {
   overflow: hidden;
 }
 
-.reveal-line > * {
+.reveal-line>* {
   display: block;
 }
 
@@ -112,6 +113,7 @@ body {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -131,6 +133,7 @@ body {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -151,6 +154,7 @@ body {
     opacity: 0;
     transform: scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

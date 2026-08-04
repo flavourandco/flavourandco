@@ -3,15 +3,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight, ChevronRight, HelpCircle } from "lucide-react";
+import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight, ChevronRight, HelpCircle, LogIn, UserPlus } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 import { navLinks, products } from "@/lib/data";
 import { media } from "@/lib/media";
 
 export default function HomeNavbar() {
   const pathname = usePathname();
+  const { user, isSignedIn, isLoaded } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const firstName = user?.firstName || user?.fullName?.split(" ")[0] || user?.username || "there";
+  const userInitial = (firstName[0] || "U").toUpperCase();
 
   useEffect(() => {
     if (mobileOpen || searchOpen) {
@@ -26,10 +31,10 @@ export default function HomeNavbar() {
 
   const filteredProducts = searchQuery.trim()
     ? products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   const popularSearches = ["Butter Chicken Pie", "Keema Lamb Pie", "Veggie Samosa", "Family Pack", "Dessert Tart"];
@@ -38,12 +43,11 @@ export default function HomeNavbar() {
     <>
       <header className="fixed inset-x-0 top-0 z-[100] bg-base-100 shadow-sm border-b border-secondary/15 transition-all duration-300">
         {/* Top Free Shipping Announcement Bar */}
-        {/* PC View: Static and Centered */}
         <div className="hidden md:block bg-brand-green py-1.5 px-4 text-center text-brand-gold text-[11px] font-bold uppercase tracking-[0.2em]">
           Free Express Shipping on Orders Over $200 | Handcrafted Gourmet Pies
         </div>
 
-        {/* Mobile View: Continuous Infinite Marquee Ticker */}
+        {/* Mobile View: Continuous Ticker */}
         <div className="md:hidden overflow-hidden bg-brand-green py-1.5 text-brand-gold text-[10px] font-bold uppercase tracking-[0.18em]">
           <div className="animate-ticker flex whitespace-nowrap">
             <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
@@ -58,26 +62,46 @@ export default function HomeNavbar() {
           {/* MOBILE VIEW NAVBAR (md:hidden) */}
           <div className="flex md:hidden items-center justify-between px-4 py-2 relative min-h-[64px] sm:min-h-[72px]">
             {/* Left: Mobile Profile & Search Icons */}
-            <div className="flex items-center gap-0.5 text-primary z-10">
-              <Link
-                href="/login"
-                className="p-1.5 hover:text-secondary transition-colors"
-                aria-label="Account"
-              >
-                <User className="h-5 w-5" />
-              </Link>
+            <div className="flex items-center gap-1 text-primary z-10">
+              {isLoaded && isSignedIn ? (
+                <Link
+                  href="/profile"
+                  className="flex items-center p-1 cursor-pointer"
+                  aria-label="Profile"
+                >
+                  {user?.imageUrl ? (
+                    <img
+                      src={user.imageUrl}
+                      alt={firstName}
+                      className="h-7 w-7 rounded-full object-cover border border-brand-gold"
+                    />
+                  ) : (
+                    <div className="h-7 w-7 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs">
+                      {userInitial}
+                    </div>
+                  )}
+                </Link>
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="p-1.5 hover:text-secondary transition-colors cursor-pointer"
+                  aria-label="Log in"
+                >
+                  <User className="h-5 w-5" />
+                </Link>
+              )}
 
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="p-1.5 hover:text-secondary transition-colors"
+                className="p-1.5 hover:text-secondary transition-colors cursor-pointer"
                 aria-label="Open search drawer"
               >
                 <Search className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Center: Enlarged Brand Logo */}
+            {/* Center: Brand Logo */}
             <Link
               href="/"
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1 px-3 block"
@@ -105,7 +129,7 @@ export default function HomeNavbar() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-1.5 hover:text-secondary transition-colors"
+                className="p-1.5 hover:text-secondary transition-colors cursor-pointer"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -124,16 +148,15 @@ export default function HomeNavbar() {
               />
             </Link>
 
-            {/* Center: Merged Navigation Links */}
+            {/* Center: Navigation Links */}
             <nav className="flex items-center gap-6 lg:gap-8">
               <ul className="flex items-center gap-6 lg:gap-8 text-sm lg:text-base font-extrabold uppercase tracking-wider">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`transition-colors pb-1 ${
-                        pathname === link.href ? "text-primary font-black border-b-2 border-primary" : "text-primary/80 hover:text-primary font-extrabold"
-                      }`}
+                      className={`transition-colors pb-1 ${pathname === link.href ? "text-primary font-black border-b-2 border-primary" : "text-primary/80 hover:text-primary font-extrabold"
+                        }`}
                     >
                       {link.label}
                     </Link>
@@ -142,18 +165,16 @@ export default function HomeNavbar() {
               </ul>
             </nav>
 
-            {/* Right: Actions */}
+            {/* Right: Actions & Auth Buttons */}
             <div className="flex items-center gap-3 sm:gap-4 text-primary">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
-                className="p-2 hover:text-secondary transition-colors"
+                className="p-2 hover:text-secondary transition-colors cursor-pointer"
                 aria-label="Open search drawer"
               >
                 <Search className="h-5 w-5" />
               </button>
-
-
 
               <Link
                 href="/shop"
@@ -161,14 +182,6 @@ export default function HomeNavbar() {
                 aria-label="Wishlist"
               >
                 <Heart className="h-5 w-5" />
-              </Link>
-
-              <Link
-                href="/login"
-                className="p-2 hover:text-secondary transition-colors"
-                aria-label="Account"
-              >
-                <User className="h-5 w-5" />
               </Link>
 
               <Link
@@ -181,30 +194,66 @@ export default function HomeNavbar() {
                   0
                 </span>
               </Link>
+
+              {/* Authentication Buttons / User Profile Redirection Pill */}
+              {isLoaded && isSignedIn ? (
+                <Link
+                  href="/profile"
+                  className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-green/30 bg-brand-green/5 hover:bg-brand-green/10 transition-all group cursor-pointer"
+                >
+                  {user?.imageUrl ? (
+                    <img
+                      src={user.imageUrl}
+                      alt={firstName}
+                      className="h-7 w-7 rounded-full object-cover border border-brand-gold/50 shadow-xs"
+                    />
+                  ) : (
+                    <div className="h-7 w-7 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs shadow-xs">
+                      {userInitial}
+                    </div>
+                  )}
+                  <span className="text-xs font-bold text-brand-green tracking-wide">
+                    Hey, {firstName}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-brand-green/60 group-hover:text-brand-green group-hover:translate-x-0.5 transition-all" />
+                </Link>
+              ) : (
+                <div className="flex items-center gap-2 ml-2">
+                  <Link
+                    href="/sign-in"
+                    className="text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-md border border-brand-green text-brand-green hover:bg-brand-green/10 transition-all cursor-pointer inline-block"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-md bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm cursor-pointer inline-block"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Redesigned Sidebar Drawer with Smooth Slide Animation */}
+      {/* Mobile Redesigned Sidebar Drawer */}
       <div
-        className={`fixed inset-0 z-[150] md:hidden transition-all duration-300 ${
-          mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-0 z-[150] md:hidden transition-all duration-300 ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+          }`}
       >
         {/* Backdrop */}
         <div
-          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${
-            mobileOpen ? "opacity-100" : "opacity-0"
-          }`}
+          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${mobileOpen ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => setMobileOpen(false)}
         />
 
         {/* Sliding Sidebar Panel */}
         <aside
-          className={`fixed inset-y-0 right-0 z-[160] w-[88%] max-w-sm bg-base-100 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${
-            mobileOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`fixed inset-y-0 right-0 z-[160] w-[88%] max-w-sm bg-base-100 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${mobileOpen ? "translate-x-0" : "translate-x-full"
+            }`}
         >
           {/* Top Section */}
           <div>
@@ -220,7 +269,7 @@ export default function HomeNavbar() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors"
+                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors cursor-pointer"
                 aria-label="Close menu"
               >
                 <X className="h-6 w-6" />
@@ -257,11 +306,10 @@ export default function HomeNavbar() {
                       <Link
                         href={link.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`flex items-center justify-between py-3 px-3 rounded-none text-sm font-bold uppercase tracking-wider transition-all ${
-                          isActive
-                            ? "bg-secondary/15 text-secondary border-l-4 border-secondary pl-4"
-                            : "text-primary hover:bg-base-200 hover:text-secondary hover:pl-4"
-                        }`}
+                        className={`flex items-center justify-between py-3 px-3 rounded-none text-sm font-bold uppercase tracking-wider transition-all ${isActive
+                          ? "bg-secondary/15 text-secondary border-l-4 border-secondary pl-4"
+                          : "text-primary hover:bg-base-200 hover:text-secondary hover:pl-4"
+                          }`}
                       >
                         <span>{link.label}</span>
                         <ChevronRight className={`h-4 w-4 ${isActive ? "text-secondary" : "opacity-40"}`} />
@@ -275,20 +323,57 @@ export default function HomeNavbar() {
 
           {/* Bottom Section */}
           <div className="pt-6 border-t border-secondary/15 mt-8 space-y-4">
-            {/* Quick Links */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Auth Buttons / Account Details */}
+            {isLoaded && isSignedIn ? (
               <Link
-                href="/login"
+                href="/profile"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all"
+                className="flex items-center justify-between py-3 px-4 bg-brand-green/10 border border-brand-green/20 rounded-md text-brand-green"
               >
-                <User className="h-4 w-4 text-secondary" />
-                Account
+                <div className="flex items-center gap-3">
+                  {user?.imageUrl ? (
+                    <img src={user.imageUrl} alt={firstName} className="h-8 w-8 rounded-full object-cover border border-brand-gold" />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs">
+                      {userInitial}
+                    </div>
+                  )}
+                  <div className="text-left">
+                    <span className="text-xs font-bold uppercase tracking-wider block text-brand-green">
+                      Hey, {firstName}
+                    </span>
+                    <span className="text-[10px] text-stone-500 block">View Profile &amp; Orders</span>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-brand-green" />
               </Link>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 border border-brand-green bg-white text-xs font-bold uppercase tracking-wider text-brand-green hover:bg-brand-green/10 transition-all rounded-md cursor-pointer text-center"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Log In
+                </Link>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-brand-green text-white text-xs font-bold uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm cursor-pointer text-center"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {/* Quick Links */}
+            <div className="grid grid-cols-1 gap-2">
               <Link
                 href="/contact"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all"
+                className="flex items-center justify-center gap-2 py-2 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all rounded-md"
               >
                 <HelpCircle className="h-4 w-4 text-secondary" />
                 Help & FAQ
@@ -297,7 +382,7 @@ export default function HomeNavbar() {
 
             {/* Handcrafted Tagline */}
             <div className="text-center">
-              <p className="font-fraunces text-xs italic text-primary/70">
+              <p className="font-serif text-xs italic text-primary/70">
                 Handcrafted Pies • Express Delivery
               </p>
               <p className="text-[10px] text-primary/40 uppercase tracking-widest mt-1">
@@ -308,36 +393,33 @@ export default function HomeNavbar() {
         </aside>
       </div>
 
-      {/* Slide-Over Search Drawer (Full width on Mobile, Half width on PC) */}
+      {/* Slide-Over Search Drawer */}
       <div
-        className={`fixed inset-0 z-[200] overflow-hidden transition-all duration-300 ${
-          searchOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-0 z-[200] overflow-hidden transition-all duration-300 ${searchOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+          }`}
       >
         {/* Backdrop */}
         <div
-          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${
-            searchOpen ? "opacity-100" : "opacity-0"
-          }`}
+          className={`fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity duration-300 ${searchOpen ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => setSearchOpen(false)}
         />
 
-        {/* Slide-Over Drawer Panel with Sliding Animation */}
+        {/* Slide-Over Drawer Panel */}
         <aside
-          className={`fixed inset-y-0 right-0 z-[210] flex w-full md:w-1/2 max-w-xl bg-base-100 p-6 sm:p-10 shadow-2xl flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${
-            searchOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`fixed inset-y-0 right-0 z-[210] flex w-full md:w-1/2 max-w-xl bg-base-100 p-6 sm:p-10 shadow-2xl flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${searchOpen ? "translate-x-0" : "translate-x-full"
+            }`}
         >
           <div>
             {/* Drawer Header */}
             <div className="flex items-center justify-between pb-6 border-b border-secondary/20">
-              <h3 className="font-fraunces text-2xl font-bold text-primary">
+              <h3 className="font-serif text-2xl font-bold text-primary">
                 Search <span className="italic text-secondary">Flavour & Co.</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setSearchOpen(false)}
-                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors"
+                className="p-2 rounded-full hover:bg-base-200 text-primary transition-colors cursor-pointer"
                 aria-label="Close search"
               >
                 <X className="h-6 w-6" />
@@ -368,7 +450,7 @@ export default function HomeNavbar() {
                   <button
                     key={tag}
                     onClick={() => setSearchQuery(tag)}
-                    className="rounded-none border border-secondary/30 bg-base-200 px-3 py-1.5 text-xs font-semibold text-primary hover:border-secondary hover:bg-secondary hover:text-secondary-content transition-all"
+                    className="rounded-none border border-secondary/30 bg-base-200 px-3 py-1.5 text-xs font-semibold text-primary hover:border-secondary hover:bg-secondary hover:text-secondary-content transition-all cursor-pointer"
                   >
                     {tag}
                   </button>
