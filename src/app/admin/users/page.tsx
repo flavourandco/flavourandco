@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useUser } from "@clerk/nextjs";
 import {
   Users,
   Search,
@@ -11,7 +12,6 @@ import {
   UserCheck,
   Mail,
   Calendar,
-  Sparkles,
   Database,
 } from "lucide-react";
 
@@ -27,6 +27,13 @@ interface AdminUser {
 }
 
 export default function AdminUsersPage() {
+  const { user: currentUser } = useUser();
+  const currentEmail = useMemo(
+    () => currentUser?.primaryEmailAddress?.emailAddress?.toLowerCase() || "",
+    [currentUser]
+  );
+  const currentClerkId = currentUser?.id || "";
+
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -35,7 +42,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/users", { cache: "no-store" });
@@ -58,7 +65,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleSyncWithClerk = async () => {
     setSyncing(true);
@@ -94,24 +101,46 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  // Filtering
-  const filteredUsers = users.filter((u) => {
-    const userRole = String(u.role || "user").toLowerCase();
-    const matchesSearch =
-      u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.clerk_user_id.toLowerCase().includes(searchQuery.toLowerCase());
+  // Memoized Filtering & Sorting: Pin logged-in user at the top
+  const sortedUsers = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const filtered = users.filter((u) => {
+      const userRole = String(u.role || "user").toLowerCase();
+      const matchesSearch =
+        !query ||
+        u.name.toLowerCase().includes(query) ||
+        u.email.toLowerCase().includes(query) ||
+        u.clerk_user_id.toLowerCase().includes(query);
 
-    const matchesRole = roleFilter === "all" ? true : userRole === roleFilter;
+      const matchesRole = roleFilter === "all" ? true : userRole === roleFilter;
+      return matchesSearch && matchesRole;
+    });
 
-    return matchesSearch && matchesRole;
-  });
+    return filtered.sort((a, b) => {
+      const isA =
+        (currentClerkId && a.clerk_user_id === currentClerkId) ||
+        (currentEmail && a.email.toLowerCase() === currentEmail);
+      const isB =
+        (currentClerkId && b.clerk_user_id === currentClerkId) ||
+        (currentEmail && b.email.toLowerCase() === currentEmail);
 
-  const totalUsersCount = users.length;
-  const adminUsersCount = users.filter((u) => String(u.role || "user").toLowerCase() === "admin").length;
-  const customerUsersCount = totalUsersCount - adminUsersCount;
+      if (isA && !isB) return -1;
+      if (!isA && isB) return 1;
+      return 0;
+    });
+  }, [users, searchQuery, roleFilter, currentClerkId, currentEmail]);
+
+  const { totalUsersCount, adminUsersCount, customerUsersCount } = useMemo(() => {
+    const total = users.length;
+    const adminCount = users.filter((u) => String(u.role || "user").toLowerCase() === "admin").length;
+    return {
+      totalUsersCount: total,
+      adminUsersCount: adminCount,
+      customerUsersCount: total - adminCount,
+    };
+  }, [users]);
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
@@ -257,7 +286,7 @@ export default function AdminUsersPage() {
             <RefreshCw className="w-6 h-6 mx-auto animate-spin text-slate-400" />
             <p className="text-xs font-medium">Loading user list from database...</p>
           </div>
-        ) : filteredUsers.length === 0 ? (
+        ) : sortedUsers.length === 0 ? (
           <div className="py-12 text-center text-slate-400 space-y-2">
             <Users className="w-8 h-8 mx-auto text-slate-300" />
             <p className="text-xs font-semibold text-slate-600">No users found</p>
@@ -280,8 +309,12 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                {filteredUsers.map((u) => {
+                {sortedUsers.map((u) => {
                   const initial = (u.name?.[0] || u.email?.[0] || "U").toUpperCase();
+                  const isYou =
+                    (currentClerkId && u.clerk_user_id === currentClerkId) ||
+                    (currentEmail && u.email.toLowerCase() === currentEmail);
+
                   const dateStr = u.created_at
                     ? new Date(u.created_at).toLocaleDateString("en-US", {
                         year: "numeric",
@@ -291,7 +324,14 @@ export default function AdminUsersPage() {
                     : "Recently";
 
                   return (
-                    <tr key={u.clerk_user_id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr
+                      key={u.clerk_user_id}
+                      className={
+                        isYou
+                          ? "bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors"
+                          : "hover:bg-slate-50/60 transition-colors"
+                      }
+                    >
                       {/* User Profile */}
                       <td className="py-3 pl-2">
                         <div className="flex items-center gap-3">
@@ -307,7 +347,14 @@ export default function AdminUsersPage() {
                             </div>
                           )}
                           <div>
-                            <span className="font-bold text-slate-900 block text-xs">{u.name}</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-slate-900 block text-xs">{u.name}</span>
+                              {isYou && (
+                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                                  (You)
+                                </span>
+                              )}
+                            </div>
                             <span className="text-[10px] text-slate-400 font-normal">Customer Account</span>
                           </div>
                         </div>
@@ -318,6 +365,11 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-1.5">
                           <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{u.email}</span>
+                          {isYou && (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                              (You)
+                            </span>
+                          )}
                         </div>
                       </td>
 

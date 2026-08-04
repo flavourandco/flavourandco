@@ -87,18 +87,43 @@ export async function POST() {
       onConflict: "clerk_user_id",
     });
 
-    // Fallback if schema is minimal (e.g. only clerk_user_id, email, name exist)
+    let columnWarning = "";
+
+    // Fallback logic if full schema fails (e.g. image_url column missing)
     if (error) {
-      console.warn("Full schema upsert failed, trying minimal fields fallback:", error.message);
-      const minimalRecords = recordsToSync.map((r: any) => ({
+      console.warn("Full schema upsert failed, attempting retry with role:", error.message);
+      const recordsWithRole = recordsToSync.map((r: any) => ({
         clerk_user_id: r.clerk_user_id,
         email: r.email,
         name: r.name,
+        role: r.role,
       }));
-      const retryMinimal = await supabase.from("users").upsert(minimalRecords, {
+
+      const retryRole = await supabase.from("users").upsert(recordsWithRole, {
         onConflict: "clerk_user_id",
       });
-      error = retryMinimal.error;
+
+      if (!retryRole.error) {
+        error = null;
+      } else {
+        console.warn("Role upsert failed (role column likely missing in Supabase):", retryRole.error.message);
+        // Fallback to basic 3 fields if role column doesn't exist yet in Supabase schema
+        const minimalRecords = recordsToSync.map((r: any) => ({
+          clerk_user_id: r.clerk_user_id,
+          email: r.email,
+          name: r.name,
+        }));
+        const retryMinimal = await supabase.from("users").upsert(minimalRecords, {
+          onConflict: "clerk_user_id",
+        });
+
+        if (!retryMinimal.error) {
+          error = null;
+          columnWarning = " (Note: 'role' column is missing in your Supabase 'users' table. Run the SQL script to save roles.)";
+        } else {
+          error = retryMinimal.error;
+        }
+      }
     }
 
     if (error) {
@@ -110,7 +135,7 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully synced ${clerkUsers.length} user(s) into Supabase database.`,
+      message: `Successfully synced ${clerkUsers.length} user(s) into Supabase database.${columnWarning}`,
       syncedCount: clerkUsers.length,
     });
   } catch (error: any) {

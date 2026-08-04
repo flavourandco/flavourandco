@@ -5,13 +5,7 @@ export async function GET() {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Supabase is not configured.",
-          users: [],
-          source: "database",
-          count: 0,
-        },
+        { success: false, error: "Supabase not configured", users: [], count: 0 },
         { status: 500 }
       );
     }
@@ -19,53 +13,41 @@ export async function GET() {
     const supabase = getSupabaseServerClient();
     if (!supabase) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Failed to initialize Supabase server client.",
-          users: [],
-          source: "database",
-          count: 0,
-        },
+        { success: false, error: "Failed to initialize Supabase client", users: [], count: 0 },
         { status: 500 }
       );
     }
 
-    // Fetch strictly from Supabase database
     const { data, error } = await supabase
       .from("users")
-      .select("*")
+      .select("clerk_user_id, email, name, role, image_url, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching users from Supabase:", error.message);
+      console.error("Error fetching users:", error.message);
       return NextResponse.json(
-        {
-          success: false,
-          error: `Supabase database error: ${error.message}`,
-          users: [],
-          source: "database",
-          count: 0,
-        },
+        { success: false, error: error.message, users: [], count: 0 },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      users: data || [],
-      source: "database",
-      count: (data || []).length,
-    });
-  } catch (error: any) {
-    console.error("Error fetching users for admin:", error);
     return NextResponse.json(
       {
-        success: false,
-        error: error.message || "Failed to fetch users from database",
-        users: [],
+        success: true,
+        users: data || [],
         source: "database",
-        count: 0,
+        count: (data || []).length,
       },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  } catch (error: any) {
+    console.error("Error fetching users:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to fetch users", users: [], count: 0 },
       { status: 500 }
     );
   }

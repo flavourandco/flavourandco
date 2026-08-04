@@ -5,17 +5,25 @@ import { useUser } from "@clerk/nextjs";
 
 export default function UserSyncListener() {
   const { user, isSignedIn, isLoaded } = useUser();
-  const syncedUserIdRef = useRef<string | null>(null);
+  const syncedRef = useRef(false);
 
   useEffect(() => {
-    if (isLoaded && isSignedIn && user?.id) {
-      if (syncedUserIdRef.current === user.id) return;
-      syncedUserIdRef.current = user.id;
+    if (!isLoaded || !isSignedIn || !user?.id || syncedRef.current) return;
 
-      fetch("/api/auth/sync-user", { method: "POST" }).catch((err) =>
-        console.error("Auto user sync to Supabase failed:", err)
-      );
+    const storageKey = `flavour_user_synced_${user.id}`;
+    if (typeof window !== "undefined" && sessionStorage.getItem(storageKey)) {
+      syncedRef.current = true;
+      return;
     }
+
+    syncedRef.current = true;
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(storageKey, "true");
+    }
+
+    fetch("/api/auth/sync-user", { method: "POST" }).catch((err) =>
+      console.error("Auto user sync error:", err)
+    );
   }, [isLoaded, isSignedIn, user?.id]);
 
   return null;

@@ -50,17 +50,31 @@ export async function POST() {
       onConflict: "clerk_user_id",
     });
 
-    // Fallback if extra columns don't exist yet in Supabase table
+    // Fallback if image_url column doesn't exist yet in Supabase table
     if (error) {
-      const minimalRecord = {
+      const recordWithRole = {
         clerk_user_id: user.id,
         email: primaryEmail,
         name,
+        role,
       };
-      const retryMinimal = await supabase.from("users").upsert(minimalRecord, {
+      const retryRole = await supabase.from("users").upsert(recordWithRole, {
         onConflict: "clerk_user_id",
       });
-      error = retryMinimal.error;
+
+      if (!retryRole.error) {
+        error = null;
+      } else {
+        const minimalRecord = {
+          clerk_user_id: user.id,
+          email: primaryEmail,
+          name,
+        };
+        const retryMinimal = await supabase.from("users").upsert(minimalRecord, {
+          onConflict: "clerk_user_id",
+        });
+        error = retryMinimal.error;
+      }
     }
 
     if (error) {
