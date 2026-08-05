@@ -154,5 +154,7 @@ export interface UserProfile {
   email: string;
   fullName: string;
   role: "admin" | "customer";
+  imageUrl?: string;
   createdAt?: string;
 }
+

@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import type { UserProfile } from "@/lib/types";
 
 export type { UserProfile };
@@ -8,44 +7,36 @@ interface AuthState {
   userProfile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
   setProfile: (profile: UserProfile) => void;
   setLoading: (loading: boolean) => void;
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
+export const useAuthStore = create<AuthState>()((set) => ({
+  userProfile: null,
+  isAuthenticated: false,
+  isLoading: true,
+  isInitialized: false,
+
+  setProfile: (profile: UserProfile) =>
+    set({
+      userProfile: profile,
+      isAuthenticated: true,
+      isLoading: false,
+      isInitialized: true,
+    }),
+
+  setLoading: (loading: boolean) => set({ isLoading: loading }),
+
+  clearAuth: () => {
+    set({
       userProfile: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitialized: true,
+    });
+  },
+}));
 
-      setProfile: (profile: UserProfile) =>
-        set({
-          userProfile: profile,
-          isAuthenticated: true,
-          isLoading: false,
-        }),
-
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
-
-      clearAuth: () => {
-        set({
-          userProfile: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
-        useAuthStore.persist.clearStorage();
-      },
-    }),
-    {
-      name: "flavour_auth_storage",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        userProfile: state.userProfile,
-        isAuthenticated: state.isAuthenticated,
-      }),
-    }
-  )
-);
 

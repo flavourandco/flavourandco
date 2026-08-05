@@ -6,12 +6,34 @@ import { useRouter } from "next/navigation";
 import { LogOut, ShoppingBag, BookOpen } from "lucide-react";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/layout/Footer";
+import { useAuthStore } from "@/store/auth.store";
+import { BoneyardProfilePageSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
 
+  const userProfile = useAuthStore((s) => s.userProfile);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+
+  const isHydrating = !isLoaded || (isSignedIn && authLoading) || (!isInitialized && isSignedIn);
+
+  // Render Boneyard Skeleton during Clerk initialization & Supabase data fetching
+  if (isHydrating) {
+    return (
+      <>
+        <HomeNavbar />
+        <main className="min-h-screen bg-[#f9f7f2] pt-[100px] sm:pt-[116px] md:pt-[124px] pb-20 px-4 sm:px-6 lg:px-12">
+          <BoneyardProfilePageSkeleton />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // Once loaded, if user is not signed in render Access Restricted
   if (isLoaded && !isSignedIn) {
     return (
       <>
@@ -38,9 +60,15 @@ export default function ProfilePage() {
     );
   }
 
-  const firstName = user?.firstName || user?.fullName?.split(" ")[0] || "Gourmet";
-  const fullName = user?.fullName || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Valued Customer";
-  const userEmail = user?.primaryEmailAddress?.emailAddress || "";
+  const fullName =
+    userProfile?.fullName ||
+    user?.fullName ||
+    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+    "Valued Customer";
+
+  const firstName = fullName.split(" ")[0] || "Gourmet";
+  const userEmail = userProfile?.email || user?.primaryEmailAddress?.emailAddress || "";
+  const avatarUrl = userProfile?.imageUrl || user?.imageUrl || "";
   const userInitial = (firstName[0] || "U").toUpperCase();
 
   const handleSignOut = async () => {
@@ -71,9 +99,9 @@ export default function ProfilePage() {
             <div className="md:col-span-4 flex flex-col items-center text-center p-4">
               {/* Minimal Avatar */}
               <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden mb-5 shadow-sm bg-brand-green text-brand-gold flex items-center justify-center text-4xl font-serif font-bold">
-                {user?.imageUrl ? (
+                {avatarUrl ? (
                   <img
-                    src={user.imageUrl}
+                    src={avatarUrl}
                     alt={fullName}
                     className="w-full h-full object-cover"
                   />
@@ -155,3 +183,4 @@ export default function ProfilePage() {
     </>
   );
 }
+

@@ -12,11 +12,14 @@ import AnnouncementBar from "./AnnouncementBar";
 import { useUIStore } from "@/store/ui.store";
 import { useProductStore } from "@/store/product.store";
 import { useAuthStore } from "@/store/auth.store";
+import { BoneyardNavUserSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function HomeNavbar() {
   const pathname = usePathname();
   const { user, isSignedIn, isLoaded } = useUser();
   const userProfile = useAuthStore((s) => s.userProfile);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const isAuthLoading = !isLoaded || (isSignedIn && authLoading);
 
   const mobileOpen = useUIStore((s) => s.mobileNavOpen);
   const setMobileOpen = useUIStore((s) => s.setMobileNavOpen);
@@ -32,8 +35,9 @@ export default function HomeNavbar() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const firstName = userProfile?.fullName?.split(" ")[0] || user?.firstName || user?.fullName?.split(" ")[0] || user?.username || "there";
+  const firstName = userProfile?.fullName?.split(" ")[0] || user?.firstName || user?.fullName?.split(" ")[0] || user?.username || "Gourmet";
   const userInitial = (firstName[0] || "U").toUpperCase();
+
 
   useEffect(() => {
     if (mobileOpen || searchOpen) {
@@ -68,7 +72,11 @@ export default function HomeNavbar() {
           <div className="flex md:hidden items-center justify-between px-4 py-2 relative min-h-[64px] sm:min-h-[72px]">
             {/* Left: Mobile Profile & Search Icons */}
             <div className="flex items-center gap-1 text-primary z-10">
-              {isLoaded && isSignedIn ? (
+              {isAuthLoading ? (
+                <div className="p-1">
+                  <div className="h-7 w-7 rounded-full bg-slate-200/80 animate-pulse" />
+                </div>
+              ) : isSignedIn ? (
                 <Link
                   href="/profile"
                   className="flex items-center p-1 cursor-pointer"
@@ -193,7 +201,9 @@ export default function HomeNavbar() {
               </Link>
 
               {/* Minimal Authentication Buttons / User Profile */}
-              {isLoaded && isSignedIn ? (
+              {isAuthLoading ? (
+                <BoneyardNavUserSkeleton />
+              ) : isSignedIn ? (
                 <Link
                   href="/profile"
                   className="ml-1 flex items-center gap-2 py-1 px-1 rounded-full hover:opacity-80 transition-all cursor-pointer"
@@ -306,7 +316,15 @@ export default function HomeNavbar() {
           {/* Bottom Section */}
           <div className="pt-6 border-t border-secondary/15 mt-8 space-y-4">
             {/* Auth Buttons / Account Details */}
-            {isLoaded && isSignedIn ? (
+            {isAuthLoading ? (
+              <div className="p-3 bg-stone-100/80 rounded-md animate-pulse flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-200" />
+                <div className="space-y-1">
+                  <div className="h-3 w-16 bg-slate-200 rounded" />
+                  <div className="h-3 w-24 bg-slate-200 rounded" />
+                </div>
+              </div>
+            ) : isSignedIn ? (
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
@@ -347,6 +365,7 @@ export default function HomeNavbar() {
                 </Link>
               </div>
             )}
+
 
             {/* Quick Links */}
             <div className="grid grid-cols-1 gap-2">

@@ -20,11 +20,17 @@ import {
   LogOut,
 } from "lucide-react";
 
+import { useAuthStore } from "@/store/auth.store";
+import { BoneyardSidebarUserSkeleton } from "@/components/ui/BoneyardSkeleton";
+
 export default function AdminClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { signOut } = useClerk();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+  const userProfile = useAuthStore((s) => s.userProfile);
+  const authLoading = useAuthStore((s) => s.isLoading);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
 
   const handleLogout = () => {
     signOut({ redirectUrl: "/sign-in" });
@@ -109,35 +115,38 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
           </button>
 
           {/* Admin User Profile Card (Highlighted Sleek Card with Online Indicator) */}
-          <div className="p-3 rounded-md bg-white border border-slate-200/90 shadow-xs flex items-center gap-3 relative overflow-hidden">
-            <div className="relative shrink-0">
-              {user?.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={adminName}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-slate-900/10 shrink-0"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                  {userInitial}
-                </div>
-              )}
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
-            </div>
+          {!isLoaded || authLoading ? (
+            <BoneyardSidebarUserSkeleton />
+          ) : (
+            <div className="p-3 rounded-md bg-white border border-slate-200/90 shadow-xs flex items-center gap-3 relative overflow-hidden">
+              <div className="relative shrink-0">
+                {user?.imageUrl ? (
+                  <img
+                    src={user.imageUrl}
+                    alt={adminName}
+                    className="w-9 h-9 rounded-full object-cover border-2 border-slate-900/10 shrink-0"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                    {userInitial}
+                  </div>
+                )}
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+              </div>
 
-            <div className="flex flex-col min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-xs font-extrabold text-slate-900 truncate">{adminName}</span>
-                <span className="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200/80 rounded-sm shrink-0">
-                  Admin
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-xs font-extrabold text-slate-900 truncate">{adminName}</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200/80 rounded-sm shrink-0">
+                    Admin
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                  {userProfile?.email || user?.primaryEmailAddress?.emailAddress || "Administrator"}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
-                {user?.primaryEmailAddress?.emailAddress || "Administrator"}
-              </span>
             </div>
-          </div>
-
+          )}
         </div>
       </aside>
 

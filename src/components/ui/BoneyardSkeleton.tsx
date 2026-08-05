@@ -145,3 +145,76 @@ export function BoneyardReviewCardSkeleton() {
     </div>
   );
 }
+
+/**
+ * Navigation User Profile Skeleton (Header & Mobile Drawer)
+ */
+export function BoneyardNavUserSkeleton() {
+  return (
+    <div className="flex items-center gap-2 animate-pulse">
+      <div className="h-8 w-8 rounded-full bg-slate-200/80 shrink-0" />
+      <div className="hidden lg:flex flex-col gap-1">
+        <div className="h-2.5 w-12 bg-slate-200/80 rounded" />
+        <div className="h-3 w-16 bg-slate-200/60 rounded" />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * User Profile Page Hydration Skeleton
+ */
+export function BoneyardProfilePageSkeleton() {
+  return (
+    <div className="mx-auto max-w-6xl space-y-8 animate-pulse">
+      {/* Header Banner Skeleton */}
+      <div className="pb-4 border-b border-stone-300/60 space-y-2">
+        <div className="h-3 w-24 bg-amber-200/60 rounded" />
+        <div className="h-8 w-64 bg-slate-200 rounded" />
+      </div>
+
+      {/* Main Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+        {/* Left Column Profile Skeleton */}
+        <div className="md:col-span-4 flex flex-col items-center text-center p-4 space-y-3">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-200/80 shrink-0" />
+          <div className="h-3 w-16 bg-slate-200/60 rounded" />
+          <div className="h-7 w-44 bg-slate-200/90 rounded" />
+          <div className="h-3 w-36 bg-slate-200/60 rounded" />
+          <div className="h-8 w-28 bg-slate-200/70 rounded-full mt-2" />
+        </div>
+
+        {/* Right Column Recent Orders Skeleton */}
+        <div className="md:col-span-8 p-4 sm:p-6 space-y-6 bg-white rounded-2xl border border-stone-200/80 shadow-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-stone-200/80">
+            <div className="h-6 w-44 bg-slate-200 rounded" />
+            <div className="h-3 w-24 bg-slate-200/60 rounded" />
+          </div>
+
+          <div className="py-12 space-y-4 flex flex-col items-center">
+            <div className="h-14 w-14 rounded-full bg-slate-200/80" />
+            <div className="h-6 w-56 bg-slate-200 rounded" />
+            <div className="h-4 w-3/4 bg-slate-100 rounded" />
+            <div className="h-10 w-40 bg-slate-200/80 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Admin Sidebar User Card Skeleton
+ */
+export function BoneyardSidebarUserSkeleton() {
+  return (
+    <div className="p-3 rounded-md bg-white border border-slate-200/90 shadow-xs flex items-center gap-3 animate-pulse">
+      <div className="w-9 h-9 rounded-full bg-slate-200 shrink-0" />
+      <div className="flex-1 space-y-1.5 min-w-0">
+        <div className="h-3.5 bg-slate-200 rounded w-24" />
+        <div className="h-2.5 bg-slate-200/70 rounded w-32" />
+      </div>
+    </div>
+  );
+}
+
