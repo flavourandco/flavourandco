@@ -74,11 +74,6 @@ export default function OfferModal() {
 
           {/* Right Column: Coupon & Subscribing details (60% width) */}
           <div className="md:col-span-6 flex flex-col justify-center p-6 sm:p-8 md:p-10 text-center md:text-left bg-cream">
-            <div className="inline-flex items-center gap-2 rounded-md border border-brand-gold/40 bg-base-200/80 px-3 py-1 text-[9px] font-mono font-medium uppercase tracking-[0.2em] text-[#6b1e30] mb-3 self-center md:self-start">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#6b1e30] inline-block animate-pulse" />
-              <span>Pie Club Exclusive</span>
-            </div>
-
             <h2
               style={{ fontFamily: "var(--font-fraunces-modal, 'Fraunces', serif)" }}
               className="text-2xl sm:text-3xl md:text-3.5xl font-semibold leading-[1.1] tracking-tight text-brand-green uppercase"
