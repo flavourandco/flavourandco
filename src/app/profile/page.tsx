@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, ShoppingBag, BookOpen } from "lucide-react";
 import HomeNavbar from "@/components/home/HomeNavbar";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/Footer";
 
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();

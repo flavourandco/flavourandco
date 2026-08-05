@@ -1,4 +1,4 @@
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { Shield, Lock, Eye, Mail } from "lucide-react";
 import type { Metadata } from "next";

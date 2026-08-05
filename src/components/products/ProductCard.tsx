@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, Heart } from "lucide-react";
 import { Product } from "@/lib/data";
-import Button from "./Button";
+import Button from "@/components/ui/Button";
 
 interface ProductCardProps {
   product: Product;

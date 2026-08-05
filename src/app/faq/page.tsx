@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import FaqClient from "@/components/FaqClient";
+import PageLayout from "@/components/layout/PageLayout";
+import FaqClient from "@/components/forms/FaqClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Star, CheckCircle2, Send, Sparkles, X } from "lucide-react";
-import Button from "./Button";
-import ShowMore from "./ShowMore";
+import Button from "@/components/ui/Button";
+import ShowMore from "@/components/ui/ShowMore";
 
 export interface ReviewItem {
   id: string;

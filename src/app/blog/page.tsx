@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import BlogClient from "@/components/BlogClient";
+import PageLayout from "@/components/layout/PageLayout";
+import BlogClient from "@/components/forms/BlogClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

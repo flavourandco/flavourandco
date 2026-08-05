@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Product, products } from "@/lib/data";
 import ProductCard from "./ProductCard";
-import ShowMore from "./ShowMore";
+import ShowMore from "@/components/ui/ShowMore";
 import { Sparkles } from "lucide-react";
 
 interface RelatedProductsProps {

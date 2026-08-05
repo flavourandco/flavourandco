@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import Products from "@/components/Products";
+import PageLayout from "@/components/layout/PageLayout";
+import Products from "@/components/products/Products";
 
 export default function ShopPage() {
   return (

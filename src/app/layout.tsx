@@ -3,8 +3,8 @@ import { Playfair_Display, Geist } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScroll from "@/components/home/SmoothScroll";
-import FloatingAdminButton from "@/components/FloatingAdminButton";
-import UserSyncListener from "@/components/UserSyncListener";
+import FloatingAdminButton from "@/components/layout/FloatingAdminButton";
+import UserSyncListener from "@/components/layout/UserSyncListener";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",

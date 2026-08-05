@@ -20,10 +20,10 @@ import {
   Zap,
 } from "lucide-react";
 import { products } from "@/lib/data";
-import PageLayout from "@/components/PageLayout";
-import Button from "@/components/Button";
-import ProductReviews from "@/components/ProductReviews";
-import RelatedProducts from "@/components/RelatedProducts";
+import PageLayout from "@/components/layout/PageLayout";
+import Button from "@/components/ui/Button";
+import ProductReviews from "@/components/products/ProductReviews";
+import RelatedProducts from "@/components/products/RelatedProducts";
 
 export default function ProductDetailPage({
   params,

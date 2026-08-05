@@ -89,3 +89,19 @@ export interface DashboardStats {
   recentOrders: Order[];
   recentInquiries: (WholesaleInquiry | ContactInquiry)[];
 }
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string[];
+  writer: string;
+  date: string;
+  readTime: string;
+  category: string;
+  image: string;
+  image2?: string;
+  authorRole?: string;
+  authorAvatar?: string;
+}

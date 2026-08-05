@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import ContactForm from "@/components/ContactForm";
+import PageLayout from "@/components/layout/PageLayout";
+import ContactForm from "@/components/forms/ContactForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

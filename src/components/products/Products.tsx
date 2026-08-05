@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { products } from "@/lib/data";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "./ProductCard";
 
 export default function Products() {
   const [wishlist, setWishlist] = useState<string[]>([]);

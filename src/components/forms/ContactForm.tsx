@@ -3,26 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
+import PhoneInput from "@/components/ui/PhoneInput";
 
-// Country list for phone input with Australia (+61) as default
-const countryCodes = [
-  { code: "+61", flag: "🇦🇺", name: "Australia" },
-  { code: "+64", flag: "🇳🇿", name: "New Zealand" },
-  { code: "+91", flag: "🇮🇳", name: "India" },
-  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
-  { code: "+1", flag: "🇺🇸", name: "United States" },
-  { code: "+1", flag: "🇨🇦", name: "Canada" },
-  { code: "+65", flag: "🇸🇬", name: "Singapore" },
-  { code: "+971", flag: "🇦🇪", name: "UAE" },
-  { code: "+679", flag: "🇫🇯", name: "Fiji" },
-  { code: "+60", flag: "🇲🇾", name: "Malaysia" },
-  { code: "+62", flag: "🇮🇩", name: "Indonesia" },
-  { code: "+49", flag: "🇩🇪", name: "Germany" },
-  { code: "+33", flag: "🇫🇷", name: "France" },
-  { code: "+39", flag: "🇮🇹", name: "Italy" },
-  { code: "+81", flag: "🇯🇵", name: "Japan" },
-  { code: "+82", flag: "🇰🇷", name: "South Korea" },
-];
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -69,11 +51,11 @@ export default function ContactForm() {
 
   return (
     <div className="w-full max-w-full overflow-hidden bg-[#fdf8f3] text-[#1c1410]">
-      
+
       {/* Top Main Section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12 md:py-16">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-16 items-start">
-          
+
           {/* Left Column: Heading & Subtext */}
           <div className="lg:col-span-5 space-y-4 text-left">
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410] leading-tight">
@@ -136,35 +118,16 @@ export default function ContactForm() {
                   />
                 </div>
 
-                {/* Phone with Mobile-Optimized Country Code Selector */}
-                <div className="space-y-1 w-full">
-                  <label htmlFor="phone" className="block text-xs font-serif italic text-[#1c1410]/70">
-                    Phone
-                  </label>
-                  <div className="flex items-center gap-2 border-b border-[#1c1410]/20 py-1 w-full min-w-0 overflow-hidden">
-                    <select
-                      value={formData.countryCode}
-                      onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                      aria-label="Country Code"
-                      className="w-[85px] sm:w-[105px] shrink-0 bg-transparent text-xs font-semibold text-[#1c1410] focus:outline-none cursor-pointer py-1 truncate"
-                    >
-                      {countryCodes.map((c, i) => (
-                        <option key={`${c.code}-${i}`} value={c.code} className="bg-[#fdf8f3] text-[#1c1410]">
-                          {c.flag} {c.code}
-                        </option>
-                      ))}
-                    </select>
-
-                    <input
-                      type="tel"
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="Enter your phone number"
-                      className="flex-1 min-w-0 bg-transparent text-sm text-[#1c1410] placeholder:text-[#1c1410]/40 focus:outline-none py-1 truncate"
-                    />
-                  </div>
-                </div>
+                {/* Phone input with customizable searchable country code dropdown */}
+                <PhoneInput
+                  id="phone"
+                  label="Phone"
+                  value={formData.phone}
+                  countryCode={formData.countryCode}
+                  onChangePhone={(phone) => setFormData({ ...formData, phone })}
+                  onChangeCountryCode={(countryCode) => setFormData({ ...formData, countryCode })}
+                  placeholder="*Phone Number"
+                />
 
                 {/* Business Name (if applicable) */}
                 <div className="space-y-1 w-full">
@@ -190,11 +153,10 @@ export default function ContactForm() {
                     {["Retail", "Wholesale", "Event Catering", "Other"].map((type) => (
                       <label
                         key={type}
-                        className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${
-                          formData.partnerType === type
+                        className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${formData.partnerType === type
                             ? "border-[#c69c40] bg-[#c69c40]/10 text-[#6b1e30] font-bold"
                             : "border-[#ebe3d8] text-[#1c1410]/70 hover:border-[#c69c40]/50"
-                        }`}
+                          }`}
                       >
                         <input
                           type="radio"
@@ -249,7 +211,7 @@ export default function ContactForm() {
       <section className="bg-[#f7efe6] border-t border-[#ebe3d8] py-12 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-16 items-center">
-            
+
             {/* Left Column Text */}
             <div className="lg:col-span-8 text-left space-y-6 sm:space-y-8">
               <div>

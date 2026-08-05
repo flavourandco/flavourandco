@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import WholesaleClient from "@/components/WholesaleClient";
+import PageLayout from "@/components/layout/PageLayout";
+import WholesaleClient from "@/components/forms/WholesaleClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

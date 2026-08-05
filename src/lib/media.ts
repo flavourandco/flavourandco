@@ -43,6 +43,16 @@ export const media = {
     builtForBusiness: "/timeline/timeline-2025.webp",
     flavourAndCo: "/timeline/timeline-2026.webp",
   },
+
+  blogs: {
+    blog1_main: "/blog/blog-1.webp",
+    blog2_main: "/blog/blog-2.1.png",
+    blog2_sub: "/blog/blog-2.2.avif",
+    blog3_main: "/blog/blog-3.1.avif",
+    blog3_sub: "/blog/blog-3.2.avif",
+    blog4_main: "/blog/blog 4.1.jpg",
+    blog4_sub: "/blog/blog-4.2.avif",
+  },
 } as const;
 
 export default media;

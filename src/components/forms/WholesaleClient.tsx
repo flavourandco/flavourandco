@@ -4,26 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 import { wholesaleBrands, wholesaleTestimonials } from "@/lib/data";
+import PhoneInput from "@/components/ui/PhoneInput";
 
-// Country list for phone input with Australia (+61) as default
-const countryCodes = [
-  { code: "+61", flag: "🇦🇺", name: "Australia" },
-  { code: "+64", flag: "🇳🇿", name: "New Zealand" },
-  { code: "+91", flag: "🇮🇳", name: "India" },
-  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
-  { code: "+1", flag: "🇺🇸", name: "United States" },
-  { code: "+1", flag: "🇨🇦", name: "Canada" },
-  { code: "+65", flag: "🇸🇬", name: "Singapore" },
-  { code: "+971", flag: "🇦🇪", name: "UAE" },
-  { code: "+679", flag: "🇫🇯", name: "Fiji" },
-  { code: "+60", flag: "🇲🇾", name: "Malaysia" },
-  { code: "+62", flag: "🇮🇩", name: "Indonesia" },
-  { code: "+49", flag: "🇩🇪", name: "Germany" },
-  { code: "+33", flag: "🇫🇷", name: "France" },
-  { code: "+39", flag: "🇮🇹", name: "Italy" },
-  { code: "+81", flag: "🇯🇵", name: "Japan" },
-  { code: "+82", flag: "🇰🇷", name: "South Korea" },
-];
 
 // Hotel & Brand Vector Logos
 function FullertonHotelLogo() {
@@ -201,6 +183,7 @@ export default function WholesaleClient() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 quality={95}
                 priority
+                loading="eager"
               />
             </div>
           </div>
@@ -432,34 +415,15 @@ export default function WholesaleClient() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <label htmlFor="phone" className="block text-xs font-serif italic text-[#1c1410]/70">
-                  Phone
-                </label>
-                <div className="flex items-center gap-2 border-b border-[#1c1410]/20 py-1 overflow-hidden">
-                  <select
-                    value={formData.countryCode}
-                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                    aria-label="Country Code"
-                    className="w-[85px] sm:w-[105px] shrink-0 bg-transparent text-xs font-semibold text-[#1c1410] focus:outline-none cursor-pointer py-1 truncate"
-                  >
-                    {countryCodes.map((c, i) => (
-                      <option key={`${c.code}-${i}`} value={c.code} className="bg-[#fdf8f3] text-[#1c1410]">
-                        {c.flag} {c.code}
-                      </option>
-                    ))}
-                  </select>
-
-                  <input
-                    type="tel"
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter phone number"
-                    className="flex-1 min-w-0 bg-transparent text-sm text-[#1c1410] placeholder:text-[#1c1410]/40 focus:outline-none py-1 truncate"
-                  />
-                </div>
-              </div>
+              <PhoneInput
+                id="phone"
+                label="Phone"
+                value={formData.phone}
+                countryCode={formData.countryCode}
+                onChangePhone={(phone) => setFormData({ ...formData, phone })}
+                onChangeCountryCode={(countryCode) => setFormData({ ...formData, countryCode })}
+                placeholder="*Phone Number"
+              />
             </div>
 
             {/* Row 3: Venue Type */}

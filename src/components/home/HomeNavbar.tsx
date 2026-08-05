@@ -8,6 +8,8 @@ import { useUser } from "@clerk/nextjs";
 import { navLinks, products } from "@/lib/data";
 import { media } from "@/lib/media";
 
+import AnnouncementBar from "./AnnouncementBar";
+
 export default function HomeNavbar() {
   const pathname = usePathname();
   const { user, isSignedIn, isLoaded } = useUser();
@@ -42,20 +44,8 @@ export default function HomeNavbar() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[100] bg-base-100 shadow-sm border-b border-secondary/15 transition-all duration-300">
-        {/* Top Free Shipping Announcement Bar */}
-        <div className="hidden md:block bg-brand-green py-1.5 px-4 text-center text-[#E3A72B] text-[11px] font-bold uppercase tracking-[0.2em]">
-          Free Express Shipping on Orders Over $200 | Handcrafted Gourmet Pies
-        </div>
-
-        {/* Mobile View: Continuous Ticker */}
-        <div className="md:hidden overflow-hidden bg-brand-green py-1.5 text-[#E3A72B] text-[10px] font-bold uppercase tracking-[0.18em]">
-          <div className="animate-ticker flex whitespace-nowrap">
-            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
-            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
-            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
-            <span className="px-4">Free Express Shipping on Orders Over $200 • Handcrafted Gourmet Pies</span>
-          </div>
-        </div>
+        {/* Top Announcement Bar with PageHeader Aesthetic */}
+        <AnnouncementBar />
 
         {/* Unified Header Bar */}
         <div className="mx-auto max-w-[1400px]">

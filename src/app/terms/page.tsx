@@ -1,4 +1,4 @@
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { FileText, ShieldAlert, Award, Scale } from "lucide-react";
 import type { Metadata } from "next";
@@ -16,7 +16,7 @@ export default function TermsPage() {
       subtitle="Terms and conditions governing the use of Flavour & Co. products and services."
     >
       <div className="max-w-4xl mx-auto space-y-8 text-stone-800 text-sm sm:text-base leading-relaxed py-4 text-left">
-        
+
         {/* Highlight Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 not-prose">
           <div className="bg-white p-5 rounded-xl border border-secondary/20 shadow-sm text-center space-y-2">

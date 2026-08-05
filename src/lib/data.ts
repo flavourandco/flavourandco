@@ -1,3 +1,6 @@
+import type { BlogPost } from "./types";
+import { media } from "./media";
+
 export const marqueeItems = [
   "plate of origin on channel 7",
   "indo-australian pies",
@@ -666,4 +669,108 @@ export const wholesaleTestimonials: WholesaleTestimonial[] = [
   },
 ];
 
-
+export const blogPosts: BlogPost[] = [
+  {
+    id: "blog-1",
+    slug: "pies-made-with-heart",
+    title: "Pies Made with Heart — Here's Why They’re Different",
+    writer: "Simran Gulati",
+    authorRole: "Founder & Master Baker",
+    authorAvatar: "/founder/simran-kitchen.jpg",
+    date: "Jul 31, 2025",
+    readTime: "2 min read",
+    category: "Heritage & Flavour",
+    image: media.blogs.blog1_main,
+    excerpt:
+      "Experience the enchanting fusion of Indian spices and Aussie flair in every bite. Get ready for a flavour celebration!",
+    content: [
+      "Experience the enchanting fusion of Indian spices and Aussie flair in every bite. Get ready for a flavour celebration! 🤩🥧",
+      "Picture the warmth of Indian spices mingling with the homely comfort of Australian favourites, creating a symphony of taste that's both exciting and familiar. Our pies aren't just food—they're conversation starters, cultural bridges, and reasons to gather with friends and family to share stories and laughter. Imagine sitting around a table, the enticing aroma wafting through the air as everyone anticipates the first bite. Each pie we create offers a unique taste adventure, meticulously crafted to ensure every flavour stands out while blending harmoniously with others. Our chefs pay extraordinary attention to detail, selecting the freshest ingredients and perfecting recipes that combine zest and comfort in perfect harmony. Whether you're craving the zing of aromatic spices that awaken your senses or the buttery goodness of a classic pie crust that melts in your mouth, this fusion delivers a culinary masterpiece waiting to be savoured. Each bite promises not just a burst of joy but also a sprinkle of magic, inviting you to a world where spice and delight coexist seamlessly, enhancing the experience with every slice of heaven.",
+      "Beyond their delightful taste, our pies tell stories—stories of tradition meeting innovation, of rich Indian heritage intersecting with the laid-back spirit of Australia, painting a picture of culinary artistry that transcends norms. With every slice, you're not just tasting food; you're experiencing a narrative, a culinary journey that transcends borders, appealing to the senses and emotions alike. It's an invitation to indulge in something wonderfully new yet comfortingly familiar, appealing to both the adventurous palate and the traditionalist at heart.",
+      "This fusion celebrates diversity and unity, bringing together the best of both worlds in a delectable offering that's hard to resist. Embrace this unique blend, gather around the table filled with laughter and camaraderie, and let our pies be the centrepiece of your next memorable gathering, sparking moments of togetherness and unforgettable memories."
+    ]
+  },
+  {
+    id: "blog-2",
+    slug: "my-team-india-supports-national-backyard-cricket-day",
+    title: "My Team India Supports National Backyard Cricket Day",
+    writer: "Ash Gulati",
+    authorRole: "Co-Founder",
+    authorAvatar: "/founder/simran-coloured.jpg",
+    date: "Jan 27, 2021",
+    readTime: "1 min read",
+    category: "Community & Cause",
+    image: media.blogs.blog2_main,
+    image2: media.blogs.blog2_sub,
+    excerpt:
+      "Go to www.nationalbackyardcricket.com and support #Nationalbackyardcricket by picking up a bat and #BattingForChange.",
+    content: [
+      "Go to www.nationalbackyardcricket.com and support #Nationalbackyardcricket by picking up a bat and #BattingForChange.",
+      "Cricket is something that India is known for, and it is definitely THE sport here in Australia. Whenever there is a match between the 2 countries, we are torn between who to go for. Simran tends to push for India and me & the kids root for Australia. Nevertheless, we don’t get too high or too low regardless of the outcome because it’s about celebration of the sport and the bond that is created between the 2 countries.",
+      "National Backyard Cricket is another initiative that My Team India fully supports. The great cause supports libraries across regional Australia via partnership with Friends of Libraries Australia as well as tertiary education projects in India, Sri Lanka, Nepal, Tanzania, South Africa, Afghanistan and Indonesia.",
+      "This Sunday January 31, 2021 is the official date for National Backyard Cricket day and it is where we will put down our tongs and spatula down and enjoy a game of cricket with our friends and family. Needless to say that our Samosa Pies will be the official snack for this day.",
+      "Go to www.nationalbackyardcricket.com and support #Nationalbackyardcricket by picking up a bat and #BattingForChange. It’s for a good cause and you can be healthy while helping these programs that help spread education which is the future for tomorrows children.",
+      "No matter if you root for India or Australia, this cause helps both countries and more and the best part is we are doing it together no matter where you are from."
+    ]
+  },
+  {
+    id: "blog-3",
+    slug: "plate-of-india",
+    title: "Plate of India",
+    writer: "Nandita Chakraborty",
+    authorRole: "Guest Journalist",
+    date: "Oct 18, 2020",
+    readTime: "5 min read",
+    category: "Media & Journey",
+    image: media.blogs.blog3_main,
+    image2: media.blogs.blog3_sub,
+    excerpt:
+      "In any competition, it is not about how complex your dish is but how plain, simple and flavourful your dish is. That’s the spirit of ‘Team India’ of Plate of Origin on Channel 7.",
+    content: [
+      "In any competition, it is not about how complex your dish is but how plain, simple and flavourful your dish is. That’s the spirit of ‘Team India’ of Plate of Origin on Channel 7.",
+      "A loud cheer of “Vandemataram!” evokes Simran’s patriotism as she declares her love for India on national television for the televised cooking competition Plate of Origin.",
+      "In a candid interview, Ash and Simran speak about their love for food and their journey together – a love story which has all the narratives of DDLJ. When meeting Simran in 2004, it was love at first sight for Ash. He wants to be as close to her as possible – meaning he has to join her in a cooking show, no matter how uncomfortable it is for him to cook in front of a camera. Ash’s accent can be American but he is the modern Raj with his perfect Hindi, which brings a smile to my face.",
+      "He declares to Simran that she is the first and last woman for him. It is all about him being the luckiest man on earth to have her – and even if it is a cooking show, why not? To that Simran says with a laugh, “It’s all about him.” Ash is originally from the US, but met Simran in Delhi; they’ve been married for fourteen years, and it has been six years since they moved to Sydney with their two beautiful kids.",
+      "It’s a beautiful transition for Ash, from working as a corporate strategist in a software company to making samosa pie on national television, all credit going to Simran. The recipes she has been developing, experimenting with and cooking have been passed down from her family. Ash tells me cooking as therapy is far better than opening that bottle of whisky.",
+      "Simran always loved the glamour and fashion of Bollywood and wanted to be part of the industry. Her journey started in Australia in 2016. Coming out of a break from being a full-time mum, she turned heads in Mrs India Australia in 2016 when she was the first runner-up. Many avenues opened up, including acting and modelling. Having two kids made her health-conscious, so Simran also became an advocate of health and fitness. The turning point for her career was winning the Mrs India Global beauty pageant in 2018. Global Indian Talent wanted an ambassador for their brand to represent them at Cannes Film Festival – who would have been better than Simran? It was a great opportunity. As they say, one thing leads to the other; one of her peers also suggested for her to audition for Plate of Origin.",
+      "So, there she was at the audition by herself; she hadn’t known that she would have to team up with someone. So, without any hesitation, she went straight home to speak to Ash and persuade him to join. A nervous Ash recollects saying to Simran that he is always a behind-the-scenes guy. For him to go to the cooking show meant he not only has to be ‘in front of the house’ but he has to cook too!",
+      "In the kitchen, both of them cook but the innovative one (and a better cook, in own Ash’s words) is Simran. They bounce off each other beautifully. Simran loves to cook Indian food and Ash has a more diverse palate; next time you are on their Instagram page and see something different, that’s all Ash. But the ‘samosa pie’ idea was entirely Simran. She says that if we can have a tandoori pie, why not twist the infamous street snack samosa into a pie? When I saw them baking that samosa pie, I was already salivating (the next day, I had to settle for a chicken pie, unfortunately).",
+      "While their dream is to open a food truck, their whole take from this journey is to make the Indian community proud and leave their footprints for others to follow. In my twenty-one years in Melbourne, I haven’t seen an Indian couple taking the stage. The diverse show Plate of Origin enables that.",
+      "Asking Ash and Simran if they would have done something different to the butter chicken in the episode that had them eliminated from the competition, they replied they’d probably have started the sauce with a prep time of 90 minutes rather than 60 minutes. They had limited time and choices, like no use of a pressure cooker. They were given the list of what they had to cook, which is what makes the challenge so intriguing. Simran would have cooked a nice hot roti fresh from the tandoor or a simple chicken curry, but chicken biryani was the order of the day.",
+      "Like everything else during the pandemic, things changed – Channel 7 had to cut the show back and it became a double elimination format. They were meant to showcase a lot of other dishes, but the show had to wrap up.",
+      "But Ash and Simran still cannot get over the first call, when they were told that they made it onto the show. I’m told they recorded it.",
+      "Team India is all about showcasing their heritage. One scene we didn’t see in the show was her tears welling up when the flag of India was flying high. From teaching the Punjabi cheer, “Bale! Bale!” to her fellow contestants to saving up emotions for mother India, I say that’s what makes her so special. Her beauty and her creativity come out in the food.",
+      "But I think if Simran took the show’s attention with her glamour, Ash definitely brought his warmth as a charming “one-woman man”. I couldn’t be happier to learn this show could be streamed on Hotstar, as it will prove to be a valuable lesson. A woman’s place is in a man’s heart, but the place in the kitchen belongs to both of them. Food and love can combine to win everything in life, even during a pandemic.",
+      "Their heritage, their simplicity in itself is them on a plate. This is only the start of a legacy, weaving a path to all the Australian Indians who have migrated here; diversity is finally taking shape.",
+      "Simran is creative with her healthy way of life, teaching her children (aged eight and ten) that Indian paratha can be as fun as a burger. The technique is the same – just swapping desi ghee with coconut oil, replacing flour with ragi and making Indian food delicious and healthy for a sustainable life.",
+      "They both say they are doing more stuff with Channel 7 – it is perhaps the end of a beginning.",
+      "Blowing kisses to Simran (and she vice-versa), she bids a goodbye from her lounge to mine. I look at Ash’s Simran and Simran’s Ash, quoting Julia Child the American chef from her book My Life in France: “The secret of a happy marriage is finding the right person. You know they’re right if you love to be with them all the time.”",
+      "By Nandita Chakraborty — This story was featured in the October 2020 edition of G'day India and The Indian Weekly."
+    ]
+  },
+  {
+    id: "blog-4",
+    slug: "rich-history-of-samosa",
+    title: "Rich History of Samosa",
+    writer: "Simran Gulati",
+    authorRole: "Founder & Master Baker",
+    authorAvatar: "/founder/simran-kitchen.jpg",
+    date: "Oct 15, 2020",
+    readTime: "2 min read",
+    category: "Food History",
+    image: media.blogs.blog4_main,
+    image2: media.blogs.blog4_sub,
+    excerpt:
+      "As it turns 6pm in Karol Bagh in Delhi, street vendors are serving up one of the most humble street snacks in India; Samosa. Discover the ancient royal history behind this beloved icon.",
+    content: [
+      "As it turns 6pm in Karol Bagh in Delhi, the nightfall is coming on a December chilly evening, street vendors have lights around their stalls each screaming to get customers attention so they can make their ends meet. 6pm means snack time, and street vendors are gearing up for the rush hour, and one of those street vendors is serving up one of the most humble street snacks in India; Samosa.",
+      "Widely considered a quintessentially Indian delicacy, few people know that the samosa does not have an Indian origin. The deep fried, tightly packed parcel of spicy goodness that people think belongs to India is actually from Central Asia.",
+      "The samosa’s origins are from thousands of miles away in the ancient empires that came up in Iran at the time of civilisation. There is mention of sanbosag, from 10th century Middle Eastern cuisine in early medieval Persian texts as a relative of samosa and a cousin of the Persian pastry, samsa.",
+      "In India, Samosa was introduced by the Middle Eastern chefs who migrated for employment during the Delhi Sultanate rule, having earned the blessings and love of the Indian royals, the samosa became a snack fit for the king. There are also traces that have been validated by famed poet Amir Khusrau; the samosa being enjoyed by nobles in the royal Indian courts in the year 1300.",
+      "The British fell in love with the samosa on their arrival in India and they, along with the Indian diaspora, took the tasty tidbit with them to the far corners of their colonial empire. The samosa settled in the hearts of people everywhere, leading to the evolution of multiple regional versions that are enjoyed by all.",
+      "There are a number of variations in India, all of them served with chutneys. According to samosa connoisseurs, a samosa is deemed perfect when there is a crispy-crunch of light golden pastry paired with soft texture and spicy taste of the filling.",
+      "The samosa is undoubtedly the brightest star of Indian street food. When you bite into a gorgeous, golden samosa, what you taste is the story of India – a melting pot of cultures, cuisines and cooking traditions.",
+      "Now that we know the origin of Samosa, we have taken it another level up to make this into a pie, do try Team India's samosa pie as we carry the tradition of this great Indian street food forward."
+    ]
+  }
+];

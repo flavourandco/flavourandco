@@ -1,7 +1,7 @@
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 import Image from "next/image";
 import Link from "next/link";
-import StoryTimeline from "@/components/StoryTimeline";
+import StoryTimeline from "@/components/story/StoryTimeline";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
@@ -94,29 +94,23 @@ export default function OurStoryPage() {
 
         {/* Section 1: Meet Simran (Overlapping Images Layout) */}
         <div id="meet-simran" className="mx-auto max-w-7xl px-6 py-16 md:py-24 lg:px-8 scroll-mt-24">
-          <div className="grid gap-16 lg:grid-cols-12 lg:gap-20 items-center">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-20 items-stretch">
             {/* Left Column: Text content */}
-            <div className="lg:col-span-6 text-left order-last lg:order-first">
-              {/* Subtitle with Garnet Dot above "More Than Food." */}
-              <div className="flex items-center gap-2.5 mb-2">
-                <span className="h-2 w-2 rounded-full bg-[#6b1e30] shrink-0" />
-                <p className="font-serif italic text-stone-800 text-2xl sm:text-3xl font-normal">
-                  Meet Simran
-                </p>
-              </div>
+            <div className="lg:col-span-6 text-left order-last lg:order-first flex flex-col justify-between">
+              <div>
+                {/* Main Headline in Gold with Garnet period */}
+                <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#c69c40] font-normal leading-[1.1] tracking-tight">
+                  More Than Food<span className="text-[#6b1e30] font-bold">.</span>
+                </h2>
 
-              {/* Main Headline in Gold with Garnet period */}
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#c69c40] font-normal leading-[1.1] tracking-tight">
-                More Than Food<span className="text-[#6b1e30] font-bold">.</span>
-              </h2>
-
-              {/* Credentials / Sub-tag line with sharp gray highlight background */}
-              <div className="mt-4 mb-6 inline-block bg-[#e5e1d8] rounded-none px-2.5 sm:px-3 py-1.5 max-w-full">
-                <p className="text-[9px] sm:text-[11px] font-mono uppercase tracking-[0.15em] sm:tracking-[0.3em] font-bold leading-none whitespace-nowrap">
-                  <span className="text-[#6b1e30]">HERITAGE</span>
-                  <span className="text-[#c69c40] mx-1.5 sm:mx-2.5 text-xs sm:text-sm">•</span>
-                  <span className="text-[#6b1e30]">FLAVOUR &amp; CONNECTION</span>
-                </p>
+                {/* Credentials / Sub-tag line with sharp gray highlight background */}
+                <div className="mt-4 mb-6 inline-block bg-[#e5e1d8] rounded-none px-2.5 sm:px-3 py-1.5 max-w-full">
+                  <p className="text-[9px] sm:text-[11px] font-mono uppercase tracking-[0.15em] sm:tracking-[0.3em] font-bold leading-none whitespace-nowrap">
+                    <span className="text-[#6b1e30]">HERITAGE</span>
+                    <span className="text-[#c69c40] mx-1.5 sm:mx-2.5 text-xs sm:text-sm">•</span>
+                    <span className="text-[#6b1e30]">FLAVOUR &amp; CONNECTION</span>
+                  </p>
+                </div>
               </div>
 
               {/* Story text with editorial serif italics matching reference */}
@@ -135,17 +129,26 @@ export default function OurStoryPage() {
               </div>
             </div>
 
-            {/* Right Column: Simran Photo */}
-            <div className="lg:col-span-6 order-first lg:order-last flex justify-center">
-              <div className="relative aspect-[3/4] w-full max-w-md overflow-hidden shadow-xl border border-brand-gold/20 rounded-xl">
+            {/* Right Column: Simran Photo with "Meet Simran" directly above it */}
+            <div className="lg:col-span-6 order-first lg:order-last flex flex-col items-center lg:items-start justify-start h-full">
+              {/* Subtitle with Garnet Dot directly above the photo */}
+              <div className="w-full max-w-md flex items-center gap-2.5 mb-3 shrink-0">
+                <span className="h-2 w-2 rounded-full bg-[#6b1e30] shrink-0" />
+                <p className="font-serif italic text-stone-800 text-2xl sm:text-3xl font-normal">
+                  Meet Simran
+                </p>
+              </div>
+
+              <div className="relative w-full max-w-md flex-1 min-h-[380px] sm:min-h-[450px] overflow-hidden shadow-xl border border-brand-gold/20 rounded-xl">
                 <Image
                   src="/founder/simran-kitchen.jpg"
                   alt="Simran in her kitchen — Founder of Flavour & Co."
                   fill
-                  className="object-cover"
+                  className="object-cover object-center"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                   quality={95}
                   priority
+                  loading="eager"
                 />
               </div>
             </div>
