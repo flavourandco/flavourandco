@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, FileSpreadsheet, CheckCircle, Clock, Archive, Trash2, Eye, X } from "lucide-react";
+import { Search, FileSpreadsheet, Trash2, Eye, X } from "lucide-react";
 import { WholesaleInquiry } from "@/lib/types";
+import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
+import { useUIStore } from "@/store/ui.store";
+import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function AdminWholesalePage() {
   const [inquiries, setInquiries] = useState<WholesaleInquiry[]>([]);
@@ -10,6 +13,8 @@ export default function AdminWholesalePage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<WholesaleInquiry | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const addToast = useUIStore((s) => s.addToast);
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -44,22 +49,26 @@ export default function AdminWholesalePage() {
         if (selectedInquiry?.id === id) {
           setSelectedInquiry((prev) => (prev ? { ...prev, status } : null));
         }
+        addToast(`Wholesale inquiry status updated to ${status}.`, "success");
       }
     } catch {
-      alert("Failed to update status");
+      addToast("Failed to update status", "error");
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this inquiry?")) return;
+  const handleDeleteConfirm = async () => {
+    if (!deletingId) return;
+    const id = deletingId;
+    setDeletingId(null);
     try {
       const res = await fetch(`/api/wholesale?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setInquiries((prev) => prev.filter((item) => item.id !== id));
         if (selectedInquiry?.id === id) setSelectedInquiry(null);
+        addToast("Wholesale inquiry deleted.", "info");
       }
     } catch {
-      alert("Failed to delete inquiry");
+      addToast("Failed to delete wholesale inquiry", "error");
     }
   };
 
@@ -75,46 +84,45 @@ export default function AdminWholesalePage() {
   const getStatusBadge = (status: WholesaleInquiry["status"]) => {
     switch (status) {
       case "pending":
-        return <span className="bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase">Pending</span>;
+        return <span className="bg-amber-50 text-amber-800 border border-amber-200/60 px-2 py-0.5 rounded-sm font-bold text-[10px] uppercase">Pending</span>;
       case "reviewed":
-        return <span className="bg-blue-100 text-blue-800 border border-blue-300 px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase">Reviewed</span>;
+        return <span className="bg-blue-50 text-blue-800 border border-blue-200/60 px-2 py-0.5 rounded-sm font-bold text-[10px] uppercase">Reviewed</span>;
       case "contacted":
-        return <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase">Contacted</span>;
+        return <span className="bg-emerald-50 text-emerald-800 border border-emerald-200/60 px-2 py-0.5 rounded-sm font-bold text-[10px] uppercase">Contacted</span>;
       case "archived":
-        return <span className="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase">Archived</span>;
+        return <span className="bg-slate-100 text-slate-600 border border-slate-200/60 px-2 py-0.5 rounded-sm font-bold text-[10px] uppercase">Archived</span>;
     }
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Wholesale &amp; Foodservice Inquiries</h2>
-        <p className="text-xs text-slate-500 mt-1">
+      <div className="pb-4 border-b border-slate-200/80">
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Wholesale &amp; Foodservice Inquiries</h1>
+        <p className="text-xs text-slate-500 mt-0.5">
           Review partnership requests from hotel venues, cafés, and corporate caterers.
         </p>
       </div>
 
       {/* Controls */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="bg-white p-3 rounded-sm border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-80">
           <input
             type="text"
-            placeholder="Search business name, contact, email..."
+            placeholder="Search business, contact, email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#c69c40]/50"
+            className="w-full bg-slate-50 border border-slate-200 rounded-sm py-1.5 pl-9 pr-3 text-xs text-slate-700 focus:outline-none focus:border-slate-900"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
           {["all", "pending", "reviewed", "contacted", "archived"].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer ${
+              className={`px-3 py-1 rounded-sm text-[11px] font-semibold uppercase tracking-wider cursor-pointer transition-colors ${
                 statusFilter === st ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -125,53 +133,51 @@ export default function AdminWholesalePage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-sm border border-slate-200/80 shadow-2xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-400">Loading wholesale inquiries...</div>
+          <BoneyardTableSkeleton rows={5} columns={6} />
         ) : filteredInquiries.length === 0 ? (
           <div className="p-12 text-center space-y-2">
             <FileSpreadsheet className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-semibold text-slate-600">No wholesale inquiries found</p>
+            <p className="text-xs font-semibold text-slate-600">No wholesale inquiries found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs text-slate-700">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200/80 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-3.5 px-4">BUSINESS / VENUE</th>
-                  <th className="py-3.5 px-4">CONTACT NAME</th>
-                  <th className="py-3.5 px-4">BUSINESS TYPE</th>
-                  <th className="py-3.5 px-4">VOLUME</th>
-                  <th className="py-3.5 px-4">STATUS</th>
-                  <th className="py-3.5 px-4 text-right">ACTIONS</th>
+                <tr className="bg-slate-50 border-b border-slate-200/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="py-3 px-4">Business &amp; Contact</th>
+                  <th className="py-3 px-4">Venue Type</th>
+                  <th className="py-3 px-4">Phone</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+              <tbody className="divide-y divide-slate-100">
                 {filteredInquiries.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-slate-800">
-                      {item.businessName}
-                      <span className="block text-[10px] text-slate-400 font-normal">{item.email}</span>
+                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-4 font-bold text-slate-900">
+                      {item.businessName || "Venue"}
+                      <span className="block text-[10px] text-slate-400 font-normal">{item.contactName} ({item.email})</span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700">{item.contactName}</td>
-                    <td className="py-3.5 px-4 text-slate-600">{item.businessType}</td>
-                    <td className="py-3.5 px-4 text-slate-600">{item.estimatedVolume || "N/A"}</td>
-                    <td className="py-3.5 px-4">{getStatusBadge(item.status)}</td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedInquiry(item)}
-                        className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors inline-block"
-                        title="View details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors inline-block"
-                        title="Delete inquiry"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <td className="py-3 px-4 text-slate-700 font-semibold">{item.businessType || "General"}</td>
+                    <td className="py-3 px-4 text-slate-600">{item.phone || "N/A"}</td>
+                    <td className="py-3 px-4">{getStatusBadge(item.status)}</td>
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => setSelectedInquiry(item)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3 h-3 text-slate-500" /> View
+                        </button>
+                        <button
+                          onClick={() => setDeletingId(item.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm border border-rose-200/80 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -181,45 +187,48 @@ export default function AdminWholesalePage() {
         )}
       </div>
 
-      {/* DETAIL MODAL */}
+      {/* STRICTLY CENTERED DETAIL MODAL OVER ENTIRE SCREEN */}
       {selectedInquiry && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-fadeIn">
+        <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
+          <div className="bg-white rounded-sm max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-5 my-auto shrink-0 max-h-[88vh] overflow-y-auto overscroll-contain" data-lenis-prevent>
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Wholesale Inquiry Details</span>
-                <h3 className="text-lg font-bold text-slate-800">{selectedInquiry.businessName}</h3>
+                <span className="text-[10px] uppercase font-mono text-slate-400">Wholesale Inquiry</span>
+                <h3 className="text-base font-bold text-slate-900">{selectedInquiry.businessName}</h3>
               </div>
-              <button onClick={() => setSelectedInquiry(null)} className="p-1 text-slate-400 hover:text-slate-700">
+              <button onClick={() => setSelectedInquiry(null)} className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl">
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-sm border border-slate-200/60">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 block">CONTACT</span>
-                  <span className="font-semibold text-slate-800">{selectedInquiry.contactName}</span>
+                  <span className="text-[10px] font-bold text-slate-400 block">CONTACT PERSON</span>
+                  <span className="font-semibold text-slate-900">{selectedInquiry.contactName}</span>
                 </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 block">EMAIL</span>
+                  <span className="font-semibold text-slate-900">{selectedInquiry.email}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-sm border border-slate-200/60">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block">PHONE</span>
-                  <span className="font-semibold text-slate-800">{selectedInquiry.phone || "N/A"}</span>
+                  <span className="font-semibold text-slate-900">{selectedInquiry.phone || "N/A"}</span>
                 </div>
-                <div className="mt-2">
-                  <span className="text-[10px] font-bold text-slate-400 block">EMAIL</span>
-                  <span className="font-semibold text-slate-800">{selectedInquiry.email}</span>
-                </div>
-                <div className="mt-2">
-                  <span className="text-[10px] font-bold text-slate-400 block">BUSINESS TYPE</span>
-                  <span className="font-semibold text-slate-800">{selectedInquiry.businessType}</span>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 block">VENUE TYPE</span>
+                  <span className="font-semibold text-slate-900">{selectedInquiry.businessType}</span>
                 </div>
               </div>
 
               <div>
                 <span className="text-[10px] font-bold text-slate-400 block mb-1">MESSAGE / REQUEST</span>
-                <p className="bg-slate-50 p-3 rounded-xl text-slate-700 leading-relaxed font-sans border border-slate-100">
-                  {selectedInquiry.message || "No message provided."}
+                <p className="bg-slate-50 p-3 rounded-sm text-slate-700 leading-relaxed font-sans border border-slate-200/60">
+                  {selectedInquiry.message}
                 </p>
               </div>
 
@@ -230,7 +239,7 @@ export default function AdminWholesalePage() {
                     <button
                       key={st}
                       onClick={() => handleUpdateStatus(selectedInquiry.id, st)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors ${
+                      className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-colors cursor-pointer ${
                         selectedInquiry.status === st
                           ? "bg-slate-900 text-white"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -246,7 +255,7 @@ export default function AdminWholesalePage() {
             <div className="pt-3 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => setSelectedInquiry(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200"
+                className="px-4 py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-sm hover:bg-slate-200 cursor-pointer"
               >
                 Close
               </button>
@@ -256,6 +265,17 @@ export default function AdminWholesalePage() {
         </div>
       )}
 
+      {/* CONFIRMATION MODAL FOR DELETION */}
+      <AdminConfirmModal
+        isOpen={Boolean(deletingId)}
+        title="Confirm Inquiry Deletion"
+        message="Are you sure you want to delete this wholesale inquiry? This message will be permanently removed."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingId(null)}
+      />
     </div>
   );
 }

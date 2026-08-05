@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "react-hot-toast";
 
 interface ToastNotification {
   id: string;
@@ -36,21 +37,16 @@ export const useUIStore = create<UIState>((set) => ({
   setOfferModalOpen: (offerModalOpen) => set({ offerModalOpen }),
 
   addToast: (message, type = "info") => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    set((state) => ({
-      toasts: [...state.toasts, { id, message, type }],
-    }));
-
-    // Auto-remove toast after 4 seconds
-    setTimeout(() => {
-      set((state) => ({
-        toasts: state.toasts.filter((t) => t.id !== id),
-      }));
-    }, 4000);
+    if (type === "success") {
+      toast.success(message);
+    } else if (type === "error") {
+      toast.error(message);
+    } else {
+      toast(message);
+    }
   },
 
-  removeToast: (id) =>
-    set((state) => ({
-      toasts: state.toasts.filter((t) => t.id !== id),
-    })),
+  removeToast: (id) => {
+    toast.dismiss(id);
+  },
 }));

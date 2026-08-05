@@ -3,29 +3,6 @@ import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/se
 import { ContactInquiry } from "@/lib/types";
 import { requireAdminApi } from "@/lib/auth";
 
-const mockContactInquiries: ContactInquiry[] = [
-  {
-    id: "cnt-1",
-    name: "Amanda Miller",
-    email: "amanda.m@gmail.com",
-    phone: "+61 422 111 222",
-    subject: "Catering for Private Birthday Event",
-    message: "Hi! Looking to order 50 mini butter chicken pies for a weekend gathering in Sydney.",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "cnt-2",
-    name: "Robert Chen",
-    email: "robert.c@techcorp.au",
-    phone: "+61 433 999 888",
-    subject: "Corporate Lunch Order",
-    message: "Do you deliver frozen packs directly to North Sydney offices on Thursday mornings?",
-    status: "replied",
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-];
-
 export async function GET() {
   const { error: authError } = await requireAdminApi();
   if (authError) return authError;
@@ -55,7 +32,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ success: true, data: mockContactInquiries });
+    return NextResponse.json({ success: true, data: [] });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -107,8 +84,6 @@ export async function POST(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      mockContactInquiries.unshift(newInquiry);
     }
 
     return NextResponse.json({ success: true, message: "Contact message sent successfully", data: newInquiry }, { status: 201 });
@@ -141,11 +116,6 @@ export async function PATCH(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      const idx = mockContactInquiries.findIndex((i) => i.id === id);
-      if (idx !== -1) {
-        mockContactInquiries[idx].status = status;
-      }
     }
 
     return NextResponse.json({ success: true, message: "Contact inquiry updated" });
@@ -175,9 +145,6 @@ export async function DELETE(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      const idx = mockContactInquiries.findIndex((i) => i.id === id);
-      if (idx !== -1) mockContactInquiries.splice(idx, 1);
     }
 
     return NextResponse.json({ success: true, message: "Contact inquiry deleted" });

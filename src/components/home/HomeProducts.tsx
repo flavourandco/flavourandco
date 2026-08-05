@@ -6,14 +6,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { products as fallbackProducts } from "@/lib/data";
 import ProductCard from "@/components/products/ProductCard";
 import { useProductStore } from "@/store/product.store";
+import { BoneyardProductCardSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HomeProducts() {
   const products = useProductStore((s) => s.products);
+  const isFetching = useProductStore((s) => s.isFetching);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const sectionRef = useRef<HTMLElement>(null);
   const [cartQuantities, setCartQuantities] = useState<Record<string, number>>({});
@@ -153,6 +154,13 @@ export default function HomeProducts() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
+          {isFetching && featuredProducts.length === 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <BoneyardProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
             <div
               className="flex transition-transform duration-500 ease-out"
               style={{
@@ -171,6 +179,7 @@ export default function HomeProducts() {
                 );
               })}
             </div>
+          )}
           </div>
 
           {/* Navigation Buttons (Desktop only) */}

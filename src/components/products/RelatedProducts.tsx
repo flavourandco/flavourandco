@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Product } from "@/lib/types";
-import { products } from "@/lib/data";
+import { useProductStore } from "@/store/product.store";
 import ProductCard from "./ProductCard";
 import ShowMore from "@/components/ui/ShowMore";
 import { Sparkles } from "lucide-react";
@@ -17,6 +17,7 @@ export default function RelatedProducts({
   initialCount = 4,
 }: RelatedProductsProps) {
   const [visibleCount, setVisibleCount] = useState<number>(initialCount);
+  const products = useProductStore((s) => s.products);
 
   // Filter out current product and prioritize products of the same category
   const filteredProducts = products.filter((p) => p.id !== currentProduct.id);

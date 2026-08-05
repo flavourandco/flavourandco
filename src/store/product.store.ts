@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Product } from "@/lib/types";
-import { products as fallbackProducts } from "@/lib/data";
 
 interface ProductState {
   products: Product[];
@@ -22,7 +21,7 @@ interface ProductState {
 export const useProductStore = create<ProductState>()(
   persist(
     (set, get) => ({
-      products: fallbackProducts as Product[],
+      products: [],
       selectedCategory: "all",
       searchQuery: "",
       sortBy: "featured",
@@ -39,12 +38,12 @@ export const useProductStore = create<ProductState>()(
       setSortBy: (sortBy: "featured" | "price-asc" | "price-desc" | "name") => set({ sortBy }),
 
       fetchProducts: async (force = false) => {
-        const { lastFetchedAt, isFetching } = get();
+        const { products, lastFetchedAt, isFetching } = get();
         const FIVE_MINUTES = 5 * 60 * 1000;
 
-        // Skip if already fetching or fetched recently unless force revalidate
+        // Skip if already fetching or fetched recently unless force or store is empty
         if (isFetching) return;
-        if (!force && lastFetchedAt && Date.now() - lastFetchedAt < FIVE_MINUTES) {
+        if (!force && products.length > 0 && lastFetchedAt && Date.now() - lastFetchedAt < FIVE_MINUTES) {
           return;
         }
 
@@ -54,12 +53,10 @@ export const useProductStore = create<ProductState>()(
           if (res.ok) {
             const resData = await res.json();
             const items = Array.isArray(resData) ? resData : (Array.isArray(resData?.data) ? resData.data : []);
-            if (items.length > 0) {
-              set({ products: items, lastFetchedAt: Date.now() });
-            }
+            set({ products: items, lastFetchedAt: Date.now() });
           }
         } catch (error) {
-          console.warn("Product revalidation background error, using cached products:", error);
+          console.warn("Product revalidation error:", error);
         } finally {
           set({ isFetching: false });
         }

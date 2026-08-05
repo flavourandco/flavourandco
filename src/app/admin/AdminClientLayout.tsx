@@ -41,20 +41,8 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
     { label: "Blog", href: "/admin/blogs", icon: BookOpenText },
   ];
 
-  const getBreadcrumbTitle = () => {
-    if (pathname === "/admin/dashboard" || pathname === "/admin") return "Dashboard";
-    if (pathname.includes("/admin/users")) return "Users";
-    if (pathname.includes("/admin/products")) return "Products";
-    if (pathname.includes("/admin/orders")) return "Orders";
-    if (pathname.includes("/admin/wholesale")) return "Wholesale";
-    if (pathname.includes("/admin/contact")) return "Inquiries";
-    if (pathname.includes("/admin/reviews")) return "Reviews";
-    if (pathname.includes("/admin/blogs")) return "Blog";
-    return "Dashboard";
-  };
-
-  const adminName = user?.firstName || user?.fullName?.split(" ")[0] || "Admin";
-  const userInitial = (adminName[0] || "A").toUpperCase();
+  const adminName = user?.firstName || user?.fullName?.split(" ")[0] || "Simran";
+  const userInitial = (adminName[0] || "S").toUpperCase();
 
   return (
     <div className="admin-scope min-h-screen bg-[#fafafa] text-slate-900 flex font-sans antialiased">
@@ -91,43 +79,65 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
           </nav>
         </div>
 
-        {/* Sidebar Bottom Controls */}
-        <div className="p-3 border-t border-slate-100 space-y-2 shrink-0 bg-slate-50/50">
+        {/* HIGHLIGHTED POLISHED SIDEBAR BOTTOM CONTROLS */}
+        <div className="p-3 border-t border-slate-200/80 space-y-2.5 shrink-0 bg-slate-100/70">
+          
+          {/* Visit Main Store (Highlighted Pill Button) */}
           <Link
             href="/"
             target="_blank"
-            className="w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-bold text-slate-900 bg-white hover:bg-slate-900 hover:text-white border border-slate-200/90 shadow-2xs transition-all duration-200 group cursor-pointer"
           >
-            <span>Visit Main Store</span>
-            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-amber-500 group-hover:text-amber-400 transition-colors" />
+              <span>Visit Main Store</span>
+            </span>
+            <span className="text-[10px] font-mono text-slate-400 group-hover:text-slate-300 transition-colors">↗</span>
           </Link>
 
+          {/* Sign Out Button (Highlighted Danger Pill) */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-semibold text-rose-700 bg-rose-50/90 hover:bg-rose-600 hover:text-white border border-rose-200/80 transition-all duration-200 cursor-pointer shadow-2xs group"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <span className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5 text-rose-600 group-hover:text-white transition-colors" />
+              <span>Sign Out</span>
+            </span>
+            <span className="text-[9px] font-mono text-rose-400 group-hover:text-rose-200 uppercase tracking-wider">Exit</span>
           </button>
 
-          {/* User Profile Card at bottom */}
-          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md bg-white border border-slate-200/80 shadow-2xs">
-            {user?.imageUrl ? (
-              <img
-                src={user.imageUrl}
-                alt={adminName}
-                className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                {userInitial}
-              </div>
-            )}
+          {/* Admin User Profile Card (Highlighted Sleek Card with Online Indicator) */}
+          <div className="p-3 rounded-md bg-white border border-slate-200/90 shadow-xs flex items-center gap-3 relative overflow-hidden">
+            <div className="relative shrink-0">
+              {user?.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={adminName}
+                  className="w-9 h-9 rounded-full object-cover border-2 border-slate-900/10 shrink-0"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  {userInitial}
+                </div>
+              )}
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+            </div>
+
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-bold text-slate-900 truncate">{adminName}</span>
-              <span className="text-[10px] text-slate-400 font-medium truncate">Administrator</span>
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-extrabold text-slate-900 truncate">{adminName}</span>
+                <span className="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200/80 rounded-sm shrink-0">
+                  Admin
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                {user?.primaryEmailAddress?.emailAddress || "Administrator"}
+              </span>
             </div>
           </div>
+
         </div>
       </aside>
 
@@ -135,7 +145,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between bg-white px-4 h-16 border-b border-slate-200 sticky top-0 z-30">
-          <div className="w-8"></div> {/* Spacer for symmetry */}
+          <div className="w-8"></div>
           <Link href="/admin/dashboard" className="flex items-center justify-center">
             <img src={media.navbarLogo} alt="Flavour & Co." className="h-11 w-auto object-contain mx-auto" />
           </Link>
@@ -149,7 +159,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
 
         {/* Mobile Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 p-4 space-y-1 shadow-md animate-fadeIn">
+          <div className="lg:hidden bg-white border-b border-slate-200 p-4 space-y-2 shadow-md animate-fadeIn">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -168,10 +178,10 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
               );
             })}
             <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
-              <Link href="/" target="_blank" className="text-xs text-slate-600 font-medium flex items-center gap-1">
-                Main Store <ExternalLink className="w-3 h-3" />
+              <Link href="/" target="_blank" rel="noopener noreferrer" className="text-xs text-slate-900 font-bold flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">
+                Main Store <ExternalLink className="w-3 h-3 text-amber-500" />
               </Link>
-              <button onClick={handleLogout} className="text-xs text-rose-600 font-semibold cursor-pointer">
+              <button onClick={handleLogout} className="text-xs text-rose-700 font-bold bg-rose-50 px-3 py-1.5 rounded-md border border-rose-200 cursor-pointer">
                 Sign Out
               </button>
             </div>

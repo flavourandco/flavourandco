@@ -37,7 +37,7 @@ export default function OfferModal() {
   if (!isOpen) return null;
 
   return (
-    <div className={`${fraunces.variable} fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 animate-fadeIn`}>
+    <div className={`${fraunces.variable} fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 animate-fadeIn overflow-y-auto`} data-lenis-prevent>
       {/* Dark backdrop blur */}
       <div
         className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity"
@@ -46,7 +46,7 @@ export default function OfferModal() {
       />
 
       {/* Modal Container — Split-screen layout with left brand-green bg, right cream content */}
-      <div className="relative w-full max-w-lg md:max-w-3xl overflow-hidden rounded-xl bg-cream border border-brand-gold/30 shadow-2xl transition-all transform scale-100 z-10 text-base-content p-0">
+      <div className="relative w-full max-w-lg md:max-w-3xl max-h-[88vh] overflow-y-auto overscroll-contain rounded-xl bg-cream border border-brand-gold/30 shadow-2xl transition-all transform scale-100 z-10 text-base-content p-0 my-auto shrink-0" data-lenis-prevent>
         {/* Rounded Close Button */}
         <button
           onClick={handleClose}

@@ -6,7 +6,11 @@ import { CheckCircle2 } from "lucide-react";
 import PhoneInput from "@/components/ui/PhoneInput";
 
 
+import { useUIStore } from "@/store/ui.store";
+import { formatCustomerError } from "@/lib/error-formatter";
+
 export default function ContactForm() {
+  const addToast = useUIStore((s) => s.addToast);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,11 +43,15 @@ export default function ContactForm() {
 
       if (res.ok) {
         setSubmitted(true);
+        addToast("Thank you! We've received your message and will get back to you shortly.", "success");
       } else {
-        alert("Something went wrong while sending your message. Please try again.");
+        const json = await res.json().catch(() => ({}));
+        const friendlyError = formatCustomerError(json.error);
+        addToast(friendlyError, "error");
       }
-    } catch {
-      alert("Failed to submit message. Please check your connection.");
+    } catch (err) {
+      const friendlyError = formatCustomerError(err);
+      addToast(friendlyError, "error");
     } finally {
       setLoading(false);
     }

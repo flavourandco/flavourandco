@@ -2,9 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Edit2, Trash2, Search, X, BookOpen, CheckCircle, EyeOff } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, X, CheckCircle, EyeOff, Eye } from "lucide-react";
 import { BlogPost } from "@/lib/types";
 import { useBlogStore } from "@/store/blog.store";
+import { useUIStore } from "@/store/ui.store";
+import { formatCustomerError } from "@/lib/error-formatter";
+import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
+import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -12,10 +16,16 @@ export default function AdminBlogsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   
   const setStoreBlogs = useBlogStore((s) => s.setPosts);
+  const addToast = useUIStore((s) => s.addToast);
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Modals State
+  const [viewingBlog, setViewingBlog] = useState<BlogPost | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+
+  // Confirmation state
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [deletingBlogId, setDeletingBlogId] = useState<string | null>(null);
 
   // Form State (NO authorRole)
   const [formData, setFormData] = useState({
@@ -54,6 +64,7 @@ export default function AdminBlogsPage() {
 
   const handleOpenCreate = () => {
     setEditingBlog(null);
+    setViewingBlog(null);
     setFormData({
       title: "",
       slug: "",
@@ -67,7 +78,12 @@ export default function AdminBlogsPage() {
       image2: "",
       published: true,
     });
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
+  };
+
+  const handleOpenEditFromView = (blog: BlogPost) => {
+    setViewingBlog(null);
+    handleOpenEdit(blog);
   };
 
   const handleOpenEdit = (blog: BlogPost) => {
@@ -85,11 +101,23 @@ export default function AdminBlogsPage() {
       image2: blog.image2 || "",
       published: blog.published ?? true,
     });
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this article?")) return;
+  const handleAttemptCloseEdit = () => {
+    setShowDiscardConfirm(true);
+  };
+
+  const handleConfirmDiscard = () => {
+    setShowDiscardConfirm(false);
+    setIsEditModalOpen(false);
+    setEditingBlog(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingBlogId) return;
+    const id = deletingBlogId;
+    setDeletingBlogId(null);
     try {
       const res = await fetch(`/api/blogs/${id}`, { method: "DELETE" });
       const json = await res.json();
@@ -99,11 +127,12 @@ export default function AdminBlogsPage() {
           setStoreBlogs(updated);
           return updated;
         });
+        addToast("Blog article deleted.", "info");
       } else {
-        alert(json.error || "Failed to delete article");
+        addToast(formatCustomerError(json.error), "error");
       }
-    } catch {
-      alert("Error deleting article");
+    } catch (err) {
+      addToast(formatCustomerError(err), "error");
     }
   };
 
@@ -124,10 +153,11 @@ export default function AdminBlogsPage() {
         });
         const json = await res.json();
         if (json.success) {
-          setIsModalOpen(false);
+          setIsEditModalOpen(false);
           fetchBlogs();
+          addToast("Blog article updated successfully!", "success");
         } else {
-          alert(json.error || "Failed to update article");
+          addToast(formatCustomerError(json.error), "error");
         }
       } else {
         const res = await fetch("/api/blogs", {
@@ -137,118 +167,121 @@ export default function AdminBlogsPage() {
         });
         const json = await res.json();
         if (json.success) {
-          setIsModalOpen(false);
+          setIsEditModalOpen(false);
           fetchBlogs();
+          addToast("New blog article published!", "success");
         } else {
-          alert(json.error || "Failed to create article");
+          addToast(formatCustomerError(json.error), "error");
         }
       }
-    } catch {
-      alert("Error saving blog article");
+    } catch (err) {
+      addToast(formatCustomerError(err), "error");
     }
   };
 
-  const filteredBlogs = blogs.filter((b) =>
-    b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.writer.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBlogs = blogs.filter(
+    (b) =>
+      b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.writer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Blog &amp; Article Management (CRUD)</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Create, edit, publish, or remove blog posts. Content is stored directly in Supabase.
-          </p>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Journal &amp; Blog Management</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Manage articles, heritage stories, and publishing status.</p>
         </div>
+
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 bg-slate-900 hover:bg-black text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-all shadow-2xs cursor-pointer border border-slate-800 shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>New Article</span>
         </button>
       </div>
 
-      {/* Filter / Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-        <div className="relative w-full sm:w-72">
+      {/* Filter Toolbar */}
+      <div className="flex items-center justify-between gap-3 bg-white p-3 rounded-sm border border-slate-200/80 shadow-2xs">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search articles by title or writer..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-9 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/20"
+            placeholder="Search articles by title or category..."
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 transition-colors"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-sm border border-slate-200/80 shadow-2xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-400 font-semibold">
-            Loading articles from Supabase...
-          </div>
+          <BoneyardTableSkeleton rows={5} columns={6} />
         ) : filteredBlogs.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-semibold text-slate-600">No blog articles found</p>
-          </div>
+          <div className="p-12 text-center text-xs text-slate-400 font-medium">No blog articles found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200/80 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-3.5 px-4">ARTICLE</th>
-                  <th className="py-3.5 px-4">WRITER</th>
-                  <th className="py-3.5 px-4">CATEGORY</th>
-                  <th className="py-3.5 px-4">DATE</th>
-                  <th className="py-3.5 px-4 text-right">ACTIONS</th>
+            <table className="w-full text-left text-xs text-slate-700">
+              <thead className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="py-3 px-4">Article</th>
+                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">Author</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                {filteredBlogs.map((post) => (
-                  <tr key={post.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3.5 px-4 flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
-                        <Image
-                          src={post.image || "https://example.com/image.jpg"}
-                          alt={post.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <span className="font-bold text-slate-800 block text-xs">{post.title}</span>
-                        <span className="text-[10px] text-slate-400 block line-clamp-1">{post.excerpt}</span>
+              <tbody className="divide-y divide-slate-100">
+                {filteredBlogs.map((b) => (
+                  <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-9 rounded-sm overflow-hidden bg-slate-100 border border-slate-200/60 shrink-0">
+                          <Image src={b.image} alt={b.title} fill className="object-cover" sizes="48px" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-slate-900 truncate max-w-xs">{b.title}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">Slug: {b.slug}</p>
+                        </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-800 font-semibold">{post.writer}</td>
-                    <td className="py-3.5 px-4">
-                      <span className="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-md text-[10px]">
-                        {post.category}
-                      </span>
+                    <td className="py-3 px-4 font-medium">{b.category}</td>
+                    <td className="py-3 px-4 text-slate-800 font-semibold">{b.writer}</td>
+                    <td className="py-3 px-4 text-slate-500">{b.date}</td>
+                    <td className="py-3 px-4">
+                      {b.published ?? true ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[10px] font-bold">
+                          <CheckCircle className="w-2.5 h-2.5" /> Published
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold">
+                          <EyeOff className="w-2.5 h-2.5" /> Draft
+                        </span>
+                      )}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-500">{post.date}</td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <button
-                        onClick={() => handleOpenEdit(post)}
-                        className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors inline-block"
-                        title="Edit article"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(post.id)}
-                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors inline-block"
-                        title="Delete article"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1">
+                        {/* VIEW BUTTON */}
+                        <button
+                          onClick={() => setViewingBlog(b)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3 h-3 text-slate-500" /> View
+                        </button>
+                        {/* DELETE BUTTON */}
+                        <button
+                          onClick={() => setDeletingBlogId(b.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm border border-rose-200/80 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -258,136 +291,235 @@ export default function AdminBlogsPage() {
         )}
       </div>
 
-      {/* CREATE / EDIT BLOG MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto animate-fadeIn">
-            
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-800">
-                {editingBlog ? "Edit Article" : "Create New Article"}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700">
+      {/* VIEW MODAL (FIXED BIGGER SHAPE & 100% COMPLETE SCROLLING) */}
+      {viewingBlog && (
+        <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
+          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
+              <div>
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Article View</span>
+                <h2 className="text-base font-bold text-slate-900">{viewingBlog.title}</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleOpenEditFromView(viewingBlog)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-colors cursor-pointer shadow-xs"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Article</span>
+                </button>
+                <button onClick={() => setViewingBlog(null)} className="p-1 text-slate-400 hover:text-slate-800 rounded-sm cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-slate-700 overscroll-contain" data-lenis-prevent>
+              <div className="relative w-full h-64 sm:h-80 rounded-sm overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                <Image src={viewingBlog.image} alt={viewingBlog.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 900px" />
+              </div>
+              
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Written by {viewingBlog.writer}</p>
+                  <p className="text-slate-500 text-[11px]">{viewingBlog.date} • Category: <span className="font-semibold text-slate-700">{viewingBlog.category}</span></p>
+                </div>
+                <span className="px-2.5 py-1 bg-slate-100 text-slate-600 font-semibold rounded-sm text-[11px]">
+                  {viewingBlog.readTime}
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">Excerpt / Summary</h4>
+                <p className="text-slate-700 bg-slate-50 p-4 rounded-sm border border-slate-200/80 leading-relaxed font-sans text-xs sm:text-sm">{viewingBlog.excerpt}</p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">Article Content</h4>
+                <div className="space-y-4 text-slate-800 leading-relaxed font-serif text-sm sm:text-base">
+                  {viewingBlog.content.map((paragraph, idx) => (
+                    <div key={idx} className="bg-slate-50/80 p-4 sm:p-5 rounded-sm border border-slate-200/60 leading-relaxed">
+                      {paragraph}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL (FIXED BIGGER SHAPE & STABLE UI) */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
+          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80 shrink-0">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  {editingBlog ? `Edit Article — ${editingBlog.title}` : "New Blog Article"}
+                </h2>
+                <p className="text-[11px] text-slate-500">Configure article content, imagery, and author attribution.</p>
+              </div>
+              <button onClick={handleAttemptCloseEdit} className="p-1 rounded-sm text-slate-400 hover:text-slate-800 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">* Article Title</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g. Rich History of Samosa"
-                  className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-slate-900"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-5 overscroll-contain" data-lenis-prevent>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">* Writer Name</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">* Title</label>
                   <input
                     type="text"
                     required
-                    value={formData.writer}
-                    onChange={(e) => setFormData({ ...formData, writer: e.target.value })}
-                    placeholder="Simran Gulati"
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-medium"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Slug / URL Key</label>
+                    <input
+                      type="text"
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                    <input
+                      type="text"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Author Name</label>
+                    <input
+                      type="text"
+                      value={formData.writer}
+                      onChange={(e) => setFormData({ ...formData, writer: e.target.value })}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Publication Date</label>
+                    <input
+                      type="text"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Read Time</label>
+                    <input
+                      type="text"
+                      value={formData.readTime}
+                      onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Main Cover Image URL / Path</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.image}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Category</label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="Food History"
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Date</label>
-                  <input
-                    type="text"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    placeholder="Oct 15, 2026"
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Excerpt Summary</label>
+                  <textarea
+                    rows={2}
+                    value={formData.excerpt}
+                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Read Time</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Article Body Content (Double enter for paragraphs)</label>
+                  <textarea
+                    rows={10}
+                    required
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none leading-relaxed font-sans"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-sm">
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Publish Article</p>
+                    <p className="text-[11px] text-slate-500">Make this blog post visible to public visitors.</p>
+                  </div>
                   <input
-                    type="text"
-                    value={formData.readTime}
-                    onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
-                    placeholder="3 min read"
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
+                    type="checkbox"
+                    checked={formData.published}
+                    onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-300 text-slate-900 cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Excerpt</label>
-                <input
-                  type="text"
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  placeholder="Summary for article card listing..."
-                  className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Main Image URL</label>
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Content (Paragraphs separated by double line break)</label>
-                <textarea
-                  rows={6}
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  placeholder="First paragraph...&#10;&#10;Second paragraph..."
-                  className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
-                />
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 font-semibold hover:bg-slate-100"
+                  onClick={handleAttemptCloseEdit}
+                  className="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-black transition-colors"
+                  className="px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs"
                 >
-                  {editingBlog ? "Save Article" : "Publish Article"}
+                  {editingBlog ? "Save Changes" : "Publish Article"}
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}
 
+      {/* CONFIRMATION DIALOG FOR DISCARDING UNSAVED CHANGES */}
+      <AdminConfirmModal
+        isOpen={showDiscardConfirm}
+        title="Discard Unsaved Changes?"
+        message="Are you sure you want to cancel? Any unsaved edits will be lost."
+        confirmText="Yes, Discard"
+        cancelText="Keep Editing"
+        variant="warning"
+        onConfirm={handleConfirmDiscard}
+        onCancel={() => setShowDiscardConfirm(false)}
+      />
+
+      {/* CONFIRMATION DIALOG FOR DELETION */}
+      <AdminConfirmModal
+        isOpen={Boolean(deletingBlogId)}
+        title="Confirm Article Deletion"
+        message="Are you sure you want to delete this article? It will be permanently removed from Supabase."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingBlogId(null)}
+      />
     </div>
   );
 }

@@ -3,34 +3,6 @@ import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/se
 import { WholesaleInquiry } from "@/lib/types";
 import { requireAdminApi } from "@/lib/auth";
 
-// In-memory fallback storage for inquiries if Supabase keys aren't set
-const mockWholesaleInquiries: WholesaleInquiry[] = [
-  {
-    id: "ws-1",
-    businessName: "Merivale Hospitality Group",
-    contactName: "James Thornton",
-    email: "james.t@merivale.com",
-    phone: "+61 412 345 678",
-    businessType: "Hotel & Resort",
-    estimatedVolume: "500-1000 units/week",
-    message: "Interested in stocking your Mini Butter Chicken & Beef Rendang pies for our Sydney event venues.",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "ws-2",
-    businessName: "Sheraton Grand Hyde Park",
-    contactName: "Claire Dupont",
-    email: "c.dupont@sheraton.com",
-    phone: "+61 498 765 432",
-    businessType: "Hotel & Resort",
-    estimatedVolume: "1000+ units/week",
-    message: "Requesting wholesale pricing guide and sample catering box for Executive Lounge.",
-    status: "reviewed",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
-
 export async function GET() {
   const { error: authError } = await requireAdminApi();
   if (authError) return authError;
@@ -62,7 +34,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ success: true, data: mockWholesaleInquiries });
+    return NextResponse.json({ success: true, data: [] });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -118,8 +90,6 @@ export async function POST(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      mockWholesaleInquiries.unshift(newInquiry);
     }
 
     return NextResponse.json({ success: true, message: "Wholesale inquiry submitted successfully", data: newInquiry }, { status: 201 });
@@ -152,11 +122,6 @@ export async function PATCH(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      const idx = mockWholesaleInquiries.findIndex((i) => i.id === id);
-      if (idx !== -1) {
-        mockWholesaleInquiries[idx].status = status;
-      }
     }
 
     return NextResponse.json({ success: true, message: "Status updated" });
@@ -186,9 +151,6 @@ export async function DELETE(request: Request) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
       }
-    } else {
-      const idx = mockWholesaleInquiries.findIndex((i) => i.id === id);
-      if (idx !== -1) mockWholesaleInquiries.splice(idx, 1);
     }
 
     return NextResponse.json({ success: true, message: "Inquiry deleted" });

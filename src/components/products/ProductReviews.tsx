@@ -78,10 +78,14 @@ const INITIAL_MOCK_REVIEWS: Record<string, ReviewItem[]> = {
   ],
 };
 
-export default function ProductReviews({ productId, productName }: ProductReviewsProps) {
-  const localStorageKey = `flavourandco_reviews_${productId}`;
+import { useUIStore } from "@/store/ui.store";
+import { formatCustomerError } from "@/lib/error-formatter";
+import { BoneyardReviewCardSkeleton } from "@/components/ui/BoneyardSkeleton";
 
+export default function ProductReviews({ productId, productName }: ProductReviewsProps) {
+  const addToast = useUIStore((s) => s.addToast);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [visibleCount, setVisibleCount] = useState<number>(4);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -96,6 +100,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
 
   // Load reviews from Supabase API
   useEffect(() => {
+    setLoading(true);
     fetch(`/api/reviews?productId=${productId}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
@@ -105,7 +110,8 @@ export default function ProductReviews({ productId, productName }: ProductReview
           setReviews(INITIAL_MOCK_REVIEWS.default);
         }
       })
-      .catch(() => setReviews(INITIAL_MOCK_REVIEWS.default));
+      .catch(() => setReviews(INITIAL_MOCK_REVIEWS.default))
+      .finally(() => setLoading(false));
   }, [productId]);
 
   // Handle ESC key to close modal
@@ -125,11 +131,15 @@ export default function ProductReviews({ productId, productName }: ProductReview
     setSuccessMsg("");
 
     if (!newName.trim()) {
-      setErrorMsg("Please enter your name.");
+      const msg = "Please enter your name.";
+      setErrorMsg(msg);
+      addToast(msg, "error");
       return;
     }
     if (!newComment.trim()) {
-      setErrorMsg("Please write a brief review.");
+      const msg = "Please write a brief review.";
+      setErrorMsg(msg);
+      addToast(msg, "error");
       return;
     }
 
@@ -148,7 +158,9 @@ export default function ProductReviews({ productId, productName }: ProductReview
       });
       const json = await res.json();
       if (json.success) {
-        setSuccessMsg("Thank you! Your review has been submitted successfully.");
+        const msg = "Thank you for your review! It's now live on our site.";
+        setSuccessMsg(msg);
+        addToast(msg, "success");
         const createdReview: ReviewItem = {
           id: json.data?.id || `rev-${Date.now()}`,
           name: newName.trim(),
@@ -163,10 +175,14 @@ export default function ProductReviews({ productId, productName }: ProductReview
         setNewRating(5);
         setTimeout(() => setIsModalOpen(false), 1500);
       } else {
-        setErrorMsg(json.error || "Failed to submit review.");
+        const friendlyError = formatCustomerError(json.error);
+        setErrorMsg(friendlyError);
+        addToast(friendlyError, "error");
       }
-    } catch {
-      setErrorMsg("Network error submitting review.");
+    } catch (err) {
+      const friendlyError = formatCustomerError(err);
+      setErrorMsg(friendlyError);
+      addToast(friendlyError, "error");
     }
   };
 
@@ -240,7 +256,14 @@ export default function ProductReviews({ productId, productName }: ProductReview
         )}
 
         {/* Written Reviews List Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <BoneyardReviewCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {visibleReviews.map((rev) => (
             <article
               key={rev.id}
@@ -285,6 +308,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
             </article>
           ))}
         </div>
+        )}
 
         {/* Reusable ShowMore Component (Only shown if total reviews > 4) */}
         <ShowMore
@@ -299,7 +323,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
           WRITE A REVIEW POPUP MODAL WITH BACKDROP OVERLAY
          ─────────────────────────────────────────────────────────── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-fadeIn overflow-y-auto" data-lenis-prevent>
           {/* Backdrop Click Dismiss */}
           <div
             className="absolute inset-0"
@@ -307,7 +331,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
           />
 
           {/* Modal Body Container */}
-          <div className="relative z-10 w-full max-w-lg bg-cream rounded-xl border-2 border-[#6b1e30]/30 shadow-2xl p-6 sm:p-8 space-y-5 overflow-hidden">
+          <div className="relative z-10 w-full max-w-lg bg-cream rounded-xl border-2 border-[#6b1e30]/30 shadow-2xl p-6 sm:p-8 space-y-5 my-auto shrink-0 max-h-[88vh] overflow-y-auto overscroll-contain" data-lenis-prevent>
             {/* Header */}
             <div className="flex items-start justify-between border-b border-stone-200/80 pb-4">
               <div>

@@ -6,8 +6,10 @@ import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import BlogCard from "@/components/blog/BlogCard";
 import { useBlogStore } from "@/store/blog.store";
+import { BoneyardBlogCardSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function BlogClient() {
+  const isFetching = useBlogStore((s) => s.isFetching);
   const fetchBlogs = useBlogStore((s) => s.fetchBlogs);
   const currentPage = useBlogStore((s) => s.currentPage);
   const setCurrentPage = useBlogStore((s) => s.setCurrentPage);
@@ -32,11 +34,19 @@ export default function BlogClient() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
 
         {/* PC & Tablet Grid Layout (12 max per page: 4 columns x 3 rows on PC) */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-          {currentPosts.map((post, idx) => (
-            <BlogCard key={post.id} post={post} priority={idx === 0} />
-          ))}
-        </div>
+        {isFetching && currentPosts.length === 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <BoneyardBlogCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {currentPosts.map((post, idx) => (
+              <BlogCard key={post.id} post={post} priority={idx === 0} />
+            ))}
+          </div>
+        )}
 
         {/* Mobile Horizontal List View (12 max per page) */}
         <div className="block md:hidden divide-y divide-[#ebe3d8] border-y border-[#ebe3d8] bg-white rounded-lg shadow-xs overflow-hidden">

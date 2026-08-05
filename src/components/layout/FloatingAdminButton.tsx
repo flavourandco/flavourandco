@@ -79,6 +79,8 @@ export default function FloatingAdminButton() {
       {/* Admin Button (Clean matte dark slate-950, borderless, silky smooth 500ms uncollapse transition) */}
       <Link
         href="/admin/dashboard"
+        target="_blank"
+        rel="noopener noreferrer"
         title="Admin Panel"
         aria-label="Admin Panel"
         className={`group flex items-center bg-slate-950 hover:bg-black text-white p-3.5 rounded-full shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${

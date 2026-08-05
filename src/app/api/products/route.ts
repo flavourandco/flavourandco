@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { products as fallbackProducts, Product } from "@/lib/data";
+import type { Product } from "@/lib/types";
 import { requireAdminApi } from "@/lib/auth";
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           // Format database records to camelCase Product interface
           const formattedProducts: Product[] = data.map((item) => ({
             id: item.id,
@@ -41,8 +41,7 @@ export async function GET() {
       }
     }
 
-    // Fallback to in-memory static data if Supabase is not configured yet
-    return NextResponse.json({ success: true, data: fallbackProducts, source: "static_fallback" });
+    return NextResponse.json({ success: true, data: [] });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json(

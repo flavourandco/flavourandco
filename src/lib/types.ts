@@ -58,14 +58,44 @@ export interface ContactInquiry {
   createdAt: string;
 }
 
+export interface OrderItem {
+  id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  variant?: string;
+}
+
+export interface ShippingAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
+  shippingAddress?: ShippingAddress | string;
+  shippingMethod?: string;
+  paymentMethod?: string;
+  paymentStatus?: "paid" | "pending" | "refunded" | "failed";
+  squarePaymentId?: string;
+  squareTransactionId?: string;
+  squareReceiptUrl?: string;
+  items?: OrderItem[];
+  subtotal?: number;
+  shippingFee?: number;
+  taxAmount?: number;
   totalAmount: number;
-  status: "completed" | "processing" | "pending" | "cancelled";
+  status: "completed" | "processing" | "shipped" | "pending" | "cancelled";
   itemsCount: number;
+  fulfillmentNotes?: string;
   createdAt: string;
 }
 

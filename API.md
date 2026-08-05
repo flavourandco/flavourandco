@@ -75,7 +75,9 @@ Zustand is used strictly for **shared client-side state** and **ephemeral UI pre
 ### 4. Authentication & User Sync API
 - **`POST /api/auth/sync-user`**: Triggered on Clerk sign-in to synchronize user profiles to the Supabase `users` table and return the formatted `UserProfile`.
 
-### 5. Inquiries & Dashboard API
+### 5. Inquiries, Orders & Dashboard API
+- **`GET /api/orders`**: *(Admin Only)* Returns all order transactions from Supabase `orders` table with Square payment IDs, transaction hashes, digital receipt URLs, items breakdown, shipping addresses, and status badges.
+- **`PATCH /api/orders`**: *(Admin Only)* Updates order status (`completed`, `processing`, `shipped`, `cancelled`) or fulfillment notes.
 - **`POST /api/wholesale`**: Submits commercial wholesale inquiries to `wholesale_inquiries` table.
 - **`POST /api/contact`**: Submits customer contact messages to `contact_inquiries` table.
 - **`GET /api/dashboard/stats`**: *(Admin Only)* Calculates revenue totals, order counts, user signups, and chart data from Supabase.

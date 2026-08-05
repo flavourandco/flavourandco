@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { BlogPost } from "@/lib/types";
-import { blogPosts as fallbackBlogs } from "@/lib/data";
 
 interface BlogState {
   posts: BlogPost[];
@@ -25,7 +24,7 @@ interface BlogState {
 export const useBlogStore = create<BlogState>()(
   persist(
     (set, get) => ({
-      posts: fallbackBlogs as BlogPost[],
+      posts: [],
       searchQuery: "",
       selectedCategory: "all",
       currentPage: 1,
@@ -43,11 +42,11 @@ export const useBlogStore = create<BlogState>()(
       setCurrentPage: (currentPage: number) => set({ currentPage }),
 
       fetchBlogs: async (force = false) => {
-        const { lastFetchedAt, isFetching } = get();
+        const { posts, lastFetchedAt, isFetching } = get();
         const TEN_MINUTES = 10 * 60 * 1000;
 
         if (isFetching) return;
-        if (!force && lastFetchedAt && Date.now() - lastFetchedAt < TEN_MINUTES) {
+        if (!force && posts.length > 0 && lastFetchedAt && Date.now() - lastFetchedAt < TEN_MINUTES) {
           return;
         }
 
@@ -57,12 +56,10 @@ export const useBlogStore = create<BlogState>()(
           if (res.ok) {
             const resData = await res.json();
             const items = Array.isArray(resData) ? resData : (Array.isArray(resData?.data) ? resData.data : []);
-            if (items.length > 0) {
-              set({ posts: items, lastFetchedAt: Date.now() });
-            }
+            set({ posts: items, lastFetchedAt: Date.now() });
           }
         } catch (error) {
-          console.warn("Blog revalidation background error, using cached blog posts:", error);
+          console.warn("Blog revalidation error:", error);
         } finally {
           set({ isFetching: false });
         }

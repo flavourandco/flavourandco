@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, ShoppingBag, User, Heart, Menu, X, ArrowRight, ChevronRight, HelpCircle, LogIn, UserPlus } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { navLinks, products } from "@/lib/data";
+import { navLinks } from "@/lib/data";
 import { media } from "@/lib/media";
 
 import AnnouncementBar from "./AnnouncementBar";
@@ -250,7 +250,8 @@ export default function HomeNavbar() {
 
         {/* Sliding Sidebar Panel */}
         <aside
-          className={`fixed inset-y-0 right-0 z-[160] w-[88%] max-w-sm bg-base-100 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${mobileOpen ? "translate-x-0" : "translate-x-full"
+          data-lenis-prevent
+          className={`fixed inset-y-0 right-0 z-[160] w-[88%] max-w-sm bg-base-100 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto overscroll-contain transition-transform duration-300 ease-in-out transform ${mobileOpen ? "translate-x-0" : "translate-x-full"
             }`}
         >
           {/* Top Section */}
@@ -386,7 +387,8 @@ export default function HomeNavbar() {
 
         {/* Slide-Over Drawer Panel */}
         <aside
-          className={`fixed inset-y-0 right-0 z-[210] flex w-full md:w-1/2 max-w-xl bg-base-100 p-6 sm:p-10 shadow-2xl flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out transform ${searchOpen ? "translate-x-0" : "translate-x-full"
+          data-lenis-prevent
+          className={`fixed inset-y-0 right-0 z-[210] flex w-full md:w-1/2 max-w-xl bg-base-100 p-6 sm:p-10 shadow-2xl flex-col justify-between overflow-y-auto overscroll-contain transition-transform duration-300 ease-in-out transform ${searchOpen ? "translate-x-0" : "translate-x-full"
             }`}
         >
           <div>
@@ -444,7 +446,7 @@ export default function HomeNavbar() {
                   Matching Products ({filteredProducts.length})
                 </h4>
                 {filteredProducts.length > 0 ? (
-                  <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                  <div className="space-y-3 max-h-[350px] overflow-y-auto overscroll-contain pr-2" data-lenis-prevent>
                     {filteredProducts.map((product) => (
                       <Link
                         key={product.id}

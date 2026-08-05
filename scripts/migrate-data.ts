@@ -753,7 +753,98 @@ async function migrate() {
       console.error(`❌ Failed review insert:`, error.message);
     }
   }
-  console.log("✅ Customer reviews migration completed.");
+  // 4. Migrate Orders
+  console.log("🛒 Migrating sample orders with Square payment details...");
+  const ordersSeed = [
+    {
+      order_number: "ORD-9481",
+      customer_name: "Eleanor Vance",
+      customer_email: "eleanor.vance@example.com",
+      customer_phone: "+61 412 345 678",
+      shipping_address: {
+        street: "124 George Street, Suite 402",
+        city: "Sydney",
+        state: "NSW",
+        postalCode: "2000",
+        country: "Australia",
+      },
+      shipping_method: "Express Cold-Chain Delivery",
+      payment_method: "Square Credit Card",
+      payment_status: "paid",
+      square_payment_id: "sq_pay_9481a7b29381",
+      square_transaction_id: "sq_tx_839201948102",
+      square_receipt_url: "https://squareupsandbox.com/receipt/preview/ORD-9481",
+      items: [
+        {
+          id: "butter-chicken-pie",
+          name: "Authentic Butter Chicken Pie",
+          variant: "Pack of 4 (Frozen)",
+          price: 34.99,
+          quantity: 2,
+          image: "/products/butter-chicken-pie.png",
+        },
+        {
+          id: "paneer-empanada",
+          name: "Achari Paneer Empanada",
+          variant: "Box of 6",
+          price: 28.50,
+          quantity: 1,
+          image: "/products/paneer-empanada.png",
+        },
+      ],
+      subtotal: 98.48,
+      shipping_fee: 15.00,
+      tax_amount: 11.35,
+      total_amount: 124.83,
+      status: "completed",
+      items_count: 3,
+      fulfillment_notes: "Packed in insulated thermal crate with dry ice. Customer notified via SMS.",
+    },
+    {
+      order_number: "ORD-9480",
+      customer_name: "Marcus Brody",
+      customer_email: "marcus.b@example.com",
+      customer_phone: "+61 423 987 654",
+      shipping_address: {
+        street: "88 Collins Street",
+        city: "Melbourne",
+        state: "VIC",
+        postalCode: "3000",
+        country: "Australia",
+      },
+      shipping_method: "Wholesale Refrigerated Freight",
+      payment_method: "Square Business Pay",
+      payment_status: "paid",
+      square_payment_id: "sq_pay_9480b9c10482",
+      square_transaction_id: "sq_tx_738192049103",
+      square_receipt_url: "https://squareupsandbox.com/receipt/preview/ORD-9480",
+      items: [
+        {
+          id: "mixed-individual-pack",
+          name: "Indo-Australian Variety Crate",
+          variant: "60 Units Wholesale",
+          price: 720.00,
+          quantity: 1,
+          image: "/products/mixed-individual-pack.png",
+        },
+      ],
+      subtotal: 720.00,
+      shipping_fee: 45.00,
+      tax_amount: 76.50,
+      total_amount: 841.50,
+      status: "processing",
+      items_count: 60,
+      fulfillment_notes: "Scheduled for loading on Tuesday morning freight route.",
+    },
+  ];
+
+  for (const o of ordersSeed) {
+    const { error } = await supabase.from("orders").upsert(o, { onConflict: "order_number" });
+    if (error) {
+      console.error(`❌ Failed order upsert (${o.order_number}):`, error.message);
+    }
+  }
+  console.log("✅ Orders migration completed.");
 
   console.log("🎉 ALL DATA SUCCESSFULLY MIGRATED TO SUPABASE!");
 }

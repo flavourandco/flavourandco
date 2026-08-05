@@ -20,8 +20,61 @@ Flavour & Co. is a modern, high-performance web application built with **Next.js
 | **Database** | Supabase (PostgreSQL with RLS & Indexes) |
 | **Authentication** | Clerk Auth (`@clerk/nextjs`) synced to Supabase `users` table |
 | **State Management** | Zustand 5 with `persist` middleware |
+| **Skeleton Tooling** | Boneyard JS (`boneyard-js`) layout-matched skeletons |
+| **Notifications** | React Hot Toast (`react-hot-toast`) with custom high z-index overlay |
 | **Validation** | Zod Schema Validation |
 | **Styling & Motion** | Tailwind CSS v4, GSAP, Lenis Smooth Scroll, Lucide Icons |
+
+---
+
+## 🦴 Skeleton Loaders & Boneyard JS (`boneyard-js`)
+
+This application utilizes **Boneyard JS (`boneyard-js`)** for pixel-perfect, zero-layout-shift skeleton loading screens across all pages where data is loaded dynamically from Supabase or Clerk.
+
+### How it Works
+1. **Reusable Skeleton Presets (`src/components/ui/BoneyardSkeleton.tsx`)**:
+   - `<BoneyardSkeleton loading={isLoading} name="component-name">`: Universal Boneyard wrapper.
+   - `<BoneyardStatCardSkeleton />`: Animated bone placeholders for summary cards in the Admin Dashboard and admin overview pages.
+   - `<BoneyardTableSkeleton rows={N} columns={M} />`: Animated skeleton rows for table views (Orders, Products, Blogs, Users, Contact Inquiries, Wholesale Inquiries).
+   - `<BoneyardProductCardSkeleton />`: Shimmer skeleton bones matching product grid items on `/shop` and the homepage carousel.
+   - `<BoneyardBlogCardSkeleton />`: Shimmer skeleton bones matching article cards on `/blog`.
+   - `<BoneyardReviewCardSkeleton />`: Skeleton bones matching customer reviews on product detail pages and `/admin/reviews`.
+
+### For Developers: Auto-Generating Bones
+When layout changes are made or new components are added, you can auto-capture exact DOM bones:
+1. Ensure your development server is running (`npm run dev`).
+2. Execute the Boneyard CLI:
+   ```bash
+   npx boneyard-js build
+   ```
+3. Boneyard scans your rendered layout and outputs updated static bone descriptors to registry files.
+
+---
+
+## 🍞 Notifications & React Hot Toast (`react-hot-toast`)
+
+All user notifications, store alerts, and admin status updates use **React Hot Toast (`react-hot-toast`)**.
+
+### Features & Styling
+- **Global Provider**: Configured in `src/components/ui/ToastContainer.tsx` and mounted in `src/app/layout.tsx`.
+- **Z-Index Layering (`z-[999999]`)**: Styled with `containerStyle: { zIndex: 999999 }` so toasts float cleanly above all Admin backdrop blur modals, popup dialogs, and Lenis scroll containers.
+- **Unified Store API**: Calling `useUIStore.getState().addToast(message, type)` automatically triggers `toast.success`, `toast.error`, or standard toasts. You can also import `toast` directly from `react-hot-toast`:
+  ```tsx
+  import { toast } from "react-hot-toast";
+
+  toast.success("Product created successfully!");
+  toast.error("Failed to delete record.");
+  ```
+
+---
+
+## 🌀 Lenis Smooth Scroll & Modal Interception
+
+Lenis smooth scroll handles smooth inertia scrolling across the site.
+- **Rule for Popup Modals & Drawers**: All backdrop overlays and modal containers **must** include the attribute `data-lenis-prevent` (e.g. `<div data-lenis-prevent className="fixed inset-0 ... overflow-y-auto">`).
+- This prevents Lenis from capturing wheel and touch events inside scrollable popup bodies.
+
+---
 
 ---
 

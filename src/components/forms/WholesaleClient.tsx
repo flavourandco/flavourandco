@@ -5,6 +5,8 @@ import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 import { wholesaleBrands, wholesaleTestimonials } from "@/lib/data";
 import PhoneInput from "@/components/ui/PhoneInput";
+import { useUIStore } from "@/store/ui.store";
+import { formatCustomerError } from "@/lib/error-formatter";
 
 
 // Hotel & Brand Vector Logos
@@ -94,13 +96,14 @@ function CorporateCateringLogo() {
 }
 
 export default function WholesaleClient() {
+  const addToast = useUIStore((s) => s.addToast);
   const [formData, setFormData] = useState({
-    name: "",
+    contactName: "",
     businessName: "",
     email: "",
     countryCode: "+61",
     phone: "",
-    venueType: "Café / Coffee Shop",
+    venueType: "Café / Bistro",
     message: "",
   });
 
@@ -116,7 +119,7 @@ export default function WholesaleClient() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contactName: formData.name,
+          contactName: formData.contactName,
           businessName: formData.businessName,
           email: formData.email,
           phone: `${formData.countryCode} ${formData.phone}`,
@@ -127,11 +130,15 @@ export default function WholesaleClient() {
 
       if (res.ok) {
         setSubmitted(true);
+        addToast("Thank you for your wholesale inquiry! Our team will get in touch with you shortly.", "success");
       } else {
-        alert("Failed to submit inquiry. Please try again.");
+        const json = await res.json().catch(() => ({}));
+        const friendlyError = formatCustomerError(json.error);
+        addToast(friendlyError, "error");
       }
-    } catch {
-      alert("Submission error. Please check your connection.");
+    } catch (err) {
+      const friendlyError = formatCustomerError(err);
+      addToast(friendlyError, "error");
     } finally {
       setLoading(false);
     }
@@ -353,7 +360,7 @@ export default function WholesaleClient() {
               Wholesale Inquiry Received!
             </h3>
             <p className="text-xs sm:text-sm text-[#1c1410]/80 max-w-md mx-auto leading-relaxed">
-              Thank you, {formData.name} from {formData.businessName || "your venue"}! Simran or a team member will get in touch with product spec sheets and sample details.
+              Thank you, {formData.contactName} from {formData.businessName || "your venue"}! Simran or a team member will get in touch with product spec sheets and sample details.
             </p>
             <button
               onClick={() => setSubmitted(false)}
@@ -375,8 +382,8 @@ export default function WholesaleClient() {
                   type="text"
                   id="name"
                   required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.contactName}
+                  onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                   placeholder="Enter your full name"
                   className="w-full bg-transparent border-b border-[#1c1410]/20 py-2.5 text-sm text-[#1c1410] placeholder:text-[#1c1410]/40 focus:outline-none focus:border-[#c69c40] transition-colors"
                 />

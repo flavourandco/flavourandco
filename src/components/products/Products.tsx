@@ -5,10 +5,14 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { useProductStore } from "@/store/product.store";
+import { useUIStore } from "@/store/ui.store";
+import { BoneyardProductCardSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function Products() {
   const products = useProductStore((s) => s.products);
+  const isFetching = useProductStore((s) => s.isFetching);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const addToast = useUIStore((s) => s.addToast);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [showWishlistOnly, setShowWishlistOnly] = useState(false);
 
@@ -17,9 +21,17 @@ export default function Products() {
   }, [fetchProducts]);
 
   const toggleWishlist = (id: string) => {
+    const isCurrentlyWishlisted = wishlist.includes(id);
     setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      isCurrentlyWishlisted ? prev.filter((item) => item !== id) : [...prev, id]
     );
+    const prod = products.find((p) => p.id === id);
+    const name = prod ? prod.name : "Item";
+    if (isCurrentlyWishlisted) {
+      addToast(`Removed ${name} from your wishlist`, "info");
+    } else {
+      addToast(`Saved ${name} to your wishlist!`, "success");
+    }
   };
 
   const displayedProducts = showWishlistOnly
@@ -69,7 +81,13 @@ export default function Products() {
         </div>
 
         {/* Product Cards Grid */}
-        {displayedProducts.length > 0 ? (
+        {isFetching && displayedProducts.length === 0 ? (
+          <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <BoneyardProductCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : displayedProducts.length > 0 ? (
           <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
             {displayedProducts.map((product) => (
               <ProductCard

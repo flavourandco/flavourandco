@@ -5,6 +5,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/home/SmoothScroll";
 import FloatingAdminButton from "@/components/layout/FloatingAdminButton";
 import UserSyncListener from "@/components/layout/UserSyncListener";
+import ToastContainer from "@/components/ui/ToastContainer";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -49,6 +50,7 @@ export default function RootLayout({
         </head>
         <body className="min-h-full flex flex-col font-serif">
           <UserSyncListener />
+          <ToastContainer />
           <SmoothScroll>{children}</SmoothScroll>
           <FloatingAdminButton />
         </body>
