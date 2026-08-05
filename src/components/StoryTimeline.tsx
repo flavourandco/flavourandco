@@ -202,21 +202,6 @@ export default function StoryTimeline() {
               <SquiggleDivider />
             </div>
           </div>
-
-          {/* Active Milestone Counter */}
-          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono text-stone-500">
-            <span className="text-[#6b1e30] font-serif text-xl sm:text-2xl font-bold">
-              {milestones[activeIndex]?.year}
-            </span>
-            <span className="text-stone-300">/</span>
-            <span>
-              {String(activeIndex + 1).padStart(2, "0")} OF {String(milestones.length).padStart(2, "0")}
-            </span>
-            <div className="flex items-center gap-1.5 pl-3 border-l border-stone-300 text-stone-600 text-[10px] sm:text-[11px] tracking-wider uppercase font-sans">
-              <span>Scroll down</span>
-              <span className="animate-bounce text-[#6b1e30]">↓</span>
-            </div>
-          </div>
         </div>
 
         {/* HORIZONTAL TIMELINE TRACK FOR ALL SCREEN SIZES (MOBILE & DESKTOP) */}
@@ -324,9 +309,25 @@ export default function StoryTimeline() {
         </div>
 
         {/* Footer info line */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full flex items-center justify-between z-20 text-[10px] sm:text-[11px] font-mono text-stone-400 border-t border-stone-200/50 pt-2.5">
-          <span>FLAVOUR &amp; CO. ARCHIVE</span>
-          <span>2018 — 2026</span>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full flex flex-wrap items-center justify-between gap-2 z-20 text-[10px] sm:text-[11px] font-mono text-stone-800 font-bold border-t border-stone-300/80 pt-2.5">
+          <span className="text-stone-900 font-extrabold uppercase tracking-wider">FLAVOUR &amp; CO. ARCHIVE</span>
+
+          {/* Active Milestone Counter */}
+          <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono text-stone-800">
+            <span className="text-[#6b1e30] font-serif text-sm sm:text-base font-bold">
+              {milestones[activeIndex]?.year}
+            </span>
+            <span className="text-stone-400">/</span>
+            <span>
+              {String(activeIndex + 1).padStart(2, "0")} OF {String(milestones.length).padStart(2, "0")}
+            </span>
+            <div className="flex items-center gap-1 pl-2 sm:pl-3 border-l border-stone-400 text-stone-800 text-[10px] sm:text-[11px] tracking-wider uppercase font-sans font-bold">
+              <span>Scroll down</span>
+              <span className="animate-bounce text-[#6b1e30]">↓</span>
+            </div>
+          </div>
+
+          <span className="text-stone-900 font-extrabold tracking-wider">2018 — 2026</span>
         </div>
       </div>
     </section>
