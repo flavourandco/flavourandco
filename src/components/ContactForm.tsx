@@ -71,14 +71,14 @@ export default function ContactForm() {
     <div className="w-full max-w-full overflow-hidden bg-[#fdf8f3] text-[#1c1410]">
       
       {/* Top Main Section */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-24">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12 md:py-16">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-16 items-start">
           
           {/* Left Column: Heading & Subtext */}
           <div className="lg:col-span-5 space-y-4 text-left">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410] leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410] leading-tight">
               Have A Question? We&apos;re Here To Help.
-            </h1>
+            </h2>
             <p className="text-xs sm:text-base text-[#1c1410]/75 leading-relaxed font-sans">
               Whether you&apos;re curious about our pie range, event catering, or wholesale opportunities — we&apos;re just a message away. Reach out and a member from our team will get back to you within 24-48 business hours.
             </p>

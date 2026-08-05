@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <PageLayout title="Contact" fullWidth hideHeader>
+    <PageLayout
+      title="Contact Us"
+      subtitle="Have a question about our artisan pies, event catering, or wholesale inquiries? We're here to help."
+      fullWidth
+    >
       <ContactForm />
     </PageLayout>
   );

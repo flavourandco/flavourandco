@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageHeader from "@/components/PageHeader";
 
 type PageLayoutProps = {
   title: string;
   subtitle?: string;
+  eyebrow?: string;
   children?: React.ReactNode;
   fullWidth?: boolean;
   hideHeader?: boolean;
@@ -13,6 +15,7 @@ type PageLayoutProps = {
 export default function PageLayout({
   title,
   subtitle,
+  eyebrow,
   children,
   fullWidth = false,
   hideHeader = false,
@@ -22,24 +25,7 @@ export default function PageLayout({
       <Navbar />
       <main className="min-h-screen bg-cream pt-[88px] sm:pt-[96px] md:pt-[104px]">
         {!hideHeader && (
-          <div className="border-b border-brand-gold/20 bg-brand-green h-44 sm:h-56 md:h-64 lg:h-72 relative overflow-hidden flex items-center justify-center w-full px-4 text-center">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              <div className="absolute -right-32 top-0 h-72 w-72 rounded-full bg-brand-gold blur-3xl" />
-            </div>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center lg:px-8 relative z-10 w-full">
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-gold mb-1">
-                Flavour & Co.
-              </p>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl tracking-tight text-white font-medium">
-                {title}
-              </h1>
-              {subtitle && (
-                <p className="mx-auto mt-2 max-w-2xl text-xs sm:text-sm text-cream/70 tracking-wide">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-          </div>
+          <PageHeader title={title} subtitle={subtitle} eyebrow={eyebrow} />
         )}
 
         {children ? (

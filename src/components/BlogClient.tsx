@@ -73,35 +73,7 @@ export const blogPosts: BlogPost[] = [
 
 export default function BlogClient() {
   return (
-    <div className="w-full bg-[#fdf8f3] text-[#1c1410] pb-8 sm:pb-12 md:pb-16">
-      
-      {/* Header Banner matching Meet Simran Typography */}
-      <div className="w-full bg-[#07402b] py-12 sm:py-16 px-6 shadow-md text-center mb-10 sm:mb-14">
-        <div className="mx-auto max-w-4xl">
-          {/* Subtitle with Garnet Dot */}
-          <div className="flex items-center gap-2.5 justify-center mb-2">
-            <span className="h-2 w-2 rounded-full bg-[#6b1e30] shrink-0" />
-            <p className="font-serif italic text-cream text-2xl sm:text-3xl font-normal">
-              Flavour &amp; Co. Journal
-            </p>
-          </div>
-
-          {/* Main Title in Gold with Garnet Period */}
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#c69c40] font-normal leading-[1.1] tracking-tight">
-            Blog &amp; Insights<span className="text-[#6b1e30] font-bold">.</span>
-          </h1>
-
-          {/* Credentials / Sub-tag line with sharp Gold highlight background */}
-          <div className="mt-4 inline-block bg-[#c69c40] rounded-none px-3.5 py-1.5 shadow-sm">
-            <p className="text-[11px] font-mono uppercase tracking-[0.3em] font-bold leading-none">
-              <span className="text-[#6b1e30]">RECIPES</span>
-              <span className="text-[#07402b] mx-2.5 text-sm">•</span>
-              <span className="text-[#6b1e30]">HERITAGE &amp; INSIGHTS</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
+    <div className="w-full bg-[#fdf8f3] text-[#1c1410] pt-6 sm:pt-8 md:pt-10 pb-8 sm:pb-12 md:pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Desktop Grid Layout (Hidden on Mobile) */}

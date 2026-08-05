@@ -14,7 +14,6 @@ export default function BlogPage() {
       title="Blog & Journal"
       subtitle="Recipes, heritage stories, heating guides, and founder insights from Simran and our Australian bakery."
       fullWidth
-      hideHeader={true}
     >
       <BlogClient />
     </PageLayout>

@@ -89,24 +89,8 @@ export default function OurStoryPage() {
       title="Our Story"
       subtitle="More Than Food. A Story of Flavour and Connection."
       fullWidth
-      hideHeader={true}
     >
       <div className="bg-cream pb-0">
-
-        {/* Banner Section */}
-        <div className="w-full relative h-48 md:h-64 lg:h-72 bg-[#07402b] flex items-center justify-center shadow-md">
-          <div className="text-center px-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#c69c40] mb-2">
-              Flavour &amp; Co.
-            </p>
-            <h1 className="font-serif text-4xl sm:text-5xl text-white font-medium leading-none">
-              Our Story
-            </h1>
-            <p className="mt-3.5 text-xs sm:text-sm text-cream/70 max-w-xl mx-auto tracking-wide">
-              More Than Food. A Story of Flavour and Connection.
-            </p>
-          </div>
-        </div>
 
         {/* Section 1: Meet Simran (Overlapping Images Layout) */}
         <div id="meet-simran" className="mx-auto max-w-7xl px-6 py-16 md:py-24 lg:px-8 scroll-mt-24">
@@ -127,10 +111,10 @@ export default function OurStoryPage() {
               </h2>
 
               {/* Credentials / Sub-tag line with sharp gray highlight background */}
-              <div className="mt-4 mb-6 inline-block bg-[#e5e1d8] rounded-none px-3 py-1.5">
-                <p className="text-[11px] font-mono uppercase tracking-[0.3em] font-bold leading-none">
+              <div className="mt-4 mb-6 inline-block bg-[#e5e1d8] rounded-none px-2.5 sm:px-3 py-1.5 max-w-full">
+                <p className="text-[9px] sm:text-[11px] font-mono uppercase tracking-[0.15em] sm:tracking-[0.3em] font-bold leading-none whitespace-nowrap">
                   <span className="text-[#6b1e30]">HERITAGE</span>
-                  <span className="text-[#c69c40] mx-2.5 text-sm">•</span>
+                  <span className="text-[#c69c40] mx-1.5 sm:mx-2.5 text-xs sm:text-sm">•</span>
                   <span className="text-[#6b1e30]">FLAVOUR &amp; CONNECTION</span>
                 </p>
               </div>

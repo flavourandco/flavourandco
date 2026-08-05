@@ -11,7 +11,7 @@ export const config = {
   ],
 };
 
-export default function middleware(req: NextRequest, evt: NextFetchEvent) {
+export default function proxy(req: NextRequest, evt: NextFetchEvent) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const secretKey = process.env.CLERK_SECRET_KEY;
 
