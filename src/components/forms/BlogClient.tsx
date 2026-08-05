@@ -1,22 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { blogPosts } from "@/lib/data";
 import BlogCard from "@/components/blog/BlogCard";
-
-const POSTS_PER_PAGE = 12;
+import { useBlogStore } from "@/store/blog.store";
 
 export default function BlogClient() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const fetchBlogs = useBlogStore((s) => s.fetchBlogs);
+  const currentPage = useBlogStore((s) => s.currentPage);
+  const setCurrentPage = useBlogStore((s) => s.setCurrentPage);
+  const getPaginatedPosts = useBlogStore((s) => s.getPaginatedPosts);
+  const getTotalPages = useBlogStore((s) => s.getTotalPages);
 
-  const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE) || 1;
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
 
-  // Calculate slice for current page to strictly load 12 posts per page
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const currentPosts = blogPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+  const currentPosts = getPaginatedPosts();
+  const totalPages = getTotalPages();
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;

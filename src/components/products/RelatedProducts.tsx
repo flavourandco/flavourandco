@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Product, products } from "@/lib/data";
+import type { Product } from "@/lib/types";
+import { products } from "@/lib/data";
 import ProductCard from "./ProductCard";
 import ShowMore from "@/components/ui/ShowMore";
 import { Sparkles } from "lucide-react";

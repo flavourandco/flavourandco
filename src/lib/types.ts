@@ -76,13 +76,13 @@ export interface ChartPoint {
 
 export interface DashboardStats {
   todaysMoney: number;
-  todaysMoneyChange: number; // percentage change e.g. +55
+  todaysMoneyChange: number;
   todaysUsers: number;
-  todaysUsersChange: number; // percentage change e.g. +3
+  todaysUsersChange: number;
   wholesaleInquiriesCount: number;
-  wholesaleChange: number; // percentage change e.g. -2
+  wholesaleChange: number;
   salesTotal: number;
-  salesChange: number; // percentage change e.g. +5
+  salesChange: number;
   weeklyViewsData: ChartPoint[];
   dailySalesData: ChartPoint[];
   monthlySalesData: ChartPoint[];
@@ -102,6 +102,27 @@ export interface BlogPost {
   category: string;
   image: string;
   image2?: string;
-  authorRole?: string;
   authorAvatar?: string;
+  published?: boolean;
+}
+
+export interface ReviewItem {
+  id: string;
+  productId?: string;
+  productName?: string;
+  name: string;
+  rating: number;
+  date: string;
+  comment: string;
+  isVerified: boolean;
+  status?: "pending" | "approved" | "rejected";
+}
+
+export interface UserProfile {
+  id: string;
+  clerkId: string;
+  email: string;
+  fullName: string;
+  role: "admin" | "customer";
+  createdAt?: string;
 }

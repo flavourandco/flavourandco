@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Heart } from "lucide-react";
-import { Product } from "@/lib/data";
+import type { Product } from "@/lib/types";
 import Button from "@/components/ui/Button";
 
 interface ProductCardProps {

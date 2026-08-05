@@ -1,56 +1,36 @@
-import type { Product, ProductVariant, WhyStandOutPoint, BlogPost, ReviewItem } from "./types";
-import { media } from "./media";
+import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
+import { media } from "../src/lib/media";
 
-export type { Product, ProductVariant, WhyStandOutPoint, BlogPost, ReviewItem };
+// Load .env file variables
+const envPath = path.resolve(__dirname, "../.env");
+if (fs.existsSync(envPath)) {
+  const envConfig = fs.readFileSync(envPath, "utf8");
+  for (const line of envConfig.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+      const [key, ...val] = trimmed.split("=");
+      process.env[key.trim()] = val.join("=").trim();
+    }
+  }
+}
 
-export const marqueeItems = [
-  "plate of origin on channel 7",
-  "indo-australian pies",
-  "australia-wide delivery",
-  "handcrafted by simran",
-  "authentic heritage spices",
-  "made with love",
-] as const;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const apiKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "";
 
-export const tickerItems = [
-  "plate of origin",
-  "indo-australian",
-  "australia-wide delivery",
-  "heritage recipes",
-  "flaky butter pastry",
-  "made with love",
-] as const;
+if (!supabaseUrl || !apiKey || supabaseUrl.includes("your-supabase")) {
+  console.log("ℹ️ Supabase environment variables not configured with active project URL yet.");
+  process.exit(0);
+}
 
-export const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Shop", href: "/shop" },
-  { label: "Our Story", href: "/our-story" },
-  { label: "Wholesale", href: "/wholesale" },
-  { label: "FAQs", href: "/faq" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact Us", href: "/contact" },
-] as const;
+const supabase = createClient(supabaseUrl, apiKey);
 
-export const homeNavLinks = [
-  { label: "Shop", href: "/shop", hasDropdown: true },
-  { label: "Our Story", href: "/our-story", hasDropdown: true },
-] as const;
-
-export const wholesaleBrands = [
-  { name: "The Fullerton Hotel Sydney", logo: "/partner-1.png" },
-  { name: "Sheraton Grand Sydney", logo: "/partner-2.png" },
-  { name: "Amora Hotel Jamison", logo: "/partner-3.png" },
-];
-
-export const wholesaleTestimonials = [
-  {
-    quote: "Flavour & Co.'s butter chicken pies have been a huge hit on our catering menus.",
-    author: "Executive Chef",
-    company: "Luxury Hotel Group",
-  },
-];
-
-export const products: Product[] = [
+const productsData = [
   // ─────────────────────────────────────────────────────────
   // MINI PIES — Pack of 12 (55g each) — Freshly Baked / Frozen
   // ─────────────────────────────────────────────────────────
@@ -436,7 +416,7 @@ export const products: Product[] = [
   },
 ];
 
-export const blogPosts: BlogPost[] = [
+const blogsData = [
   {
     id: "blog-1",
     slug: "pies-made-with-heart",
@@ -538,7 +518,7 @@ export const blogPosts: BlogPost[] = [
   }
 ];
 
-export const testimonials = [
+const testimonialsData = [
   {
     quote:
       "Simran's butter chicken pie is the best food I've ever tasted. The pastry is incredibly flaky and the filling is rich and authentic.",
@@ -695,3 +675,90 @@ export const faqItems: FaqItem[] = [
     answer: "Our meat is sourced from suppliers who use Halal-certified meat. However, Flavour & Co products are prepared in a facility that also handles non-Halal ingredients, and our finished products are not Halal certified.\n\nIf you have any questions about our ingredients or production processes, please don't hesitate to contact us."
   }
 ];
+
+async function migrate() {
+  console.log("🚀 Starting database migration to Supabase...");
+  console.log(`Connecting to: ${supabaseUrl}`);
+
+  // 1. Migrate Products
+  console.log(`📦 Migrating ${productsData.length} products to Supabase...`);
+  for (const p of productsData) {
+    const record = {
+      id: p.id,
+      name: p.name,
+      tagline: p.tagline || "",
+      short_description: p.shortDescription || "",
+      description: p.description || "",
+      why_stand_out: p.whyStandOut || [],
+      product_details: p.productDetails || [],
+      pack_info: p.packInfo || "Pack of 12",
+      price: p.price,
+      image: p.image,
+      images: p.images || [p.image, p.image],
+      badge: p.badge || null,
+      category: p.category,
+      variants: p.variants || [],
+      preparation_options: p.preparationOptions || [],
+      is_featured: Boolean(p.isFeatured),
+      is_best_seller: Boolean(p.isBestSeller),
+      is_new_arrival: Boolean(p.isNewArrival),
+    };
+
+    const { error } = await supabase.from("products").upsert(record, { onConflict: "id" });
+    if (error) {
+      console.error(`❌ Failed product upsert (${p.id}):`, error.message);
+    }
+  }
+  console.log("✅ Products migration completed.");
+
+  // 2. Migrate Blogs
+  console.log(`📝 Migrating ${blogsData.length} blog posts (authorRole removed)...`);
+  for (const b of blogsData) {
+    const record = {
+      id: b.id,
+      slug: b.slug,
+      title: b.title,
+      excerpt: b.excerpt || "",
+      content: b.content || [],
+      writer: b.writer || "Simran Gulati",
+      date: b.date || "",
+      read_time: b.readTime || "3 min read",
+      category: b.category || "General",
+      image: b.image,
+      image2: b.image2 || null,
+      author_avatar: b.authorAvatar || null,
+      published: true,
+    };
+
+    const { error } = await supabase.from("blogs").upsert(record, { onConflict: "id" });
+    if (error) {
+      console.error(`❌ Failed blog upsert (${b.id}):`, error.message);
+    }
+  }
+  console.log("✅ Blogs migration completed.");
+
+  // 3. Migrate Reviews
+  console.log(`⭐ Migrating ${testimonialsData.length} customer reviews...`);
+  for (const t of (testimonialsData as unknown as any[])) {
+    const record = {
+      name: t.author || t.name || "Happy Customer",
+      rating: t.rating || 5,
+      comment: t.quote || t.comment || "",
+      is_verified: true,
+      status: "approved",
+    };
+
+    const { error } = await supabase.from("reviews").insert([record]);
+    if (error) {
+      console.error(`❌ Failed review insert:`, error.message);
+    }
+  }
+  console.log("✅ Customer reviews migration completed.");
+
+  console.log("🎉 ALL DATA SUCCESSFULLY MIGRATED TO SUPABASE!");
+}
+
+migrate().catch((err) => {
+  console.error("Migration error:", err);
+  process.exit(1);
+});

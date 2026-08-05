@@ -19,11 +19,12 @@ import {
   Package,
   Zap,
 } from "lucide-react";
-import { products } from "@/lib/data";
+import { useProductStore } from "@/store/product.store";
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import ProductReviews from "@/components/products/ProductReviews";
 import RelatedProducts from "@/components/products/RelatedProducts";
+import { useEffect } from "react";
 
 export default function ProductDetailPage({
   params,
@@ -33,7 +34,14 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const productId = resolvedParams.id;
 
-  const product = products.find((p) => p.id === productId);
+  const storeProducts = useProductStore((s) => s.products);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const product = storeProducts.find((p) => p.id === productId);
 
   // States
   const [selectedVariantIdx, setSelectedVariantIdx] = useState<number>(0);

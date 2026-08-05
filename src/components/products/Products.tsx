@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
-import { products } from "@/lib/data";
 import ProductCard from "./ProductCard";
+import { useProductStore } from "@/store/product.store";
 
 export default function Products() {
+  const products = useProductStore((s) => s.products);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [showWishlistOnly, setShowWishlistOnly] = useState(false);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const toggleWishlist = (id: string) => {
     setWishlist((prev) =>

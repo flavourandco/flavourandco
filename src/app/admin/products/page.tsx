@@ -2,14 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Edit2, Trash2, Search, Check, X, Tag } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, X, Tag } from "lucide-react";
 import { Product } from "@/lib/types";
+import { useProductStore } from "@/store/product.store";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+
+  const setStoreProducts = useProductStore((s) => s.setProducts);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,7 +28,7 @@ export default function AdminProductsPage() {
     price: 34.99,
     packInfo: "Pack of 12",
     badge: "Best Seller",
-    image: "/products/butter-chicken-pie.png",
+    image: "https://example.com/image.jpg",
     isFeatured: true,
     isBestSeller: false,
     isNewArrival: false,
@@ -38,6 +41,7 @@ export default function AdminProductsPage() {
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setProducts(json.data);
+        setStoreProducts(json.data);
       }
     } catch (err) {
       console.error("Error fetching products", err);
@@ -61,7 +65,7 @@ export default function AdminProductsPage() {
       price: 34.99,
       packInfo: "Pack of 12",
       badge: "Best Seller",
-      image: "/products/butter-chicken-pie.png",
+      image: "https://example.com/image.jpg",
       isFeatured: true,
       isBestSeller: false,
       isNewArrival: false,
@@ -94,7 +98,11 @@ export default function AdminProductsPage() {
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (json.success) {
-        setProducts((prev) => prev.filter((p) => p.id !== id));
+        setProducts((prev) => {
+          const updated = prev.filter((p) => p.id !== id);
+          setStoreProducts(updated);
+          return updated;
+        });
       } else {
         alert(json.error || "Failed to delete product");
       }
@@ -107,7 +115,6 @@ export default function AdminProductsPage() {
     e.preventDefault();
     try {
       if (editingProduct) {
-        // PUT Update
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -121,7 +128,6 @@ export default function AdminProductsPage() {
           alert(json.error || "Failed to update product");
         }
       } else {
-        // POST Create
         const res = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -154,7 +160,7 @@ export default function AdminProductsPage() {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Product Management (CRUD)</h2>
           <p className="text-xs text-slate-500 mt-1">
-            Manage your gourmet pie inventory, prices, badges, and catalog listings.
+            Manage your gourmet pie inventory, prices, badges, catalog listings, and images directly in Supabase.
           </p>
         </div>
         <button
@@ -204,7 +210,7 @@ export default function AdminProductsPage() {
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-xs text-slate-400 font-semibold">
-            Loading products...
+            Loading products from Supabase...
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="p-12 text-center space-y-3">
@@ -231,7 +237,7 @@ export default function AdminProductsPage() {
                     <td className="py-3.5 px-4 flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                         <Image
-                          src={product.image || "/products/butter-chicken-pie.png"}
+                          src={product.image || "https://example.com/image.jpg"}
                           alt={product.name}
                           fill
                           className="object-cover"
@@ -388,7 +394,7 @@ export default function AdminProductsPage() {
                   type="text"
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="/products/butter-chicken-pie.png"
+                  placeholder="https://example.com/image.jpg"
                   className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
                 />
               </div>

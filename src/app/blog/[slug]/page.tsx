@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ChevronRight, ArrowRight } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { blogPosts } from "@/lib/data";
 import BlogCard from "@/components/blog/BlogCard";
+import { getBlogBySlugServer, getBlogsServer } from "@/lib/supabase/queries";
 
 interface BlogDetailPageProps {
   params: Promise<{
@@ -14,7 +14,8 @@ interface BlogDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
+  const blogs = await getBlogsServer();
+  return blogs.map((post) => ({
     slug: post.slug,
   }));
 }
@@ -23,7 +24,7 @@ export async function generateMetadata({
   params,
 }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogBySlugServer(slug);
 
   if (!post) {
     return {
@@ -39,16 +40,14 @@ export async function generateMetadata({
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogBySlugServer(slug);
 
   if (!post) {
     notFound();
   }
 
-  // Filter other posts for related stories section
-  const relatedPosts = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
-
-  // Determine middle point for inserting 2nd image if present
+  const allBlogs = await getBlogsServer();
+  const relatedPosts = allBlogs.filter((p) => p.slug !== post.slug).slice(0, 3);
   const midPoint = Math.floor(post.content.length / 2) || 2;
 
   return (
@@ -85,12 +84,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#ebe3d8] text-sm text-[#1c1410]/80">
               <div className="flex items-center gap-2 text-sm font-sans font-medium text-[#1c1410]">
                 <span>By {post.writer}</span>
-                {post.authorRole && (
-                  <>
-                    <span>•</span>
-                    <span className="text-xs text-[#1c1410]/60">{post.authorRole}</span>
-                  </>
-                )}
               </div>
 
               <div className="flex items-center gap-3 text-xs font-sans text-[#1c1410]/60">
@@ -124,7 +117,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               
               return (
                 <div key={idx} className="space-y-6">
-                  {/* First Paragraph / Highlight block */}
                   {idx === 0 ? (
                     <p className="font-serif text-lg sm:text-xl font-medium italic text-[#6b1e30] leading-relaxed border-l-4 border-[#c69c40] pl-4 sm:pl-6 py-1 bg-[#f7efe6]/60 rounded-r-lg">
                       {paragraph}
@@ -139,7 +131,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                     </p>
                   )}
 
-                  {/* Render Optional 2nd Full Image at mid-point ONLY if post.image2 exists */}
                   {post.image2 && idx === midPoint - 1 && (
                     <div className="my-10 w-full overflow-hidden rounded-2xl shadow-md border border-[#c69c40]/25 bg-stone-100">
                       <img
@@ -154,73 +145,27 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             })}
           </div>
 
-          {/* Related Articles Section */}
+          {/* Related Articles Footer */}
           {relatedPosts.length > 0 && (
-            <section className="mt-16 pt-10 border-t border-[#ebe3d8]">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1c1410]">
-                    Explore Related Articles
-                  </h2>
-                </div>
+            <footer className="mt-16 sm:mt-24 pt-10 border-t border-[#ebe3d8] space-y-8">
+              <div className="flex items-center justify-between">
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#1c1410]">
+                  More Stories &amp; Insights
+                </h3>
                 <Link
                   href="/blog"
-                  className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6b1e30] hover:text-[#c69c40] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6b1e30] hover:text-[#c69c40] transition-colors"
                 >
-                  View All <ChevronRight className="h-4 w-4" />
+                  View All Journal Articles <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
 
-              {/* Desktop / PC Grid */}
-              <div className="hidden md:grid md:grid-cols-3 gap-6 items-stretch">
-                {relatedPosts.map((relPost) => (
-                  <BlogCard key={relPost.id} post={relPost} />
+              <div className="grid md:grid-cols-3 gap-6">
+                {relatedPosts.map((rPost) => (
+                  <BlogCard key={rPost.id} post={rPost} />
                 ))}
               </div>
-
-              {/* Mobile Horizontal List (Same format as main /blog page) */}
-              <div className="block md:hidden divide-y divide-[#ebe3d8] border-y border-[#ebe3d8] bg-white rounded-lg shadow-xs overflow-hidden">
-                {relatedPosts.map((relPost) => (
-                  <Link
-                    key={relPost.id}
-                    href={`/blog/${relPost.slug}`}
-                    className="p-4 flex items-start gap-4 cursor-pointer hover:bg-stone-50/80 transition-colors block"
-                  >
-                    <div className="relative w-24 h-20 shrink-0 rounded-lg overflow-hidden border border-[#ebe3d8] bg-stone-100 mt-0.5">
-                      <Image
-                        src={relPost.image}
-                        alt={relPost.title}
-                        fill
-                        className="object-cover"
-                        sizes="96px"
-                        quality={90}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-1.5 text-left">
-                      <div className="flex items-center gap-2 text-[10px] text-[#1c1410]/60 font-sans">
-                        <span className="font-semibold text-[#6b1e30]">{relPost.writer}</span>
-                        <span>•</span>
-                        <span>{relPost.date}</span>
-                      </div>
-                      <h3 className="font-serif text-sm font-bold text-[#1c1410] leading-snug">
-                        {relPost.title}
-                      </h3>
-                      <p className="text-xs text-[#1c1410]/75 leading-relaxed font-sans line-clamp-2">
-                        {relPost.excerpt}
-                      </p>
-                      <div className="pt-1 flex items-center justify-between">
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#c69c40]">
-                          Read Story <ArrowRight className="h-3 w-3" />
-                        </span>
-                        <span className="text-[10px] text-[#1c1410]/50 font-sans">
-                          {relPost.readTime}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
+            </footer>
           )}
 
         </div>

@@ -9,15 +9,30 @@ import { navLinks, products } from "@/lib/data";
 import { media } from "@/lib/media";
 
 import AnnouncementBar from "./AnnouncementBar";
+import { useUIStore } from "@/store/ui.store";
+import { useProductStore } from "@/store/product.store";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function HomeNavbar() {
   const pathname = usePathname();
   const { user, isSignedIn, isLoaded } = useUser();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const userProfile = useAuthStore((s) => s.userProfile);
+
+  const mobileOpen = useUIStore((s) => s.mobileNavOpen);
+  const setMobileOpen = useUIStore((s) => s.setMobileNavOpen);
+  const searchOpen = useUIStore((s) => s.searchModalOpen);
+  const setSearchOpen = useUIStore((s) => s.setSearchModalOpen);
+
+  const products = useProductStore((s) => s.products);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
+
   const [searchQuery, setSearchQuery] = useState("");
 
-  const firstName = user?.firstName || user?.fullName?.split(" ")[0] || user?.username || "there";
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const firstName = userProfile?.fullName?.split(" ")[0] || user?.firstName || user?.fullName?.split(" ")[0] || user?.username || "there";
   const userInitial = (firstName[0] || "U").toUpperCase();
 
   useEffect(() => {

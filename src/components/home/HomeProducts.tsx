@@ -6,12 +6,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { products } from "@/lib/data";
+import { products as fallbackProducts } from "@/lib/data";
 import ProductCard from "@/components/products/ProductCard";
+import { useProductStore } from "@/store/product.store";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HomeProducts() {
+  const products = useProductStore((s) => s.products);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
   const sectionRef = useRef<HTMLElement>(null);
   const [cartQuantities, setCartQuantities] = useState<Record<string, number>>({});
   const [isInView, setIsInView] = useState(false);
@@ -20,6 +23,10 @@ export default function HomeProducts() {
   const [isHovered, setIsHovered] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   useEffect(() => {
     const handleResize = () => {

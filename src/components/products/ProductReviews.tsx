@@ -94,20 +94,19 @@ export default function ProductReviews({ productId, productName }: ProductReview
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
 
-  // Load reviews from localStorage or initial mock data
+  // Load reviews from Supabase API
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(localStorageKey);
-      if (stored) {
-        setReviews(JSON.parse(stored));
-      } else {
-        const initial = INITIAL_MOCK_REVIEWS[productId] || INITIAL_MOCK_REVIEWS.default;
-        setReviews(initial);
-      }
-    } catch {
-      setReviews(INITIAL_MOCK_REVIEWS.default);
-    }
-  }, [productId, localStorageKey]);
+    fetch(`/api/reviews?productId=${productId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
+          setReviews(json.data);
+        } else {
+          setReviews(INITIAL_MOCK_REVIEWS.default);
+        }
+      })
+      .catch(() => setReviews(INITIAL_MOCK_REVIEWS.default));
+  }, [productId]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -120,7 +119,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
@@ -134,30 +133,41 @@ export default function ProductReviews({ productId, productName }: ProductReview
       return;
     }
 
-    const createdReview: ReviewItem = {
-      id: `rev-${Date.now()}`,
-      name: newName.trim(),
-      rating: newRating,
-      date: "Just now",
-      comment: newComment.trim(),
-      isVerified: true,
-    };
-
-    const updatedReviews = [createdReview, ...reviews];
-    setReviews(updatedReviews);
-
     try {
-      localStorage.setItem(localStorageKey, JSON.stringify(updatedReviews));
-    } catch (e) {
-      console.error("Could not save review to localStorage", e);
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId,
+          name: newName.trim(),
+          rating: newRating,
+          comment: newComment.trim(),
+          isVerified: true,
+          status: "approved",
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSuccessMsg("Thank you! Your review has been submitted successfully.");
+        const createdReview: ReviewItem = {
+          id: json.data?.id || `rev-${Date.now()}`,
+          name: newName.trim(),
+          rating: newRating,
+          date: "Just now",
+          comment: newComment.trim(),
+          isVerified: true,
+        };
+        setReviews((prev) => [createdReview, ...prev]);
+        setNewName("");
+        setNewComment("");
+        setNewRating(5);
+        setTimeout(() => setIsModalOpen(false), 1500);
+      } else {
+        setErrorMsg(json.error || "Failed to submit review.");
+      }
+    } catch {
+      setErrorMsg("Network error submitting review.");
     }
-
-    // Reset form state and close modal
-    setNewName("");
-    setNewComment("");
-    setNewRating(5);
-    setSuccessMsg("Thank you! Your review has been submitted successfully.");
-    setIsModalOpen(false);
   };
 
   // Calculate Average Rating & Pagination
