@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Clock, ChevronRight } from "lucide-react";
+import { Calendar, Clock, ChevronRight, ArrowRight } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import { blogPosts } from "@/lib/data";
 import BlogCard from "@/components/blog/BlogCard";
@@ -81,7 +81,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               {post.title}
             </h1>
 
-            {/* Author Meta Bar (No Profile Pic) */}
+            {/* Author Meta Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#ebe3d8] text-sm text-[#1c1410]/80">
               <div className="flex items-center gap-2 text-sm font-sans font-medium text-[#1c1410]">
                 <span>By {post.writer}</span>
@@ -154,17 +154,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             })}
           </div>
 
-          {/* Clean Back Navigation Link */}
-          <div className="mt-14 pt-8 border-t border-[#ebe3d8] flex justify-start">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 bg-[#6b1e30] text-cream px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#7d2438] transition-colors shadow-sm cursor-pointer"
-            >
-              <ArrowLeft className="h-4 w-4" /> All Stories
-            </Link>
-          </div>
-
-          {/* Related Articles Section - Reusing BlogCard Component */}
+          {/* Related Articles Section */}
           {relatedPosts.length > 0 && (
             <section className="mt-16 pt-10 border-t border-[#ebe3d8]">
               <div className="flex items-center justify-between mb-8">
@@ -181,9 +171,53 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 items-stretch">
+              {/* Desktop / PC Grid */}
+              <div className="hidden md:grid md:grid-cols-3 gap-6 items-stretch">
                 {relatedPosts.map((relPost) => (
                   <BlogCard key={relPost.id} post={relPost} />
+                ))}
+              </div>
+
+              {/* Mobile Horizontal List (Same format as main /blog page) */}
+              <div className="block md:hidden divide-y divide-[#ebe3d8] border-y border-[#ebe3d8] bg-white rounded-lg shadow-xs overflow-hidden">
+                {relatedPosts.map((relPost) => (
+                  <Link
+                    key={relPost.id}
+                    href={`/blog/${relPost.slug}`}
+                    className="p-4 flex items-start gap-4 cursor-pointer hover:bg-stone-50/80 transition-colors block"
+                  >
+                    <div className="relative w-24 h-20 shrink-0 rounded-lg overflow-hidden border border-[#ebe3d8] bg-stone-100 mt-0.5">
+                      <Image
+                        src={relPost.image}
+                        alt={relPost.title}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                        quality={90}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1.5 text-left">
+                      <div className="flex items-center gap-2 text-[10px] text-[#1c1410]/60 font-sans">
+                        <span className="font-semibold text-[#6b1e30]">{relPost.writer}</span>
+                        <span>•</span>
+                        <span>{relPost.date}</span>
+                      </div>
+                      <h3 className="font-serif text-sm font-bold text-[#1c1410] leading-snug">
+                        {relPost.title}
+                      </h3>
+                      <p className="text-xs text-[#1c1410]/75 leading-relaxed font-sans line-clamp-2">
+                        {relPost.excerpt}
+                      </p>
+                      <div className="pt-1 flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#c69c40]">
+                          Read Story <ArrowRight className="h-3 w-3" />
+                        </span>
+                        <span className="text-[10px] text-[#1c1410]/50 font-sans">
+                          {relPost.readTime}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </section>

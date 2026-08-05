@@ -1,27 +1,43 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { blogPosts } from "@/lib/data";
 import BlogCard from "@/components/blog/BlogCard";
 
+const POSTS_PER_PAGE = 12;
+
 export default function BlogClient() {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE) || 1;
+
+  // Calculate slice for current page to strictly load 12 posts per page
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const currentPosts = blogPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="w-full bg-[#fdf8f3] text-[#1c1410] pt-6 sm:pt-10 pb-12 sm:pb-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
 
-        {/* PC & Tablet Grid Layout (4 per row on PC, 2 on Tablet) */}
+        {/* PC & Tablet Grid Layout (12 max per page: 4 columns x 3 rows on PC) */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-          {blogPosts.map((post, idx) => (
+          {currentPosts.map((post, idx) => (
             <BlogCard key={post.id} post={post} priority={idx === 0} />
           ))}
         </div>
 
-        {/* Mobile Horizontal List View */}
+        {/* Mobile Horizontal List View (12 max per page) */}
         <div className="block md:hidden divide-y divide-[#ebe3d8] border-y border-[#ebe3d8] bg-white rounded-lg shadow-xs overflow-hidden">
-          {blogPosts.map((post) => (
+          {currentPosts.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
@@ -67,6 +83,52 @@ export default function BlogClient() {
             </Link>
           ))}
         </div>
+
+        {/* Performant Pagination Bar */}
+        {totalPages > 1 && (
+          <div className="pt-8 border-t border-[#ebe3d8] flex items-center justify-between gap-4 font-sans">
+            {/* Previous Button */}
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-[#ebe3d8] bg-white text-xs font-bold text-[#1c1410] hover:bg-[#6b1e30] hover:text-white disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-[#1c1410] transition-colors cursor-pointer disabled:cursor-not-allowed shadow-xs"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </button>
+
+            {/* Page Number Buttons */}
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                const isActive = pageNum === currentPage;
+                return (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`h-9 w-9 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-[#6b1e30] text-white shadow-xs"
+                        : "bg-white text-[#1c1410] border border-[#ebe3d8] hover:border-[#6b1e30] hover:text-[#6b1e30]"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
+            <button
+              type="button"
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-[#ebe3d8] bg-white text-xs font-bold text-[#1c1410] hover:bg-[#6b1e30] hover:text-white disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-[#1c1410] transition-colors cursor-pointer disabled:cursor-not-allowed shadow-xs"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
       </div>
     </div>
