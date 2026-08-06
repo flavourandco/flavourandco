@@ -7,9 +7,10 @@ import ProductCard from "./ProductCard";
 import { useProductStore } from "@/store/product.store";
 import { useUIStore } from "@/store/ui.store";
 import { BoneyardProductCardSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { sortProductsByCustomOrder } from "@/lib/utils";
 
 export default function Products() {
-  const products = useProductStore((s) => s.products);
+  const rawProducts = useProductStore((s) => s.products);
   const isFetching = useProductStore((s) => s.isFetching);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const addToast = useUIStore((s) => s.addToast);
@@ -19,6 +20,8 @@ export default function Products() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  const products = sortProductsByCustomOrder(rawProducts);
 
   const toggleWishlist = (id: string) => {
     const isCurrentlyWishlisted = wishlist.includes(id);

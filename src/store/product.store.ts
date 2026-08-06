@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Product } from "@/lib/types";
+import { sortProductsByCustomOrder } from "@/lib/utils";
 
 interface ProductState {
   products: Product[];
@@ -29,7 +30,7 @@ export const useProductStore = create<ProductState>()(
       lastFetchedAt: null,
 
       setProducts: (products: Product[]) =>
-        set({ products, lastFetchedAt: Date.now() }),
+        set({ products: sortProductsByCustomOrder(products), lastFetchedAt: Date.now() }),
 
       setSelectedCategory: (selectedCategory: string) => set({ selectedCategory }),
 
@@ -53,7 +54,7 @@ export const useProductStore = create<ProductState>()(
           if (res.ok) {
             const resData = await res.json();
             const items = Array.isArray(resData) ? resData : (Array.isArray(resData?.data) ? resData.data : []);
-            set({ products: items, lastFetchedAt: Date.now() });
+            set({ products: sortProductsByCustomOrder(items), lastFetchedAt: Date.now() });
           }
         } catch (error) {
           console.warn("Product revalidation error:", error);
@@ -90,6 +91,8 @@ export const useProductStore = create<ProductState>()(
           filtered.sort((a, b) => b.price - a.price);
         } else if (sortBy === "name") {
           filtered.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortBy === "featured") {
+          filtered = sortProductsByCustomOrder(filtered);
         }
 
         return filtered;

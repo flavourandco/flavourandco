@@ -1,5 +1,6 @@
 import { getSupabaseServerClient, isSupabaseConfigured } from "./server";
 import type { Product, BlogPost, ReviewItem } from "@/lib/types";
+import { sortProductsByCustomOrder } from "@/lib/utils";
 
 export async function getProductsServer(): Promise<Product[]> {
   if (!isSupabaseConfigured()) return [];
@@ -13,7 +14,7 @@ export async function getProductsServer(): Promise<Product[]> {
 
   if (error || !data) return [];
 
-  return data.map((item) => ({
+  const formatted: Product[] = data.map((item) => ({
     id: item.id,
     name: item.name,
     tagline: item.tagline || "",
@@ -33,6 +34,8 @@ export async function getProductsServer(): Promise<Product[]> {
     isBestSeller: Boolean(item.is_best_seller),
     isNewArrival: Boolean(item.is_new_arrival),
   }));
+
+  return sortProductsByCustomOrder(formatted);
 }
 
 export async function getProductByIdServer(id: string): Promise<Product | null> {

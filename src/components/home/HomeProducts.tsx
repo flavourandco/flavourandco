@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProductCard from "@/components/products/ProductCard";
 import { useProductStore } from "@/store/product.store";
 import { BoneyardProductCardSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { sortProductsByCustomOrder } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,7 +43,7 @@ export default function HomeProducts() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const featuredProducts = products.filter((p) => p.isFeatured);
+  const featuredProducts = sortProductsByCustomOrder(products.filter((p) => p.isFeatured));
   const maxIndex = Math.max(0, featuredProducts.length - itemsPerPage);
 
   // Clamp currentIndex when itemsPerPage changes

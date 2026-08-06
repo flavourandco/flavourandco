@@ -171,3 +171,5 @@ export const faqItems: FaqItem[] = [
     answer: "Our meat is sourced from suppliers who use Halal-certified meat. However, Flavour & Co products are prepared in a facility that also handles non-Halal ingredients, and our finished products are not Halal certified.\n\nIf you have any questions about our ingredients or production processes, please don't hesitate to contact us."
   }
 ];
+
+export { sortProductsByCustomOrder } from "./utils";

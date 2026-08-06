@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { Product } from "@/lib/types";
 import { requireAdminApi } from "@/lib/auth";
+import { sortProductsByCustomOrder } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -36,7 +37,7 @@ export async function GET() {
             isNewArrival: Boolean(item.is_new_arrival),
           }));
 
-          return NextResponse.json({ success: true, data: formattedProducts });
+          return NextResponse.json({ success: true, data: sortProductsByCustomOrder(formattedProducts) });
         }
       }
     }
