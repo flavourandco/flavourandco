@@ -23,7 +23,7 @@ export default function AnnouncementBar() {
       <div className="hidden md:flex relative z-20 w-full items-center justify-center gap-2.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-[#E3A72B] drop-shadow-[0_0_14px_rgba(227,167,43,0.35)] px-4">
         <span>FREE EXPRESS SHIPPING</span>
         <span className="opacity-60">•</span>
-        <span>ORDER ABOVE $200 TO AVAIL THE OFFER</span>
+        <span>DELIVERING SYDNEY WIDE</span>
         <span className="opacity-60">•</span>
         <span>HANDCRAFTED GOURMET PIES</span>
       </div>
@@ -35,7 +35,7 @@ export default function AnnouncementBar() {
             <span key={key} className="inline-flex items-center gap-2 px-4">
               <span>FREE EXPRESS SHIPPING</span>
               <span className="opacity-60">•</span>
-              <span>ORDER ABOVE $200 TO AVAIL THE OFFER</span>
+              <span>DELIVERING SYDNEY WIDE</span>
               <span className="opacity-60">•</span>
               <span>HANDCRAFTED GOURMET PIES</span>
             </span>

@@ -33,7 +33,7 @@ export const media = {
     y2022: "/timeline/timeline-2022.webp",
     y2024: "/timeline/timeline-2024.webp",
     y2025: "/timeline/timeline-2025.webp",
-    y2026: "/timeline/timeline-2026.webp",
+    y2026: "/footer_brand_logo.png",
     // Backwards compatibility aliases
     spark: "/timeline/timeline-2018.webp",
     plateOfOrigin: "/timeline/timeline-2020.webp",
@@ -41,7 +41,7 @@ export const media = {
     commercialKitchen: "/timeline/timeline-2022.webp",
     ownFacility: "/timeline/timeline-2024.webp",
     builtForBusiness: "/timeline/timeline-2025.webp",
-    flavourAndCo: "/timeline/timeline-2026.webp",
+    flavourAndCo: "/footer_brand_logo.png",
   },
 
   blogs: {

@@ -41,7 +41,7 @@ function YearSeal({ year, filled }: YearSealProps): React.ReactElement {
       <circle
         cx="50"
         cy="50"
-        r="29"
+        r="30"
         fill="none"
         stroke={filled ? "#f5e9ce" : "#6b1e30"}
         strokeWidth="1"
@@ -50,9 +50,9 @@ function YearSeal({ year, filled }: YearSealProps): React.ReactElement {
       />
       <text
         x="50"
-        y="56"
+        y="59"
         textAnchor="middle"
-        fontSize="18"
+        fontSize="29"
         fontFamily="var(--font-serif, serif)"
         fontWeight={800}
         fill={filled ? "#fdf8f3" : "#6b1e30"}
@@ -80,6 +80,8 @@ export interface MilestoneItem {
   copy: string;
   image: string;
   imagePosition?: string;
+  bgClass?: string;
+  imageFit?: "object-cover" | "object-contain";
 }
 
 export interface ImageFrameProps {
@@ -103,18 +105,19 @@ function ImageFrame({
   const rounding = flip
     ? `rounded-tr-[8px] rounded-bl-[8px] ${roundClass.replace("TL", "TR").replace("BR", "BL")}`
     : roundClass;
+  const isContain = item.imageFit === "object-contain";
   return (
     <div className={`w-full p-[3px] bg-gradient-to-br from-[#c69c40] via-[#e8cd8a] to-[#c69c40]/60 shadow-sm ${frameClass}`}>
-      <div className={`relative w-full ${aspectClass} overflow-hidden ${rounding} group`}>
+      <div className={`relative w-full ${aspectClass} overflow-hidden ${rounding} group ${item.bgClass || ""}`}>
         <Image
           src={item.image}
           alt={`${item.year} — ${item.title}`}
           fill
-          className={`object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.05] ${item.imagePosition || "object-center"}`}
+          className={`${isContain ? "object-contain p-4 sm:p-5" : "object-cover"} transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.05] ${item.imagePosition || "object-center"}`}
           sizes={sizes}
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07402b]/25 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07402b]/25 via-transparent to-transparent pointer-events-none" />
       </div>
     </div>
   );
@@ -139,14 +142,14 @@ function StoryContent({
   maxWidthClass = "max-w-[38ch]",
 }: StoryContentProps): React.ReactElement {
   return (
-    <div className="w-full flex flex-col justify-center text-left">
-      <div className="flex items-center gap-1.5 mb-1.5">
+    <div className="w-full flex flex-col items-center justify-center text-center">
+      <div className="flex items-center justify-center gap-1.5 mb-1.5">
         <span className="w-1.5 h-1.5 rounded-full bg-[#6b1e30] shrink-0" />
         <span className={`font-mono uppercase text-[#6b1e30]/85 font-semibold ${tagClass}`}>
           {item.tag}
         </span>
       </div>
-      <div className="relative">
+      <div className="relative w-full flex flex-col items-center justify-center">
         <span aria-hidden="true" className={`absolute select-none leading-none z-0 font-serif font-black text-[#6b1e30]/[0.07] ${ghostClass}`}>
           {item.year.slice(2)}
         </span>
@@ -154,10 +157,10 @@ function StoryContent({
           {item.title}
         </h4>
       </div>
-      <p className={`relative z-10 text-stone-600 font-sans leading-relaxed mt-1.5 ${maxWidthClass} ${bodyClass}`}>
+      <p className={`relative z-10 text-stone-600 font-sans leading-relaxed mt-1.5 mx-auto ${maxWidthClass} ${bodyClass}`}>
         {item.copy}
       </p>
-      <span className="mt-2.5 h-px w-8 bg-[#c69c40]/70" />
+      <span className="mt-2.5 h-px w-8 bg-[#c69c40]/70 mx-auto" />
     </div>
   );
 }
@@ -211,7 +214,7 @@ export default function StoryTimeline(): React.ReactElement {
     { year: "2022", title: "Into a commercial kitchen", tag: "Scaling up", copy: "We step out of the home kitchen and into a licensed commercial kitchen, scaling up to meet growing demand.", image: media.timeline.y2022, imagePosition: "object-center" },
     { year: "2024", title: "Our own facility", tag: "HACCP certified", copy: "We move into our own dedicated, HACCP-certified facility, and land our first major wholesale partner.", image: media.timeline.y2024, imagePosition: "object-center" },
     { year: "2025", title: "Built for business", tag: "Wholesale expansion", copy: "Wholesale becomes a core focus, growing into a trusted supplier for hotels, catering, and cafes.", image: media.timeline.y2025, imagePosition: "object-center" },
-    { year: "2026", title: "Flavour & Co.", tag: "The next chapter", copy: "We rebrand to Flavour & Co, expanding into South Asian canapes and breakfast items at scale.", image: media.timeline.y2026, imagePosition: "object-center" },
+    { year: "2026", title: "Flavour & Co.", tag: "The next chapter", copy: "We rebrand to Flavour & Co, expanding into South Asian canapes and breakfast items at scale.", image: media.timeline.y2026, imagePosition: "object-center", bgClass: "bg-[#07402b]", imageFit: "object-contain" },
   ];
 
   const mobileReveal = useRowReveal(milestones.length);
@@ -261,10 +264,10 @@ export default function StoryTimeline(): React.ReactElement {
               const story = (
                 <StoryContent
                   item={item}
-                  ghostClass="-top-3 sm:-top-6 -left-1 text-[46px] sm:text-[72px]"
-                  titleClass="text-lg sm:text-2xl"
-                  bodyClass="text-[12px] sm:text-sm"
-                  tagClass="text-[9px] sm:text-[11px] tracking-[0.18em]"
+                  ghostClass="-top-3 sm:-top-6 left-1/2 -translate-x-1/2 text-[48px] sm:text-[76px]"
+                  titleClass="text-xl sm:text-2xl"
+                  bodyClass="text-[13px] sm:text-base"
+                  tagClass="text-[10px] sm:text-xs tracking-[0.18em]"
                 />
               );
 
@@ -276,7 +279,7 @@ export default function StoryTimeline(): React.ReactElement {
                     }`}
                 >
                   <div className="w-full">{imageOnLeft ? image : story}</div>
-                  <div className="relative z-10 w-9 sm:w-12 aspect-square">
+                  <div className="relative z-10 w-14 sm:w-16 aspect-square">
                     <YearSeal year={item.year} filled={filled} />
                   </div>
                   <div className="w-full">{imageOnLeft ? story : image}</div>
@@ -311,10 +314,10 @@ export default function StoryTimeline(): React.ReactElement {
               const story = (
                 <StoryContent
                   item={item}
-                  ghostClass="-top-2 xl:-top-3 -left-0.5 text-[32px] xl:text-[42px]"
-                  titleClass="text-[11px] xl:text-sm"
-                  bodyClass="text-[10px] xl:text-[11px]"
-                  tagClass="text-[8px] xl:text-[9px] tracking-[0.14em]"
+                  ghostClass="-top-2 xl:-top-3 left-1/2 -translate-x-1/2 text-[36px] xl:text-[46px]"
+                  titleClass="text-[13px] xl:text-[15px]"
+                  bodyClass="text-[11px] xl:text-[13px]"
+                  tagClass="text-[9px] xl:text-[10px] tracking-[0.14em]"
                   maxWidthClass="max-w-none"
                 />
               );
@@ -335,7 +338,7 @@ export default function StoryTimeline(): React.ReactElement {
                       aria-hidden="true"
                       className="w-px h-4 xl:h-5 bg-gradient-to-b from-[#c69c40]/5 via-[#c69c40] to-[#c69c40]"
                     />
-                    <div className="relative my-1 z-20 w-10 xl:w-12 aspect-square">
+                    <div className="relative my-1 z-20 w-14 xl:w-18 aspect-square">
                       <YearSeal year={item.year} filled={filled} />
                     </div>
                     <span
