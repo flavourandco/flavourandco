@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   images: {
-    qualities: [75, 80, 85, 90, 95],
+    qualities: [75, 80, 85, 90, 92, 95],
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {

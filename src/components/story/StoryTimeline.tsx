@@ -1,333 +1,356 @@
 "use client";
 
-import { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import media from "@/lib/media";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+/** Scalloped "seal" path — a fluted circle echoing a crimped pie edge.
+ *  Computed once at module load since the shape is identical for every year. */
+const SEAL_PATH = (() => {
+  const cx = 50, cy = 50, rOuter = 40, flutes = 16, depth = 3.5;
+  const pts: [number, number][] = [];
+  for (let i = 0; i <= flutes; i++) {
+    const a = (i / flutes) * Math.PI * 2;
+    const r = rOuter + (i % 2 === 0 ? depth : -depth);
+    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)} `;
+  for (let i = 1; i < pts.length; i++) {
+    const midA = ((i - 0.5) / flutes) * Math.PI * 2;
+    const mx = cx + rOuter * Math.cos(midA);
+    const my = cy + rOuter * Math.sin(midA);
+    d += `Q ${mx.toFixed(2)} ${my.toFixed(2)}, ${pts[i][0].toFixed(2)} ${pts[i][1].toFixed(2)} `;
+  }
+  return d + "Z";
+})();
+
+export interface YearSealProps {
+  year: string;
+  filled: boolean;
 }
 
-/** Hand-drawn wave divider for header */
-function SquiggleDivider({ className = "" }: { className?: string }) {
-  const amplitude = 6;
-  const period = 20;
-  const width = 200;
-  let d = `M0 10`;
-  for (let x = 0; x < width; x += period) {
-    d += ` Q ${x + period / 4} ${10 - amplitude}, ${x + period / 2} 10 Q ${x + (3 * period) / 4} ${10 + amplitude}, ${x + period} 10`;
-  }
+function YearSeal({ year, filled }: YearSealProps): React.ReactElement {
   return (
-    <svg viewBox="0 0 200 20" preserveAspectRatio="none" className={`block w-full ${className}`} aria-hidden="true">
-      <path d={d} stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
+      <path
+        d={SEAL_PATH}
+        fill={filled ? "#6b1e30" : "#fdf8f3"}
+        stroke={filled ? "#c69c40" : "#6b1e30"}
+        strokeWidth="1.5"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="29"
+        fill="none"
+        stroke={filled ? "#f5e9ce" : "#6b1e30"}
+        strokeWidth="1"
+        strokeDasharray="1.5 3"
+        opacity="0.55"
+      />
+      <text
+        x="50"
+        y="56"
+        textAnchor="middle"
+        fontSize="18"
+        fontFamily="var(--font-serif, serif)"
+        fontWeight={800}
+        fill={filled ? "#fdf8f3" : "#6b1e30"}
+      >
+        {year}
+      </text>
     </svg>
   );
 }
 
-/** Highlighter tag badge */
-function HighlightTag({ children }: { children: React.ReactNode }) {
+function OrnamentDivider(): React.ReactElement {
   return (
-    <span className="inline-block px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-sm bg-[#c69c40] text-[#07402b] font-extrabold text-[9px] sm:text-[10px] tracking-wider uppercase">
-      {children}
-    </span>
+    <div className="flex items-center justify-center gap-3 w-full" aria-hidden="true">
+      <span className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#c69c40]" />
+      <span className="w-2 h-2 rotate-45 bg-[#c69c40]" />
+      <span className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-[#c69c40]" />
+    </div>
   );
 }
 
-interface MilestoneItem {
-  num: string;
+export interface MilestoneItem {
   year: string;
   title: string;
-  tag?: string;
+  tag: string;
   copy: string;
   image: string;
-  isTopImage: boolean;
-  color: string;
   imagePosition?: string;
 }
 
-export default function StoryTimeline() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+export interface ImageFrameProps {
+  item: MilestoneItem;
+  flip: boolean;
+  aspectClass: string;
+  frameClass: string;
+  roundClass: string;
+  sizes: string;
+}
 
+/** Gold-framed image with alternating "crimped" corner rounding. */
+function ImageFrame({
+  item,
+  flip,
+  aspectClass,
+  frameClass,
+  roundClass,
+  sizes,
+}: ImageFrameProps): React.ReactElement {
+  const rounding = flip
+    ? `rounded-tr-[8px] rounded-bl-[8px] ${roundClass.replace("TL", "TR").replace("BR", "BL")}`
+    : roundClass;
+  return (
+    <div className={`w-full p-[3px] bg-gradient-to-br from-[#c69c40] via-[#e8cd8a] to-[#c69c40]/60 shadow-sm ${frameClass}`}>
+      <div className={`relative w-full ${aspectClass} overflow-hidden ${rounding} group`}>
+        <Image
+          src={item.image}
+          alt={`${item.year} — ${item.title}`}
+          fill
+          className={`object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.05] ${item.imagePosition || "object-center"}`}
+          sizes={sizes}
+          quality={90}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07402b]/25 via-transparent to-transparent" />
+      </div>
+    </div>
+  );
+}
+
+export interface StoryContentProps {
+  item: MilestoneItem;
+  ghostClass: string;
+  titleClass: string;
+  bodyClass: string;
+  tagClass: string;
+  maxWidthClass?: string;
+}
+
+/** Story copy with a ghost year-numeral behind the title. */
+function StoryContent({
+  item,
+  ghostClass,
+  titleClass,
+  bodyClass,
+  tagClass,
+  maxWidthClass = "max-w-[38ch]",
+}: StoryContentProps): React.ReactElement {
+  return (
+    <div className="w-full flex flex-col justify-center text-left">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#6b1e30] shrink-0" />
+        <span className={`font-mono uppercase text-[#6b1e30]/85 font-semibold ${tagClass}`}>
+          {item.tag}
+        </span>
+      </div>
+      <div className="relative">
+        <span aria-hidden="true" className={`absolute select-none leading-none z-0 font-serif font-black text-[#6b1e30]/[0.07] ${ghostClass}`}>
+          {item.year.slice(2)}
+        </span>
+        <h4 className={`relative z-10 font-serif text-[#07402b] font-semibold leading-snug ${titleClass}`}>
+          {item.title}
+        </h4>
+      </div>
+      <p className={`relative z-10 text-stone-600 font-sans leading-relaxed mt-1.5 ${maxWidthClass} ${bodyClass}`}>
+        {item.copy}
+      </p>
+      <span className="mt-2.5 h-px w-8 bg-[#c69c40]/70" />
+    </div>
+  );
+}
+
+export interface UseRowRevealResult {
+  nodeRefs: React.RefObject<(HTMLDivElement | null)[]>;
+  visible: Set<number>;
+}
+
+/** Reveals rows/columns as they scroll into view. */
+function useRowReveal(count: number): UseRowRevealResult {
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [visible, setVisible] = useState<Set<number>>(() => {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      return new Set(Array.from({ length: count }, (_, i) => i));
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      setVisible(new Set(Array.from({ length: count }, (_, i) => i)));
+      return;
+    }
+    const observers: IntersectionObserver[] = [];
+    nodeRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible((prev) => new Set(prev).add(i));
+            io.disconnect();
+          }
+        },
+        { threshold: 0.05, rootMargin: "0px 0px 50px 0px" }
+      );
+      io.observe(el);
+      observers.push(io);
+    });
+    return () => observers.forEach((io) => io.disconnect());
+  }, [count]);
+
+  return { nodeRefs, visible };
+}
+
+export default function StoryTimeline(): React.ReactElement {
   const milestones: MilestoneItem[] = [
-    {
-      num: "01",
-      year: "2018",
-      title: "The Spark",
-      tag: "Heritage Kitchen",
-      copy: "Simran starts combining her heritage recipes with classic buttery pastry, right in her home kitchen.",
-      image: media.timeline.y2018,
-      isTopImage: true,
-      color: "bg-[#6b1e30]",
-      imagePosition: "object-top",
-    },
-    {
-      num: "02",
-      year: "2020",
-      title: "Plate of Origin",
-      tag: "Channel 7 TV",
-      copy: "Represents India on Channel 7's national cooking show, winning judges over with bold, familial flavours.",
-      image: media.timeline.y2020,
-      isTopImage: false,
-      color: "bg-[#c69c40]",
-      imagePosition: "object-center",
-    },
-    {
-      num: "03",
-      year: "2021",
-      title: "Going Live",
-      tag: "E-Commerce Launch",
-      copy: "Our website launches, bringing handcrafted gourmet pies direct to foodies across Sydney.",
-      image: media.timeline.y2021,
-      isTopImage: true,
-      color: "bg-[#6b1e30]",
-      imagePosition: "object-center",
-    },
-    {
-      num: "04",
-      year: "2022",
-      title: "Into Commercial Kitchen",
-      tag: "Scaling Up",
-      copy: "We step out of the home kitchen and into a licensed commercial kitchen — scaling up to meet growing demand.",
-      image: media.timeline.y2022,
-      isTopImage: false,
-      color: "bg-[#c69c40]",
-      imagePosition: "object-center",
-    },
-    {
-      num: "05",
-      year: "2024",
-      title: "Our Own Facility",
-      tag: "HACCP Certified",
-      copy: "We move into our own dedicated, HACCP-certified facility — and land our first major wholesale partner.",
-      image: media.timeline.y2024,
-      isTopImage: true,
-      color: "bg-[#6b1e30]",
-      imagePosition: "object-center",
-    },
-    {
-      num: "06",
-      year: "2025",
-      title: "Built for Business",
-      tag: "Wholesale Expansion",
-      copy: "Wholesale becomes a core focus, growing into a trusted supplier for hotels, catering, and cafes.",
-      image: media.timeline.y2025,
-      isTopImage: false,
-      color: "bg-[#c69c40]",
-      imagePosition: "object-center",
-    },
-    {
-      num: "07",
-      year: "2026",
-      title: "Flavour & Co.",
-      tag: "The Next Chapter",
-      copy: "We rebrand to Flavour & Co, expanding into South Asian canapés and breakfast items at scale.",
-      image: media.timeline.y2026,
-      isTopImage: true,
-      color: "bg-[#6b1e30]",
-      imagePosition: "object-center",
-    },
+    { year: "2018", title: "The Spark", tag: "Heritage kitchen", copy: "Simran starts combining her heritage recipes with classic buttery pastry, right in her home kitchen.", image: media.timeline.y2018, imagePosition: "object-top" },
+    { year: "2020", title: "Plate of Origin", tag: "Channel 7 TV", copy: "Represents India on Channel 7's national cooking show, winning judges over with bold, familial flavours.", image: media.timeline.y2020, imagePosition: "object-center" },
+    { year: "2021", title: "Going live", tag: "E-commerce launch", copy: "Our website launches, bringing handcrafted gourmet pies direct to foodies across Sydney.", image: media.timeline.y2021, imagePosition: "object-center" },
+    { year: "2022", title: "Into a commercial kitchen", tag: "Scaling up", copy: "We step out of the home kitchen and into a licensed commercial kitchen, scaling up to meet growing demand.", image: media.timeline.y2022, imagePosition: "object-center" },
+    { year: "2024", title: "Our own facility", tag: "HACCP certified", copy: "We move into our own dedicated, HACCP-certified facility, and land our first major wholesale partner.", image: media.timeline.y2024, imagePosition: "object-center" },
+    { year: "2025", title: "Built for business", tag: "Wholesale expansion", copy: "Wholesale becomes a core focus, growing into a trusted supplier for hotels, catering, and cafes.", image: media.timeline.y2025, imagePosition: "object-center" },
+    { year: "2026", title: "Flavour & Co.", tag: "The next chapter", copy: "We rebrand to Flavour & Co, expanding into South Asian canapes and breakfast items at scale.", image: media.timeline.y2026, imagePosition: "object-center" },
   ];
 
-  useGSAP(
-    () => {
-      const section = containerRef.current;
-      const track = trackRef.current;
-      if (!section || !track) return;
-
-      const getMaxScroll = () => {
-        const parentWidth = track.parentElement?.clientWidth || window.innerWidth;
-        const maxScroll = track.scrollWidth - parentWidth;
-        return maxScroll > 0 ? maxScroll : 0;
-      };
-
-      // Guaranteed full scroll from start (01) to end (07) on down-scroll, and back to start on up-scroll across all screens
-      const tween = gsap.to(track, {
-        x: () => -getMaxScroll(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.5,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            setScrollProgress(self.progress);
-            const index = Math.min(
-              Math.floor(self.progress * milestones.length),
-              milestones.length - 1
-            );
-            setActiveIndex(Math.max(0, index));
-          },
-        },
-      });
-
-      return () => {
-        tween.kill();
-      };
-    },
-    { scope: containerRef }
-  );
+  const mobileReveal = useRowReveal(milestones.length);
+  const desktopReveal = useRowReveal(milestones.length);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative bg-[#f8f3eb] text-stone-800 border-t border-b border-secondary/15 h-[220vh] md:h-[260vh]"
-    >
-      {/* Sticky Viewport Frame */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between py-4 sm:py-6 md:py-8 overflow-hidden bg-[#f8f3eb]">
-        {/* Top Progress Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-[#6b1e30]/15 z-30">
-          <div
-            className="h-full bg-gradient-to-r from-[#6b1e30] via-[#c69c40] to-[#07402b] transition-all duration-75 origin-left"
-            style={{ width: `${Math.min(100, Math.max(0, scrollProgress * 100))}%` }}
-          />
-        </div>
+    <section className="relative bg-[#fdf8f3] text-stone-900 border-t border-b border-[#c69c40]/20 py-12 sm:py-16 lg:py-20 overflow-hidden">
+      <div className="absolute top-0 right-0 -mt-16 -mr-16 w-72 h-72 bg-[#c69c40]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-72 h-72 bg-[#6b1e30]/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Section Header */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 z-20">
-          <div className="text-left">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[#6b1e30]">
-              Our History &amp; Growth
-            </span>
-            <h3 className="mt-0.5 font-serif text-2xl sm:text-4xl lg:text-5xl text-brand-green font-semibold leading-tight">
-              Our Journey &amp; <span className="text-[#6b1e30] italic font-medium">Milestones</span>
-            </h3>
-            <div className="text-[#6b1e30] mt-1.5 w-20 sm:w-24 opacity-70">
-              <SquiggleDivider />
-            </div>
+      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header - Minimum Gap to Timeline (mb-2 sm:mb-3 lg:mb-4) */}
+        <div className="text-center flex flex-col items-center justify-center mb-2 sm:mb-3 lg:mb-4">
+          <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-[0.25em] text-[#6b1e30] mb-2">
+            Our history &amp; legacy
+          </span>
+          <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#07402b] font-semibold leading-tight tracking-tight">
+            Our journey &amp; <span className="text-[#6b1e30] italic font-normal">milestones</span>
+          </h3>
+          <div className="mt-3 w-full max-w-[220px]">
+            <OrnamentDivider />
           </div>
         </div>
 
-        {/* HORIZONTAL TIMELINE TRACK FOR ALL SCREEN SIZES (MOBILE & DESKTOP) */}
-        <div className="w-full overflow-hidden my-auto py-1 sm:py-2 z-10 relative">
+        {/* ============================== MOBILE / TABLET — vertical (below lg) ============================== */}
+        <div className="lg:hidden relative max-w-2xl mx-auto">
           <div
-            ref={trackRef}
-            className="relative flex items-center gap-4 sm:gap-6 lg:gap-8 px-4 sm:px-8 md:px-16 w-max min-h-[460px] sm:min-h-[520px] md:min-h-[560px] will-change-transform"
-          >
-            {/* Single Continuous Horizontal Center Axis Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-[2.5px] bg-[#6b1e30]/30 -translate-y-1/2 z-0 pointer-events-none" />
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-2 bottom-2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-[#c69c40] to-transparent opacity-70"
+          />
+          <div className="flex flex-col">
+            {milestones.map((item, idx) => {
+              const imageOnLeft = idx % 2 === 0;
+              const filled = idx % 2 === 0;
+              const isVisible = mobileReveal.visible.has(idx);
 
-            {milestones.map((item) => (
-              <div
-                key={item.year}
-                className="relative w-[250px] sm:w-[290px] md:w-[320px] lg:w-[340px] xl:w-[360px] shrink-0 h-[460px] sm:h-[520px] md:h-[560px] flex flex-col justify-between items-center text-center px-1 z-10"
-              >
-                {/* Continuous Vertical Dashed Connector Line */}
-                <div className="absolute top-10 sm:top-14 bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 w-[2px] border-l-2 border-dashed border-[#6b1e30]/40 z-0 pointer-events-none" />
+              const image = (
+                <ImageFrame
+                  item={item}
+                  flip={!imageOnLeft}
+                  aspectClass="aspect-[4/5] sm:aspect-[4/3]"
+                  frameClass="rounded-[8px]"
+                  roundClass="rounded-tl-[8px] rounded-br-[8px] rounded-tr-[44px] rounded-bl-[44px]"
+                  sizes="(max-width: 640px) 45vw, 380px"
+                />
+              );
+              const story = (
+                <StoryContent
+                  item={item}
+                  ghostClass="-top-3 sm:-top-6 -left-1 text-[46px] sm:text-[72px]"
+                  titleClass="text-lg sm:text-2xl"
+                  bodyClass="text-[12px] sm:text-sm"
+                  tagClass="text-[9px] sm:text-[11px] tracking-[0.18em]"
+                />
+              );
 
-                {/* Center Node Dot strictly on cross-section */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center">
-                  <div
-                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full ${item.isTopImage ? "bg-[#6b1e30]" : "bg-[#c69c40]"} border-3 sm:border-4 border-[#f8f3eb] shadow-md flex items-center justify-center transition-transform hover:scale-125`}
-                  >
-                    <div
-                      className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${item.isTopImage ? "bg-brand-gold" : "bg-[#07402b]"}`}
+              return (
+                <div
+                  key={item.year}
+                  ref={(el) => { mobileReveal.nodeRefs.current[idx] = el; }}
+                  className={`grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 sm:gap-x-8 py-7 sm:py-12 motion-safe:transition-all motion-safe:duration-700 motion-safe:ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                    }`}
+                >
+                  <div className="w-full">{imageOnLeft ? image : story}</div>
+                  <div className="relative z-10 w-9 sm:w-12 aspect-square">
+                    <YearSeal year={item.year} filled={filled} />
+                  </div>
+                  <div className="w-full">{imageOnLeft ? story : image}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ============================== DESKTOP — horizontal (lg and up) ============================== */}
+        <div className="hidden lg:block relative">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-2 right-2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-[#c69c40] to-transparent opacity-70"
+          />
+          <div className="grid grid-cols-7 gap-3 xl:gap-6 relative z-10 min-h-[560px] items-stretch">
+            {milestones.map((item, idx) => {
+              const imageOnTop = idx % 2 === 0;
+              const filled = idx % 2 === 0;
+              const isVisible = desktopReveal.visible.has(idx);
+
+              const image = (
+                <ImageFrame
+                  item={item}
+                  flip={!imageOnTop}
+                  aspectClass="aspect-[4/3]"
+                  frameClass="rounded-[6px]"
+                  roundClass="rounded-tl-[6px] rounded-br-[6px] rounded-tr-[28px] rounded-bl-[28px]"
+                  sizes="(max-width: 1280px) 13vw, 190px"
+                />
+              );
+              const story = (
+                <StoryContent
+                  item={item}
+                  ghostClass="-top-2 xl:-top-3 -left-0.5 text-[32px] xl:text-[42px]"
+                  titleClass="text-[11px] xl:text-sm"
+                  bodyClass="text-[10px] xl:text-[11px]"
+                  tagClass="text-[8px] xl:text-[9px] tracking-[0.14em]"
+                  maxWidthClass="max-w-none"
+                />
+              );
+
+              return (
+                <div
+                  key={item.year}
+                  ref={(el) => { desktopReveal.nodeRefs.current[idx] = el; }}
+                  className={`flex flex-col items-center h-full motion-safe:transition-all motion-safe:duration-700 motion-safe:ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                    }`}
+                >
+                  <div className="w-full flex-1 flex flex-col justify-end">
+                    {imageOnTop ? image : story}
+                  </div>
+
+                  <div className="flex flex-col items-center shrink-0">
+                    <span
+                      aria-hidden="true"
+                      className="w-px h-4 xl:h-5 bg-gradient-to-b from-[#c69c40]/5 via-[#c69c40] to-[#c69c40]"
+                    />
+                    <div className="relative my-1 z-20 w-10 xl:w-12 aspect-square">
+                      <YearSeal year={item.year} filled={filled} />
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="w-px h-4 xl:h-5 bg-gradient-to-b from-[#c69c40] via-[#c69c40] to-[#c69c40]/5"
                     />
                   </div>
-                </div>
 
-                {/* TOP HALF (Image if top, Text if bottom) */}
-                <div className="relative z-10 h-[210px] sm:h-[240px] lg:h-[265px] flex flex-col justify-end items-center">
-                  {item.isTopImage ? (
-                    <div className="relative group mb-1 sm:mb-2">
-                      <div className={`absolute -top-1.5 -right-1.5 w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full ${item.color} shadow-sm transition-transform duration-500 group-hover:scale-105`} />
-                      <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden border-3 sm:border-4 border-white shadow-xl z-10">
-                        <Image
-                          src={item.image}
-                          alt={`${item.year} - ${item.title}`}
-                          fill
-                          className={`object-cover ${item.imagePosition || "object-center"} group-hover:scale-110 transition-transform duration-700`}
-                          sizes="(max-width: 640px) 130px, 200px"
-                          quality={92}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center max-w-[240px] sm:max-w-[280px] lg:max-w-[310px] pb-2 sm:pb-3 px-1">
-                      <span className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#6b1e30] tracking-tight leading-none mb-1">
-                        {item.year}
-                      </span>
-                      <h4 className="font-bold text-brand-green text-[11px] sm:text-xs lg:text-sm uppercase tracking-wider mb-1 flex items-center gap-1.5 justify-center">
-                        {item.title}
-                      </h4>
-                      {item.tag && (
-                        <div className="mb-1 sm:mb-1.5">
-                          <HighlightTag>{item.tag}</HighlightTag>
-                        </div>
-                      )}
-                      <p className="text-[11px] sm:text-xs lg:text-sm text-stone-600 leading-relaxed font-sans font-normal">
-                        {item.copy}
-                      </p>
-                    </div>
-                  )}
+                  <div className="w-full flex-1 flex flex-col justify-start">
+                    {imageOnTop ? story : image}
+                  </div>
                 </div>
-
-                {/* BOTTOM HALF (Text if top, Image if bottom) */}
-                <div className="relative z-10 h-[210px] sm:h-[240px] lg:h-[265px] flex flex-col justify-start items-center">
-                  {!item.isTopImage ? (
-                    <div className="relative group pt-1 sm:pt-2">
-                      <div className={`absolute -bottom-1.5 -left-1.5 w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full ${item.color} shadow-sm transition-transform duration-500 group-hover:scale-105`} />
-                      <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden border-3 sm:border-4 border-white shadow-xl z-10">
-                        <Image
-                          src={item.image}
-                          alt={`${item.year} - ${item.title}`}
-                          fill
-                          className={`object-cover ${item.imagePosition || "object-center"} group-hover:scale-110 transition-transform duration-700`}
-                          sizes="(max-width: 640px) 130px, 200px"
-                          quality={92}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center max-w-[240px] sm:max-w-[280px] lg:max-w-[310px] pt-2 sm:pt-3 px-1">
-                      <span className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#6b1e30] tracking-tight leading-none mb-1">
-                        {item.year}
-                      </span>
-                      <h4 className="font-bold text-brand-green text-[11px] sm:text-xs lg:text-sm uppercase tracking-wider mb-1 flex items-center gap-1.5 justify-center">
-                        {item.title}
-                      </h4>
-                      {item.tag && (
-                        <div className="mb-1 sm:mb-1.5">
-                          <HighlightTag>{item.tag}</HighlightTag>
-                        </div>
-                      )}
-                      <p className="text-[11px] sm:text-xs lg:text-sm text-stone-600 leading-relaxed font-sans font-normal">
-                        {item.copy}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
-
-        {/* Footer info line */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 w-full flex flex-wrap items-center justify-between gap-2 z-20 text-[10px] sm:text-[11px] font-mono text-stone-800 font-bold border-t border-stone-300/80 pt-2.5">
-          <span className="text-stone-900 font-extrabold uppercase tracking-wider">FLAVOUR &amp; CO. ARCHIVE</span>
-
-          {/* Active Milestone Counter */}
-          <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono text-stone-800">
-            <span className="text-[#6b1e30] font-serif text-sm sm:text-base font-bold">
-              {milestones[activeIndex]?.year}
-            </span>
-            <span className="text-stone-400">/</span>
-            <span>
-              {String(activeIndex + 1).padStart(2, "0")} OF {String(milestones.length).padStart(2, "0")}
-            </span>
-            <div className="flex items-center gap-1 pl-2 sm:pl-3 border-l border-stone-400 text-stone-800 text-[10px] sm:text-[11px] tracking-wider uppercase font-sans font-bold">
-              <span>Scroll down</span>
-              <span className="animate-bounce text-[#6b1e30]">↓</span>
-            </div>
-          </div>
-
-          <span className="text-stone-900 font-extrabold tracking-wider">2018 — 2026</span>
         </div>
       </div>
     </section>
