@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import { media } from "@/lib/media";
 
@@ -129,7 +129,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Legal & Policy Pages */}
+          {/* Column 4: Legal & Policy Pages & Contact Info */}
           <div>
             <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
               Legal &amp; Policy
@@ -145,6 +145,24 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+            </ul>
+
+            <h4 className="mt-6 text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
+              Get in Touch
+            </h4>
+            <ul className="mt-3 space-y-2.5 text-xs opacity-80">
+              <li className="flex items-center gap-2">
+                <Mail className="h-3.5 w-3.5 text-secondary shrink-0" />
+                <a href="mailto:help@flavourandco.com.au" className="hover:underline hover:opacity-100 transition-opacity">
+                  help@flavourandco.com.au
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-3.5 w-3.5 text-secondary shrink-0" />
+                <a href="tel:+61423092989" className="hover:underline hover:opacity-100 transition-opacity">
+                  +61 423 092 989
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -215,6 +233,24 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
+              </ul>
+
+              <h4 className="mt-6 text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
+                Get in Touch
+              </h4>
+              <ul className="mt-3 space-y-2.5 text-xs opacity-80">
+                <li className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-secondary shrink-0" />
+                  <a href="mailto:help@flavourandco.com.au" className="hover:underline hover:opacity-100 transition-opacity">
+                    help@flavourandco.com.au
+                  </a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-secondary shrink-0" />
+                  <a href="tel:+61423092989" className="hover:underline hover:opacity-100 transition-opacity">
+                    +61 423 092 989
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
