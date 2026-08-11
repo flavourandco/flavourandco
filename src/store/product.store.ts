@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Product } from "@/lib/types";
 import { sortProductsByCustomOrder } from "@/lib/utils";
+import { subscribeToRealtimeUpdates } from "@/lib/realtime";
 
 interface ProductState {
   products: Product[];
@@ -42,15 +43,15 @@ export const useProductStore = create<ProductState>()(
         const { products, lastFetchedAt, isFetching } = get();
         const FIVE_MINUTES = 5 * 60 * 1000;
 
-        // Skip if already fetching or fetched recently unless force or store is empty
-        if (isFetching) return;
+        if (isFetching && !force) return;
         if (!force && products.length > 0 && lastFetchedAt && Date.now() - lastFetchedAt < FIVE_MINUTES) {
           return;
         }
 
         set({ isFetching: true });
         try {
-          const res = await fetch("/api/products");
+          const url = force ? `/api/products?t=${Date.now()}` : "/api/products";
+          const res = await fetch(url, { cache: "no-store" });
           if (res.ok) {
             const resData = await res.json();
             const items = Array.isArray(resData) ? resData : (Array.isArray(resData?.data) ? resData.data : []);
@@ -108,3 +109,12 @@ export const useProductStore = create<ProductState>()(
     }
   )
 );
+
+// Subscribe to real-time broadcasts in browser
+if (typeof window !== "undefined") {
+  subscribeToRealtimeUpdates((type) => {
+    if (type === "products") {
+      useProductStore.getState().fetchProducts(true);
+    }
+  });
+}

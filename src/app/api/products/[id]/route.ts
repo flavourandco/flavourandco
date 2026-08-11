@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { requireAdminApi } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(
   request: Request,
@@ -18,7 +22,10 @@ export async function GET(
           .single();
 
         if (!error && data) {
-          return NextResponse.json({ success: true, data });
+          return NextResponse.json(
+            { success: true, data },
+            { headers: { "Cache-Control": "no-store, max-age=0" } }
+          );
         }
       }
     }
@@ -44,29 +51,43 @@ export async function PUT(
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
       if (supabase) {
+        const updatePayload = {
+          name: body.name,
+          tagline: body.tagline || "",
+          short_description: body.shortDescription || "",
+          description: body.description || "",
+          why_stand_out: Array.isArray(body.whyStandOut) ? body.whyStandOut : [],
+          product_details: Array.isArray(body.productDetails) ? body.productDetails : [],
+          pack_info: body.packInfo || "Pack of 12",
+          price: Number(body.price),
+          image: body.image,
+          images: Array.isArray(body.images) && body.images.length > 0 ? body.images : [body.image],
+          badge: body.badge || null,
+          category: body.category || "frozen",
+          variants: Array.isArray(body.variants) ? body.variants : [],
+          preparation_options: Array.isArray(body.preparationOptions) ? body.preparationOptions : [],
+          is_featured: Boolean(body.isFeatured),
+          is_best_seller: Boolean(body.isBestSeller),
+          is_new_arrival: Boolean(body.isNewArrival),
+          updated_at: new Date().toISOString(),
+        };
+
         const { data, error } = await supabase
           .from("products")
-          .update({
-            name: body.name,
-            tagline: body.tagline,
-            short_description: body.shortDescription,
-            description: body.description,
-            pack_info: body.packInfo,
-            price: Number(body.price),
-            image: body.image,
-            images: body.images,
-            badge: body.badge,
-            category: body.category,
-            is_featured: body.isFeatured,
-            is_best_seller: body.isBestSeller,
-            is_new_arrival: body.isNewArrival,
-          })
+          .update(updatePayload)
           .eq("id", id)
           .select();
 
         if (error) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
+
+        // Revalidate route caches
+        revalidatePath("/api/products");
+        revalidatePath(`/api/products/${id}`);
+        revalidatePath("/shop");
+        revalidatePath(`/shop/${body.category || "frozen"}/${id}`);
+        revalidatePath("/");
 
         return NextResponse.json({ success: true, data });
       }
@@ -96,6 +117,10 @@ export async function DELETE(
         if (error) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
+
+        revalidatePath("/api/products");
+        revalidatePath("/shop");
+        revalidatePath("/");
       }
     }
 

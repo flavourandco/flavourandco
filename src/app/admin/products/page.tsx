@@ -9,6 +9,10 @@ import { useUIStore } from "@/store/ui.store";
 import { formatCustomerError } from "@/lib/error-formatter";
 import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { MediaUploader } from "@/components/ui/MediaUploader";
+import { useStagedMedia } from "@/hooks/useStagedMedia";
+import { RefreshCw } from "lucide-react";
+import { notifyContentUpdated } from "@/lib/realtime";
 
 type TabType = "basic" | "media" | "variants" | "highlights" | "flags";
 
@@ -18,6 +22,8 @@ export default function AdminProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
+  const stagedMedia = useStagedMedia({ multiple: true, maxFiles: 10 });
+
   const setStoreProducts = useProductStore((s) => s.setProducts);
   const addToast = useUIStore((s) => s.addToast);
 
@@ -26,6 +32,7 @@ export default function AdminProductsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("basic");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Confirmation Modals State
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
@@ -64,7 +71,7 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setProducts(json.data);
@@ -85,6 +92,7 @@ export default function AdminProductsPage() {
     setEditingProduct(null);
     setViewingProduct(null);
     setActiveTab("basic");
+    stagedMedia.setInitialMedia([]);
     setFormData({
       id: "",
       name: "",
@@ -116,6 +124,8 @@ export default function AdminProductsPage() {
   const handleOpenEdit = (product: Product) => {
     setEditingProduct(product);
     setActiveTab("basic");
+    const existingImgs = product.images && product.images.length > 0 ? product.images : [product.image];
+    stagedMedia.setInitialMedia(existingImgs);
     setFormData({
       id: product.id,
       name: product.name,
@@ -127,7 +137,7 @@ export default function AdminProductsPage() {
       packInfo: product.packInfo,
       badge: product.badge || "",
       image: product.image,
-      images: product.images && product.images.length > 0 ? product.images : [product.image],
+      images: existingImgs,
       variants: product.variants || [],
       preparationOptions: product.preparationOptions || [],
       whyStandOut: product.whyStandOut || [],
@@ -162,6 +172,8 @@ export default function AdminProductsPage() {
           setStoreProducts(updated);
           return updated;
         });
+        useProductStore.getState().fetchProducts(true);
+        notifyContentUpdated("products");
         addToast("Product deleted successfully.", "info");
       } else {
         addToast(formatCustomerError(json.error), "error");
@@ -173,16 +185,39 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
+      let finalImages: string[] = formData.images;
+
+      // Publish staged local media to Cloudinary before saving database record
+      if (stagedMedia.hasLocalFiles) {
+        const { urls } = await stagedMedia.publishMedia();
+        finalImages = urls;
+      } else if (stagedMedia.stagedItems.length > 0) {
+        finalImages = stagedMedia.stagedItems
+          .map((item) => (item.source === "remote" ? item.url : ""))
+          .filter(Boolean);
+      }
+
+      const primaryImage = finalImages[0] || formData.image || "https://example.com/image.jpg";
+
+      const payload = {
+        ...formData,
+        image: primaryImage,
+        images: finalImages.length > 0 ? finalImages : [primaryImage],
+      };
+
       if (editingProduct) {
         const res = await fetch(`/api/products/${editingProduct.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         const json = await res.json();
         if (json.success) {
           setIsEditModalOpen(false);
+          await useProductStore.getState().fetchProducts(true);
+          notifyContentUpdated("products");
           fetchProducts();
           addToast("Product updated successfully!", "success");
         } else {
@@ -192,11 +227,13 @@ export default function AdminProductsPage() {
         const res = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         const json = await res.json();
         if (json.success) {
           setIsEditModalOpen(false);
+          await useProductStore.getState().fetchProducts(true);
+          notifyContentUpdated("products");
           fetchProducts();
           addToast("New product created successfully!", "success");
         } else {
@@ -205,6 +242,8 @@ export default function AdminProductsPage() {
       }
     } catch (err) {
       addToast(formatCustomerError(err), "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -385,7 +424,7 @@ export default function AdminProductsPage() {
       {/* READ-ONLY VIEW MODAL (FIXED BIGGER SHAPE & STABLE RECTANGLE) */}
       {viewingProduct && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
-          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+          <div className="bg-white w-full max-w-5xl xl:max-w-6xl w-[95vw] h-[85vh] sm:h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
             {/* View Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
               <div>
@@ -480,7 +519,7 @@ export default function AdminProductsPage() {
       {/* ADD & EDIT PANEL (FIXED BIGGER SHAPE & STABLE UI FOR TABS) */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
-          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+          <div className="bg-white w-full max-w-5xl xl:max-w-6xl w-[95vw] h-[85vh] sm:h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
             
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80 shrink-0">
@@ -607,16 +646,15 @@ export default function AdminProductsPage() {
 
                 {activeTab === "media" && (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">* Primary Image URL / Path</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.image}
-                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-mono"
-                      />
-                    </div>
+                    <label className="block text-xs font-bold text-slate-700">Product Media Gallery</label>
+                    <MediaUploader
+                      stagedMedia={stagedMedia}
+                      multiple={true}
+                      maxFiles={10}
+                      label="Upload Product Images"
+                      helperText="Local preview displayed immediately in 4:3 aspect ratio matching product view. Multiple images supported per product."
+                      aspectRatioClassName="aspect-[4/3] w-full"
+                    />
                   </div>
                 )}
 
@@ -638,14 +676,14 @@ export default function AdminProductsPage() {
                         placeholder="Price"
                         className="w-28 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm"
                       />
-                      <button type="button" onClick={addVariant} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm">Add</button>
+                      <button type="button" onClick={addVariant} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm cursor-pointer hover:bg-black transition-colors">Add</button>
                     </div>
 
                     <div className="space-y-1.5 pt-2">
                       {formData.variants.map((v, i) => (
                         <div key={i} className="flex items-center justify-between p-2 bg-slate-50 border border-slate-200 rounded-sm text-xs">
                           <span className="font-bold text-slate-800">{v.name} — ${v.price.toFixed(2)}</span>
-                          <button type="button" onClick={() => removeVariant(v.name)} className="text-rose-600 font-bold hover:underline">Remove</button>
+                          <button type="button" onClick={() => removeVariant(v.name)} className="text-rose-600 font-bold hover:underline cursor-pointer">Remove</button>
                         </div>
                       ))}
                     </div>
@@ -659,7 +697,7 @@ export default function AdminProductsPage() {
                       <input type="text" value={newWhyTitle} onChange={(e) => setNewWhyTitle(e.target.value)} placeholder="Highlight Title" className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm" />
                       <input type="text" value={newWhyDesc} onChange={(e) => setNewWhyDesc(e.target.value)} placeholder="Description Text" className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm" />
                     </div>
-                    <button type="button" onClick={addWhyPoint} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm">Add Highlight</button>
+                    <button type="button" onClick={addWhyPoint} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm cursor-pointer hover:bg-black transition-colors">Add Highlight</button>
 
                     <div className="space-y-2 pt-2">
                       {formData.whyStandOut.map((pt, i) => (
@@ -668,7 +706,7 @@ export default function AdminProductsPage() {
                             <p className="font-bold text-slate-900">{pt.title}</p>
                             <p className="text-slate-600 text-[11px]">{pt.text}</p>
                           </div>
-                          <button type="button" onClick={() => removeWhyPoint(i)} className="text-rose-600 font-bold text-xs hover:underline">Remove</button>
+                          <button type="button" onClick={() => removeWhyPoint(i)} className="text-rose-600 font-bold text-xs hover:underline cursor-pointer">Remove</button>
                         </div>
                       ))}
                     </div>
@@ -699,16 +737,27 @@ export default function AdminProductsPage() {
               <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0">
                 <button
                   type="button"
+                  disabled={isSubmitting || stagedMedia.isUploading}
                   onClick={handleAttemptCloseEdit}
-                  className="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm transition-colors cursor-pointer shadow-xs"
+                  disabled={isSubmitting || stagedMedia.isUploading}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs disabled:opacity-75 transition-all"
                 >
-                  {editingProduct ? "Save Changes" : "Create Product"}
+                  {isSubmitting || stagedMedia.isUploading ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                      <span>{stagedMedia.isUploading ? "Uploading Media..." : "Saving Product..."}</span>
+                    </>
+                  ) : editingProduct ? (
+                    "Save Changes"
+                  ) : (
+                    "Create Product"
+                  )}
                 </button>
               </div>
             </form>

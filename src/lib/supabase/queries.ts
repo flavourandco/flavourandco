@@ -81,6 +81,7 @@ export async function getBlogsServer(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from("blogs")
     .select("*")
+    .eq("published", true)
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
@@ -114,6 +115,7 @@ export async function getBlogBySlugServer(slug: string): Promise<BlogPost | null
     .single();
 
   if (error || !data) return null;
+  if (data.published === false) return null;
 
   return {
     id: data.id,

@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { BlogSchema } from "@/lib/validations/blog";
 import { requireAdminApi } from "@/lib/auth";
 import type { BlogPost } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -31,12 +35,15 @@ export async function GET() {
             published: item.published ?? true,
           }));
 
-          return NextResponse.json({ success: true, data: formattedBlogs });
+          return NextResponse.json(
+            { success: true, data: formattedBlogs },
+            { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+          );
         }
       }
     }
 
-    return NextResponse.json({ success: true, data: [] });
+    return NextResponse.json({ success: true, data: [] }, { headers: { "Cache-Control": "no-store" } });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json(
@@ -47,54 +54,66 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { error: authErr } = await requireAdminApi();
-  if (authErr) return authErr;
+  const { error: authError } = await requireAdminApi();
+  if (authError) return authError;
 
   try {
     const body = await request.json();
     const validated = BlogSchema.parse(body);
 
-    const id = validated.id || `blog-${validated.slug || Date.now()}`;
-
-    const blogRecord = {
-      id,
-      slug: validated.slug,
+    const newBlog: BlogPost = {
+      id: body.id || `blog-${Date.now()}`,
+      slug: validated.slug || validated.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
       title: validated.title,
-      excerpt: validated.excerpt,
+      excerpt: validated.excerpt || "",
       content: validated.content,
-      writer: validated.writer,
-      date: validated.date,
-      read_time: validated.readTime,
-      category: validated.category,
+      writer: validated.writer || "Simran Gulati",
+      date: validated.date || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      readTime: validated.readTime || "3 min read",
+      category: validated.category || "General",
       image: validated.image,
-      image2: validated.image2 || null,
-      author_avatar: validated.authorAvatar || null,
+      image2: validated.image2 || undefined,
+      authorAvatar: validated.authorAvatar || undefined,
       published: validated.published ?? true,
     };
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
       if (supabase) {
-        const { data, error } = await supabase
-          .from("blogs")
-          .insert([blogRecord])
-          .select()
-          .single();
+        const { error: dbError } = await supabase.from("blogs").insert([
+          {
+            id: newBlog.id,
+            slug: newBlog.slug,
+            title: newBlog.title,
+            excerpt: newBlog.excerpt,
+            content: newBlog.content,
+            writer: newBlog.writer,
+            date: newBlog.date,
+            read_time: newBlog.readTime,
+            category: newBlog.category,
+            image: newBlog.image,
+            image2: newBlog.image2 || null,
+            author_avatar: newBlog.authorAvatar || null,
+            published: newBlog.published,
+          },
+        ]);
 
-        if (error) {
-          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+        if (dbError) {
+          return NextResponse.json({ success: false, error: dbError.message }, { status: 400 });
         }
 
-        return NextResponse.json({ success: true, data }, { status: 201 });
+        revalidatePath("/api/blogs");
+        revalidatePath("/blog");
+        revalidatePath(`/blog/${newBlog.slug}`);
       }
     }
 
-    return NextResponse.json({ success: true, data: blogRecord }, { status: 201 });
+    return NextResponse.json({ success: true, data: newBlog }, { status: 201 });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to create blog" },
-      { status: 400 }
+      { success: false, error: error.message || "Failed to create blog article" },
+      { status: 500 }
     );
   }
 }

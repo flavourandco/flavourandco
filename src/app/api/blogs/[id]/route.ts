@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { requireAdminApi } from "@/lib/auth";
 import { BlogSchema } from "@/lib/validations/blog";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(
   request: Request,
@@ -19,7 +23,10 @@ export async function GET(
           .single();
 
         if (!error && data) {
-          return NextResponse.json({ success: true, data });
+          return NextResponse.json(
+            { success: true, data },
+            { headers: { "Cache-Control": "no-store, max-age=0" } }
+          );
         }
       }
     }
@@ -73,6 +80,11 @@ export async function PUT(
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
+        revalidatePath("/api/blogs");
+        revalidatePath(`/api/blogs/${id}`);
+        revalidatePath("/blog");
+        if (validated.slug) revalidatePath(`/blog/${validated.slug}`);
+
         return NextResponse.json({ success: true, data });
       }
     }
@@ -101,6 +113,9 @@ export async function DELETE(
         if (error) {
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
+
+        revalidatePath("/api/blogs");
+        revalidatePath("/blog");
       }
     }
 

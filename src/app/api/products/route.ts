@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { Product } from "@/lib/types";
 import { requireAdminApi } from "@/lib/auth";
 import { sortProductsByCustomOrder } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -37,12 +41,15 @@ export async function GET() {
             isNewArrival: Boolean(item.is_new_arrival),
           }));
 
-          return NextResponse.json({ success: true, data: sortProductsByCustomOrder(formattedProducts) });
+          return NextResponse.json(
+            { success: true, data: sortProductsByCustomOrder(formattedProducts) },
+            { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+          );
         }
       }
     }
 
-    return NextResponse.json({ success: true, data: [] });
+    return NextResponse.json({ success: true, data: [] }, { headers: { "Cache-Control": "no-store" } });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json(
@@ -59,7 +66,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Input validation & sanitization (protect against vulnerabilities)
     const {
       name,
       tagline,
@@ -97,10 +103,10 @@ export async function POST(request: Request) {
       packInfo: packInfo ? packInfo.trim() : "Pack of 12",
       price: Number(price),
       image: image || "/products/butter-chicken-pie.png",
-      images: Array.isArray(images) && images.length >= 2 ? (images as [string, string]) : [image || "/products/butter-chicken-pie.png", image || "/products/butter-chicken-pie.png"],
+      images: Array.isArray(images) && images.length > 0 ? images : [image || "/products/butter-chicken-pie.png"],
       badge: badge ? badge.trim() : undefined,
       category: category || "frozen",
-      variants: Array.isArray(body.variants) ? body.variants : [{ name: packInfo || "Pack of 12", price: Number(price) }],
+      variants: Array.isArray(body.variants) && body.variants.length > 0 ? body.variants : [{ name: packInfo || "Pack of 12", price: Number(price) }],
       preparationOptions: Array.isArray(body.preparationOptions) ? body.preparationOptions : [],
       isFeatured: Boolean(isFeatured),
       isBestSeller: Boolean(isBestSeller),
@@ -110,7 +116,7 @@ export async function POST(request: Request) {
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
       if (supabase) {
-        const { error } = await supabase.from("products").insert([
+        const { error: dbError } = await supabase.from("products").insert([
           {
             id: newProduct.id,
             name: newProduct.name,
@@ -133,9 +139,13 @@ export async function POST(request: Request) {
           },
         ]);
 
-        if (error) {
-          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+        if (dbError) {
+          return NextResponse.json({ success: false, error: dbError.message }, { status: 400 });
         }
+
+        revalidatePath("/api/products");
+        revalidatePath("/shop");
+        revalidatePath("/");
       }
     }
 

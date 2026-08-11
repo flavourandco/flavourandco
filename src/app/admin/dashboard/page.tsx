@@ -140,14 +140,14 @@ export default function AdminDashboardPage() {
           {/* Card 3: Registered Users */}
           <div className="bg-white rounded-sm p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Registered Users</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Registered Customers</span>
               <div className="w-7 h-7 rounded-sm bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/60">
                 <Users className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-                {stats ? stats.todaysUsers : 0} Users
+                {stats ? stats.todaysUsers : 0} Customers
               </h3>
               <span className="text-[11px] font-medium text-purple-600 block mt-1">
                 Synced via Clerk &amp; DB
@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
         <div className="bg-white rounded-sm border border-slate-200/80 p-5 space-y-4 shadow-2xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Registered Users</h2>
+              <h2 className="text-sm font-bold text-slate-900">Registered Customers</h2>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">Live accounts synced from Clerk</p>
             </div>
             <a href="/admin/users" className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors">

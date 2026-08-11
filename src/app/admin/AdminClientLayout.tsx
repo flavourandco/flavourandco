@@ -38,7 +38,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
 
   const navItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Users", href: "/admin/users", icon: Users },
+    { label: "Customers", href: "/admin/users", icon: Users },
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
     { label: "Wholesale", href: "/admin/wholesale", icon: FileSpreadsheet },

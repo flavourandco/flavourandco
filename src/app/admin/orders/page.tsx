@@ -428,7 +428,7 @@ export default function AdminOrdersPage() {
                 onClick={() => setSelectedOrder(null)}
                 className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
               >
-                Close Window
+                Close
               </button>
             </div>
 

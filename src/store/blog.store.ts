@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { BlogPost } from "@/lib/types";
+import { subscribeToRealtimeUpdates } from "@/lib/realtime";
 
 interface BlogState {
   posts: BlogPost[];
@@ -45,14 +46,15 @@ export const useBlogStore = create<BlogState>()(
         const { posts, lastFetchedAt, isFetching } = get();
         const TEN_MINUTES = 10 * 60 * 1000;
 
-        if (isFetching) return;
+        if (isFetching && !force) return;
         if (!force && posts.length > 0 && lastFetchedAt && Date.now() - lastFetchedAt < TEN_MINUTES) {
           return;
         }
 
         set({ isFetching: true });
         try {
-          const res = await fetch("/api/blogs");
+          const url = force ? `/api/blogs?t=${Date.now()}` : "/api/blogs";
+          const res = await fetch(url, { cache: "no-store" });
           if (res.ok) {
             const resData = await res.json();
             const items = Array.isArray(resData) ? resData : (Array.isArray(resData?.data) ? resData.data : []);
@@ -67,7 +69,8 @@ export const useBlogStore = create<BlogState>()(
 
       getFilteredPosts: () => {
         const { posts, searchQuery, selectedCategory } = get();
-        let filtered = [...posts];
+        // Filter out draft posts for public website views
+        let filtered = posts.filter((p) => p.published !== false);
 
         if (selectedCategory && selectedCategory !== "all") {
           filtered = filtered.filter((p) => p.category === selectedCategory);
@@ -109,3 +112,12 @@ export const useBlogStore = create<BlogState>()(
     }
   )
 );
+
+// Subscribe to real-time broadcasts in browser
+if (typeof window !== "undefined") {
+  subscribeToRealtimeUpdates((type) => {
+    if (type === "blogs") {
+      useBlogStore.getState().fetchBlogs(true);
+    }
+  });
+}
