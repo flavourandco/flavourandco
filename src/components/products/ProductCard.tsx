@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Heart } from "lucide-react";
+import { Star, Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";
+
 import Button from "@/components/ui/Button";
 
 interface ProductCardProps {
@@ -13,8 +14,6 @@ interface ProductCardProps {
   isWishlisted?: boolean;
   onToggleWishlist?: () => void;
 }
-
-const GARNET = "#6b1e30";
 
 export default function ProductCard({
   product,
@@ -42,83 +41,100 @@ export default function ProductCard({
     .replace(/(^-|-$)+/g, "");
   const detailUrl = `/shop/${slug}/${product.id}`;
 
+  const image1 = product.images?.[0] || product.image;
+  const image2 = product.images?.[1] || image1;
+
   return (
-    <article className="product-card relative flex flex-col justify-between overflow-hidden bg-white rounded-lg border border-[#c69c40]/40 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+    <article className="product-card group relative flex flex-col justify-between overflow-hidden bg-white rounded-sm border border-[#c69c40]/25 shadow-xs hover:shadow-xl hover:border-[#c69c40]/50 hover:-translate-y-1 transition-all duration-500 ease-out h-full">
 
       {/* Image Area (Clickable Link to detail page) */}
-      <div className="group relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-b from-[#6b1e30]/20 to-[#6b1e30]/5 block">
-        <Link href={detailUrl} className="absolute inset-0 z-0">
-          {/* Normal image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#faf6f0] block">
+        <Link href={detailUrl} className="absolute inset-0 z-0 block">
+          {/* Primary image */}
           <Image
-            src={product.images[0]}
+            src={image1}
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
-          {/* Hover image */}
-          <Image
-            src={product.images[1]}
-            alt={`${product.name} hover view`}
-            fill
-            className="object-cover absolute inset-0 opacity-0 scale-95 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:scale-100"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
+          {/* Secondary / Hover image */}
+          {image2 !== image1 && (
+            <Image
+              src={image2}
+              alt={`${product.name} alternate view`}
+              fill
+              className="object-cover absolute inset-0 opacity-0 scale-95 transition-all duration-700 ease-out group-hover:opacity-100 group-hover:scale-100"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          )}
+          {/* Soft vignette overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-300" />
         </Link>
 
-        {/* Bold Badge for Shop */}
+        {/* Badge */}
         {showBadge && (product.badge || product.isBestSeller || product.isNewArrival) && (
-          <span className="hidden sm:block absolute top-3 left-3 text-[10px] font-sans font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3.5 py-1.5 rounded-full border border-[#c69c40]/40 shadow-md z-10 pointer-events-none">
-            {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
-          </span>
+          <div className="absolute top-3 left-3 z-10 pointer-events-none">
+            <span className="inline-flex items-center text-[9px] font-sans font-extrabold uppercase tracking-[0.18em] text-white bg-[#6b1e30]/95 backdrop-blur-md px-2.5 py-1 rounded-sm border border-[#E3A72B]/40 shadow-xs">
+              {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
+            </span>
+          </div>
         )}
 
-        {/* Floating Wishlist Heart Icon Top-Right of Product Card Image */}
+        {/* Floating Wishlist Heart Icon Top-Right */}
         <button
           type="button"
           onClick={handleWishlistClick}
-          className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white/90 backdrop-blur-xs border border-stone-200/60 shadow-sm hover:bg-white flex items-center justify-center transition-all cursor-pointer"
+          className="absolute top-3 right-3 z-10 h-8 w-8 rounded-sm bg-white/85 backdrop-blur-md border border-white/70 shadow-xs hover:bg-white flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
           aria-label="Wishlist product"
         >
           <Heart
-            className={`h-4 w-4 transition-transform active:scale-90 ${
-              isWishlisted
-                ? "fill-[#6b1e30] text-[#6b1e30]"
-                : "text-stone-600 hover:text-[#6b1e30]"
-            }`}
+            className={`h-4 w-4 transition-colors ${isWishlisted
+              ? "fill-[#6b1e30] text-[#6b1e30]"
+              : "text-stone-600 hover:text-[#6b1e30]"
+              }`}
           />
         </button>
       </div>
 
       {/* Body & Content Area */}
-      <div className="flex flex-col flex-grow p-3 sm:p-5 justify-between bg-white z-10">
+      <div className="flex flex-col flex-grow p-4 sm:p-5 justify-between bg-white z-10">
 
-        {/* Title & Price Information */}
-        <div className="flex flex-col gap-2.5">
-          <Link href={detailUrl} className="block cursor-pointer">
-            <h3 className="font-serif font-extrabold text-base sm:text-lg leading-snug line-clamp-2 h-12 sm:h-14 hover:text-[#c69c40] transition-colors duration-300" style={{ color: GARNET }}>
+        {/* Top Meta Tag & Title */}
+        <div className="flex flex-col gap-1.5">
+          {/* Pack / Serving Meta info */}
+          <div className="flex items-center justify-between text-[10px] font-sans font-bold uppercase tracking-[0.16em] text-[#c69c40]">
+            <span>{product.packInfo || "Artisan Selection"}</span>
+          </div>
+
+          {/* Product Title */}
+          <Link href={detailUrl} className="block cursor-pointer group/title">
+            <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg leading-snug line-clamp-2 h-11 sm:h-13 group-hover/title:text-[#6b1e30] transition-colors duration-300">
               {product.name}
             </h3>
           </Link>
 
-          {/* Price + Rating */}
-          <div className="flex items-end justify-between pt-1">
-            <span className="text-lg sm:text-2xl font-extrabold font-sans tracking-tight leading-none" style={{ color: GARNET }}>
+          {/* Price & Rating */}
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-lg sm:text-xl font-extrabold font-sans tracking-tight text-[#6b1e30] leading-none">
               A${price.toFixed(2)}
             </span>
-            <div className="hidden sm:flex items-center gap-0.5 text-brand-gold">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-3.5 w-3.5 fill-brand-gold text-brand-gold"
-                />
-              ))}
+            <div className="flex items-center gap-1 text-[#E3A72B]">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-3 w-3 fill-[#E3A72B] text-[#E3A72B]"
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] font-sans font-bold text-stone-500">5.0</span>
             </div>
           </div>
         </div>
 
         {/* Bottom CTA Action Button */}
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-4 pt-3 border-t border-stone-100 flex items-center gap-2">
           <Button
             onClick={() => alert(`Added ${product.name} to cart!`)}
             variant="primary"

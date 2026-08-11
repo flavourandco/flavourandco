@@ -12,7 +12,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyle =
-    "group relative overflow-hidden inline-flex items-center justify-center font-serif font-bold uppercase tracking-wider text-center transition-all duration-300 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+    "group relative overflow-hidden inline-flex items-center justify-center font-serif font-bold uppercase tracking-wider text-center transition-all duration-300 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded-sm";
 
   const variantStyles = {
     primary: "bg-[#6b1e30] text-white border border-transparent",
