@@ -481,8 +481,8 @@ export default function HomeNavbar() {
                         <div className="flex-1">
                           <h5 className="text-sm font-bold text-primary">{product.name}</h5>
                           <p className="text-xs opacity-75 line-clamp-1">{product.description}</p>
-                          <span className="text-xs font-bold text-secondary mt-0.5 block">
-                            ${product.price.toFixed(2)} AUD
+                          <span className="text-xs font-bold font-sans tracking-tight text-secondary mt-0.5 block">
+                            A${product.price.toFixed(2)}
                           </span>
                         </div>
                         <ArrowRight className="h-4 w-4 text-secondary shrink-0" />

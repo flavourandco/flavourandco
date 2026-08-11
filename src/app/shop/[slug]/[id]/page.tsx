@@ -304,7 +304,7 @@ export default function ProductDetailPage({
                     Price
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold font-mono text-[#6b1e30]">
+                    <span className="text-3xl font-extrabold font-sans tracking-tight text-[#6b1e30]">
                       A${unitPrice.toFixed(2)}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#07402b] bg-[#07402b]/10 px-2 py-0.5 rounded border border-[#07402b]/20">

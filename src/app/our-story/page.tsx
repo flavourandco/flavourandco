@@ -120,11 +120,11 @@ export default function OurStoryPage() {
                 </p>
 
                 <p>
-                  Raised in a home where recipes were passed down through generations, she developed a deep appreciation for flavour, culture and the moments food creates.
+                  Raised in a home where recipes were passed down through generations, she developed a deep appreciation for the flavour, culture and moments that food creates.
                 </p>
 
                 <p>
-                  Today, as the face of Flavour &amp; Co, Simran brings that heritage into a modern context — reimagining familiar flavours into something refined, approachable and made for how we gather today.
+                  Today, as the face of Flavour &amp; Co, Simran brings that heritage into a modern context — reimagining familiar South Asian flavours into something refined, approachable and made for how we gather today. From pastry through to the newest additions in the range, every product carries that same idea: real, rooted flavour, made effortless to share.
                 </p>
               </div>
             </div>

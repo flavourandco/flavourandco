@@ -103,7 +103,7 @@ export default function ProductCard({
 
           {/* Price + Rating */}
           <div className="flex items-end justify-between pt-1">
-            <span className="text-lg sm:text-2xl font-extrabold font-mono leading-none" style={{ color: GARNET }}>
+            <span className="text-lg sm:text-2xl font-extrabold font-sans tracking-tight leading-none" style={{ color: GARNET }}>
               A${price.toFixed(2)}
             </span>
             <div className="hidden sm:flex items-center gap-0.5 text-brand-gold">

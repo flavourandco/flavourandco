@@ -126,8 +126,7 @@ export default function HomeHero() {
           </svg>
 
           <p className="hero-subtext mt-6 max-w-xl text-sm font-normal leading-relaxed text-[#F2E6D3]/85 sm:text-base">
-            Baking our roots into every pie. Rich, slow-cooked Indian spiced fillings, wrapped
-            in light, multi-layered flaky Australian pastry — made by hand, one crimp at a time.
+            Familiar flavours, reimagined for how we gather today. Rooted in South Asian heritage, made refined and easy to share.
           </p>
 
           <div className="hero-ingredients mt-5 flex items-center flex-nowrap whitespace-nowrap gap-0 font-sans text-[10px] sm:text-[15px] uppercase tracking-widest font-semibold sm:font-bold">
