@@ -146,7 +146,7 @@ body {
 }
 
 .animate-marquee:hover {
-  animation-play-state: paused;
+  animation-duration: 60s !important;
 }
 
 @keyframes fadeIn {

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <!-- Novotel Badge -->
+  <rect x="15" y="16" width="85" height="28" rx="4" fill="#07402b" />
+  <text x="57.5" y="34" font-family="Arial, sans-serif" font-size="13" font-weight="900" fill="#ffffff" letter-spacing="2" text-anchor="middle">NOVOTEL</text>
+  <!-- Text -->
+  <text x="110" y="33" font-family="Arial, sans-serif" font-size="10" font-weight="800" fill="#1c1410" letter-spacing="2">DARLING HARBOUR</text>
+</svg>

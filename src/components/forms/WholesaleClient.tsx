@@ -7,6 +7,7 @@ import { wholesaleBrands, wholesaleTestimonials } from "@/lib/data";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { useUIStore } from "@/store/ui.store";
 import { formatCustomerError } from "@/lib/error-formatter";
+import PartnerLogosStrip from "@/components/home/PartnerLogosStrip";
 
 
 // Hotel & Brand Vector Logos
@@ -200,7 +201,158 @@ export default function WholesaleClient() {
 
 
 
-      {/* 3. Why Work With Us Section (Compact Simran Kitchen Image) */}
+      {/* 2. Partner Logos Strip */}
+      <PartnerLogosStrip />
+
+      {/* 3. WHERE WE'RE ALREADY TRUSTED Section */}
+      <section className="w-full bg-[#fdf8f3] py-16 md:py-20 border-b border-[#ebe3d8]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30]">
+              PROVEN B2B TRACK RECORD
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410]">
+              WHERE WE&apos;RE ALREADY TRUSTED
+            </h2>
+            <p className="text-xs sm:text-sm text-[#1c1410]/75 max-w-2xl mx-auto">
+              Flavour &amp; Co. products are currently on the menu at leading 5-star hotels and catering partners across banquet, buffet, and bar service:
+            </p>
+          </div>
+
+          {/* 5-Star Hotel & Venue Cards Grid */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Card 1 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/fullerton-hotel.svg" alt="The Fullerton Hotel Sydney" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">5-Star Hotel</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">The Fullerton Hotel Sydney</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Banquet pies, breakfast buffet items, and Chicken Tikka Samosas (bar menu).
+                </p>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/hyatt-regency.svg" alt="Hyatt Regency Sydney" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">5-Star Hotel</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Hyatt Regency Sydney</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Event banquet supply, function menu pies, and breakfast items.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/sheraton-grand.svg" alt="Sheraton Grand Sydney Hyde Park" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">5-Star Hotel</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Sheraton Grand Sydney</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Banquet pies and event foodservice supply for Hyde Park venue.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/amora-hotel.svg" alt="Amora Hotel Jamison Sydney" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">5-Star Hotel</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Amora Hotel Jamison</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Pies and gluten-free South Asian breakfast items.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 5 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/novotel.svg" alt="Novotel Sydney Darling Harbour" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">Harbour Venue</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Novotel Sydney</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Canapés for cocktail and function menus at Darling Harbour.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 6 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/parkroyal.svg" alt="PARKROYAL Parramatta" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">5-Star Hotel</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">PARKROYAL Parramatta</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Pies and breakfast items for hotel guests.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 7 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/channel-7.svg" alt="Channel 7 Plate of Origin" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">National TV</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Channel 7</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Featured Simran&apos;s signature recipes on Plate of Origin.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 8 */}
+            <div className="bg-white p-5 rounded-xl border border-[#c69c40]/25 shadow-sm space-y-3 text-left flex flex-col justify-between transition-all hover:border-[#c69c40]/50 hover:shadow-md">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="relative h-6 w-24 shrink-0 opacity-90">
+                    <Image src="/partners/corporate-catering.svg" alt="Corporate Catering Partners" fill className="object-contain object-left" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b1e30] bg-[#6b1e30]/10 px-2 py-0.5 rounded shrink-0">Catering</span>
+                </div>
+                <h3 className="font-serif font-bold text-base text-[#1c1410]">Corporate Catering</h3>
+                <p className="text-xs text-[#1c1410]/75 leading-relaxed mt-1">
+                  Full gourmet pie range, mini canapés, and grazing formats.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Why Work With Us Section (Compact Simran Kitchen Image) */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 items-center">
 
