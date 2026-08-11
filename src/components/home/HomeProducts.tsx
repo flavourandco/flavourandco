@@ -132,7 +132,7 @@ export default function HomeProducts() {
   return (
     <section
       ref={sectionRef}
-      className="bg-base-200 py-24 md:py-32 border-b border-secondary/15 overflow-hidden text-base-content"
+      className="bg-base-200 pt-16 pb-12 sm:pt-20 sm:pb-14 md:pt-24 md:pb-16 border-b border-secondary/15 overflow-hidden text-base-content"
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
         <div className="product-header mx-auto max-w-3xl text-center">
@@ -224,7 +224,7 @@ export default function HomeProducts() {
           )}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-8 sm:mt-10 text-center">
           <Link
             href="/shop"
             className="inline-flex rounded-md border-2 border-primary/30 px-10 py-4 text-[12px] font-bold uppercase tracking-[0.18em] text-primary transition-all hover:bg-primary hover:text-primary-content hover:border-primary"

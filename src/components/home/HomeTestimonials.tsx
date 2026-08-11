@@ -82,9 +82,9 @@ export default function HomeTestimonials() {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-base-100 py-20 md:py-28 border-b border-secondary/15 overflow-hidden text-base-content"
+      className="w-full bg-base-100 pt-12 pb-20 sm:pt-16 sm:pb-24 md:pt-20 md:pb-28 border-b border-secondary/15 overflow-hidden text-base-content"
     >
-      <div className="mx-auto max-w-3xl px-6 text-center mb-14">
+      <div className="mx-auto max-w-3xl px-6 text-center mb-10">
         <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.3em] text-secondary">
           Customer Stories &amp; Reviews
         </p>
