@@ -12,6 +12,7 @@ import AnnouncementBar from "./AnnouncementBar";
 import { useUIStore } from "@/store/ui.store";
 import { useProductStore } from "@/store/product.store";
 import { useAuthStore } from "@/store/auth.store";
+import { useCartStore } from "@/store/cart.store";
 import { BoneyardNavUserSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function HomeNavbar() {
@@ -28,8 +29,18 @@ export default function HomeNavbar() {
 
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const cartItems = useCartStore((s) => s.items);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const totalCartCount = mounted
+    ? cartItems.reduce((acc, item) => acc + item.quantity, 0)
+    : 0;
 
   useEffect(() => {
     fetchProducts();
@@ -129,13 +140,13 @@ export default function HomeNavbar() {
             {/* Right: Cart & Hamburger Menu */}
             <div className="flex items-center gap-0.5 text-primary z-10">
               <Link
-                href="/shop"
+                href="/cart"
                 className="relative p-1.5 hover:text-secondary transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] font-bold text-secondary-content">
-                  0
+                  {totalCartCount}
                 </span>
               </Link>
 
@@ -190,13 +201,13 @@ export default function HomeNavbar() {
               </button>
 
               <Link
-                href="/shop"
+                href="/cart"
                 className="relative p-1.5 text-stone-700 hover:text-brand-green transition-colors"
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute -top-0.5 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-gold text-[9px] font-extrabold text-brand-green shadow-xs">
-                  0
+                  {totalCartCount}
                 </span>
               </Link>
 

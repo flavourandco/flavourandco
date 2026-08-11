@@ -3,6 +3,7 @@
 import { use, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Star,
   Minus,
@@ -20,6 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useProductStore } from "@/store/product.store";
+import { useCartStore } from "@/store/cart.store";
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import ProductReviews from "@/components/products/ProductReviews";
@@ -34,8 +36,11 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const productId = resolvedParams.id;
 
+  const router = useRouter();
   const storeProducts = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const addItem = useCartStore((s) => s.addItem);
+  const clearCart = useCartStore((s) => s.clearCart);
 
   useEffect(() => {
     fetchProducts();
@@ -184,11 +189,9 @@ export default function ProductDetailPage({
                 {/* Add to Cart & Order Now side-by-side */}
                 <div className="flex flex-row gap-3">
                   <Button
-                    onClick={() =>
-                      alert(
-                        `Added ${quantity}x ${product.name} (${activeVariant?.name || "Standard"}) to cart!`
-                      )
-                    }
+                    onClick={() => {
+                      addItem(product, quantity, activeVariant?.name, unitPrice);
+                    }}
                     variant="primary"
                     className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
                   >
@@ -197,11 +200,11 @@ export default function ProductDetailPage({
                   </Button>
 
                   <Button
-                    onClick={() =>
-                      alert(
-                        `Proceeding to checkout with ${quantity}x ${product.name} (${activeVariant?.name || "Standard"})!`
-                      )
-                    }
+                    onClick={() => {
+                      clearCart();
+                      addItem(product, quantity, activeVariant?.name, unitPrice);
+                      router.push("/checkout");
+                    }}
                     variant="secondary"
                     className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
                   >
