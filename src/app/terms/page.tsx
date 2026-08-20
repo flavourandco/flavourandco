@@ -40,7 +40,7 @@ export default function TermsPage() {
               <ShieldAlert className="h-5 w-5" />
             </div>
             <h3 className="font-bold text-primary text-sm">Perishable Goods</h3>
-            <p className="text-xs text-stone-600">Cold-chain delivery policy requiring prompt refrigeration upon receipt.</p>
+            <p className="text-xs text-stone-600">Sydney direct delivery policy requiring prompt refrigeration or freezing upon receipt.</p>
           </div>
         </div>
 
@@ -64,7 +64,7 @@ export default function TermsPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">3. Delivery &amp; Perishable Product Policy</h2>
           <p>
-            Orders are delivered Australia-wide via refrigerated couriers. Due to the perishable nature of handcrafted pies, recipients are responsible for ensuring someone is available to receive or refrigerate items upon arrival.
+            Orders are delivered directly across Australia with temperature-controlled packaging. Customers choose fresh or frozen preferences on the shop page. Due to the perishable nature of handcrafted pies, recipients are responsible for ensuring someone is available to receive or refrigerate/freeze items upon arrival.
           </p>
         </section>
 

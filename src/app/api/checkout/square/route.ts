@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import {
+  calculateShippingFee,
+  isValidAustralianPostcode,
+} from "@/lib/shipping";
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +24,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Validate customer contact and delivery details
+    if (!customer.postcode || !/^\d{4}$/.test(String(customer.postcode).trim())) {
+      return NextResponse.json(
+        { error: "Please enter a valid 4-digit Australian postcode." },
+        { status: 400 }
+      );
+    }
+
     // Calculate subtotal and total in AUD cents for Square
     const subtotal = items.reduce(
       (sum: number, item: { unitPrice: number; quantity: number }) =>
@@ -27,7 +39,7 @@ export async function POST(req: Request) {
       0
     );
 
-    const shippingFee = subtotal >= 200 ? 0 : 15;
+    const shippingFee = calculateShippingFee(subtotal, customer.postcode);
     const totalAmount = subtotal + shippingFee;
     const totalAmountCents = Math.round(totalAmount * 100);
 

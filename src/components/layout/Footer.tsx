@@ -296,7 +296,7 @@ export default function Footer() {
             </div>
 
             <p className="text-[11px] opacity-60">
-              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved. Handcrafted Australia-wide.
+              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved. Delivering fresh &amp; frozen Sydney-wide.
             </p>
           </div>
 
@@ -305,7 +305,7 @@ export default function Footer() {
         {/* Desktop Copyright Bar */}
         <div className="hidden md:flex mt-12 items-center justify-between border-t border-secondary/20 pt-6 text-xs opacity-60">
           <p>&copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved.</p>
-          <p>Handcrafted by Simran • Australia-Wide Delivery</p>
+          <p>Handcrafted by Simran • Fresh &amp; Frozen Sydney Delivery</p>
         </div>
 
       </div>

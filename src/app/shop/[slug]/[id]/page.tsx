@@ -43,7 +43,7 @@ export default function ProductDetailPage({
   const clearCart = useCartStore((s) => s.clearCart);
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(true);
   }, [fetchProducts]);
 
   const product = storeProducts.find((p) => p.id === productId);
@@ -246,7 +246,7 @@ export default function ProductDetailPage({
                 <div className="bg-cream/60 rounded p-3 border border-[#c69c40]/15 space-y-2 text-[11px] text-stone-700">
                   <div className="flex items-center gap-2">
                     <Truck className="h-3.5 w-3.5 text-[#07402b] shrink-0" />
-                    <span><strong>Australia-Wide Delivery</strong></span>
+                    <span><strong>Sydney-Wide Delivery</strong> (Fresh &amp; Frozen)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Flame className="h-3.5 w-3.5 text-[#6b1e30] shrink-0" />

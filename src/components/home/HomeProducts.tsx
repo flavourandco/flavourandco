@@ -27,7 +27,7 @@ export default function HomeProducts() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(true);
   }, [fetchProducts]);
 
   useEffect(() => {

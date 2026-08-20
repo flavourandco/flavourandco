@@ -6,14 +6,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Shipping & Delivery Policy | Flavour & Co.",
   description:
-    "Learn about Flavour & Co's express delivery schedule, cold-chain packaging, and return policy for artisan pies.",
+    "Learn about Flavour & Co's Sydney fresh and frozen delivery schedule, local delivery zones, and quality guarantees.",
 };
 
 export default function ShippingPage() {
   return (
     <PageLayout
-      title="Shipping & Returns"
-      subtitle="Australia-wide express delivery schedule, cold-chain packaging, and quality guarantees."
+      title="Shipping & Delivery"
+      subtitle="Direct temperature-controlled delivery across Australia, packaging details, and quality guarantees."
     >
       <div className="max-w-4xl mx-auto space-y-10 text-stone-800 text-sm sm:text-base leading-relaxed py-4 text-left">
         
@@ -24,8 +24,8 @@ export default function ShippingPage() {
               <Truck className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-primary text-base">Australia-Wide Express</h3>
-              <p className="text-xs text-stone-600 mt-1">Refrigerated express shipping across Australia with cold-chain logistics partners.</p>
+              <h3 className="font-bold text-primary text-base">Direct Delivery</h3>
+              <p className="text-xs text-stone-600 mt-1">Delivering handcrafted gourmet pies directly to your door with temperature-controlled packaging.</p>
             </div>
           </div>
 
@@ -34,8 +34,8 @@ export default function ShippingPage() {
               <Clock className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-primary text-base">Flexible Delivery Slots</h3>
-              <p className="text-xs text-stone-600 mt-1">Orders dispatched Tuesday through Saturday in insulated thermal packaging.</p>
+              <h3 className="font-bold text-primary text-base">Fresh or Frozen Choice</h3>
+              <p className="text-xs text-stone-600 mt-1">Select your preferred format (freshly baked or frozen pack) directly when adding items on the shop page.</p>
             </div>
           </div>
 
@@ -44,8 +44,8 @@ export default function ShippingPage() {
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-primary text-base">Cold-Chain Guarantee</h3>
-              <p className="text-xs text-stone-600 mt-1">Pies are packed with cold-chain protection to stay frozen or chilled until unpacking.</p>
+              <h3 className="font-bold text-primary text-base">Cold-Chain Packaging</h3>
+              <p className="text-xs text-stone-600 mt-1">Food-grade insulated thermal liners keep your pies at optimal temperature during transit.</p>
             </div>
           </div>
 
@@ -55,19 +55,19 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Freshness Guarantee</h3>
-              <p className="text-xs text-stone-600 mt-1">Full replacement or refund if your order arrives damaged or degraded.</p>
+              <p className="text-xs text-stone-600 mt-1">Full replacement or refund if your handcrafted pies arrive damaged or degraded.</p>
             </div>
           </div>
         </div>
 
         {/* Section 1 */}
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Delivery Zones & Rates</h2>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Delivery Zones &amp; Rates</h2>
           <p>
-            Flavour &amp; Co. delivers fresh and frozen handcrafted pies Australia-wide. Standard express delivery is $15 AUD, and orders over $200 receive <strong>Free Express Shipping</strong>.
+            Flavour &amp; Co. delivers fresh and frozen handcrafted gourmet pies across Australia. Depending on what you choose on the shop page, your order is prepared fresh or frozen and packed securely for direct doorstep delivery.
           </p>
           <p>
-            For wholesale or high-volume orders, shipping is arranged via 3rd party courier (not directly at checkout); our team will reach out directly to coordinate delivery.
+            Standard express courier delivery is $15 AUD, and orders over $200 (or eligible local delivery postcodes) receive <strong>Free Delivery</strong>.
           </p>
         </section>
 
@@ -88,7 +88,7 @@ export default function ShippingPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">3. Order Cancellations & Modifying Orders</h2>
           <p>
-            Modifications or cancellations must be submitted at least 24 hours prior to your scheduled dispatch date. Once pies are baked and packed in cold-chain logistics, cancellations cannot be honored.
+            Modifications or cancellations must be submitted at least 24 hours prior to your scheduled dispatch date. Once pies are prepared and scheduled for courier dispatch, cancellations cannot be honored.
           </p>
         </section>
 

@@ -208,13 +208,72 @@ function useRowReveal(count: number): UseRowRevealResult {
 
 export default function StoryTimeline(): React.ReactElement {
   const milestones: MilestoneItem[] = [
-    { year: "2018", title: "The Spark", tag: "Heritage kitchen", copy: "Simran starts combining her heritage recipes with classic buttery pastry, right in her home kitchen.", image: media.timeline.y2018, imagePosition: "object-top" },
-    { year: "2020", title: "Plate of Origin", tag: "Channel 7 TV", copy: "Represents India on Channel 7's national cooking show, winning judges over with bold, familial flavours.", image: media.timeline.y2020, imagePosition: "object-center" },
-    { year: "2021", title: "Going live", tag: "E-commerce launch", copy: "Our website launches, bringing handcrafted gourmet pies direct to foodies across Sydney.", image: media.timeline.y2021, imagePosition: "object-center" },
-    { year: "2022", title: "Into a commercial kitchen", tag: "Scaling up", copy: "We step out of the home kitchen and into a licensed commercial kitchen, scaling up to meet growing demand.", image: media.timeline.y2022, imagePosition: "object-center" },
-    { year: "2024", title: "Our own facility", tag: "HACCP certified", copy: "We move into our own dedicated, HACCP-certified facility, and land our first major wholesale partner.", image: media.timeline.y2024, imagePosition: "object-center" },
-    { year: "2025", title: "Built for business", tag: "Wholesale expansion", copy: "Wholesale becomes a core focus, growing into a trusted supplier for hotels, catering, and cafes.", image: media.timeline.y2025, imagePosition: "object-center" },
-    { year: "2026", title: "Flavour & Co.", tag: "The next chapter", copy: "We rebrand to Flavour & Co, expanding into South Asian canapes and breakfast items at scale.", image: media.timeline.y2026, imagePosition: "object-center", bgClass: "bg-[#07402b]", imageFit: "object-contain" },
+    {
+      year: "2018",
+      title: "The Spark",
+      tag: "Heritage kitchen",
+      copy: "Simran starts combining her heritage recipes with classic buttery pastry, right in her home kitchen.",
+      image: media.timeline.y2018,
+      imagePosition: "object-top",
+    },
+    {
+      year: "2020",
+      title: "Plate of Origin",
+      tag: "Channel 7 TV",
+      copy: "Represents India on Channel 7's national cooking show, winning judges over with bold, familiar flavours.",
+      image: media.timeline.y2020,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2021",
+      title: "Market stalls",
+      tag: "Sydney markets",
+      copy: "Before going online, Simran takes her pies straight to Sydney's markets — proving the product one customer, one conversation at a time.",
+      image: media.timeline.marketStalls,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2021",
+      title: "Going live",
+      tag: "My Team India",
+      copy: "Under the name My Team India, our website launches — bringing handcrafted gourmet pies direct to foodies across Sydney.",
+      image: media.timeline.y2021GoingLive,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2022",
+      title: "Into a commercial kitchen",
+      tag: "Scaling up",
+      copy: "We step out of the home kitchen and into a licensed commercial kitchen, scaling up to meet growing demand.",
+      image: media.timeline.y2022,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2024",
+      title: "Our own facility",
+      tag: "HACCP certified",
+      copy: "We move into our own dedicated, HACCP-certified facility, and land our first major wholesale partner.",
+      image: media.timeline.y2024,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2025",
+      title: "Bringing people together",
+      tag: "Community-led",
+      copy: "Holi Mela reminds us why we started: sharing pies and colour with the community. And as more hotels, caterers and cafes discover us, wholesale becomes a natural extension of that same spirit — feeding more gatherings, just at a bigger scale.",
+      image: media.timeline.bringingPeopleTogether,
+      imagePosition: "object-center",
+    },
+    {
+      year: "2026",
+      title: "Flavour & Co",
+      tag: "The next chapter",
+      copy: "We rebrand to Flavour & Co, carrying familiar flavours, reimagined, into South Asian canapés and breakfast items at scale.",
+      image: media.timeline.y2026,
+      imagePosition: "object-center",
+      bgClass: "bg-[#07402b]",
+      imageFit: "object-contain",
+    },
   ];
 
   const mobileReveal = useRowReveal(milestones.length);
@@ -225,7 +284,7 @@ export default function StoryTimeline(): React.ReactElement {
       <div className="absolute top-0 right-0 -mt-16 -mr-16 w-72 h-72 bg-[#c69c40]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-72 h-72 bg-[#6b1e30]/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-6 xl:px-8 relative z-10">
         {/* Header - Minimum Gap to Timeline (mb-2 sm:mb-3 lg:mb-4) */}
         <div className="text-center flex flex-col items-center justify-center mb-2 sm:mb-3 lg:mb-4">
           <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-[0.25em] text-[#6b1e30] mb-2">
@@ -273,7 +332,7 @@ export default function StoryTimeline(): React.ReactElement {
 
               return (
                 <div
-                  key={item.year}
+                  key={`${item.year}-${item.title}`}
                   ref={(el) => { mobileReveal.nodeRefs.current[idx] = el; }}
                   className={`grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 sm:gap-x-8 py-7 sm:py-12 motion-safe:transition-all motion-safe:duration-700 motion-safe:ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                     }`}
@@ -295,7 +354,7 @@ export default function StoryTimeline(): React.ReactElement {
             aria-hidden="true"
             className="pointer-events-none absolute top-1/2 left-2 right-2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-[#c69c40] to-transparent opacity-70"
           />
-          <div className="grid grid-cols-7 gap-3 xl:gap-6 relative z-10 min-h-[560px] items-stretch">
+          <div className="grid grid-cols-8 gap-2 xl:gap-3.5 relative z-10 min-h-[550px] items-stretch">
             {milestones.map((item, idx) => {
               const imageOnTop = idx % 2 === 0;
               const filled = idx % 2 === 0;
@@ -307,24 +366,24 @@ export default function StoryTimeline(): React.ReactElement {
                   flip={!imageOnTop}
                   aspectClass="aspect-[4/3]"
                   frameClass="rounded-[6px]"
-                  roundClass="rounded-tl-[6px] rounded-br-[6px] rounded-tr-[28px] rounded-bl-[28px]"
-                  sizes="(max-width: 1280px) 13vw, 190px"
+                  roundClass="rounded-tl-[6px] rounded-br-[6px] rounded-tr-[24px] rounded-bl-[24px]"
+                  sizes="(max-width: 1400px) 11vw, 175px"
                 />
               );
               const story = (
                 <StoryContent
                   item={item}
-                  ghostClass="-top-2 xl:-top-3 left-1/2 -translate-x-1/2 text-[36px] xl:text-[46px]"
-                  titleClass="text-[13px] xl:text-[15px]"
-                  bodyClass="text-[11px] xl:text-[13px]"
-                  tagClass="text-[9px] xl:text-[10px] tracking-[0.14em]"
+                  ghostClass="-top-2 xl:-top-2.5 left-1/2 -translate-x-1/2 text-[30px] xl:text-[38px]"
+                  titleClass="text-[12px] xl:text-[14px]"
+                  bodyClass="text-[10px] xl:text-[11.5px] leading-snug"
+                  tagClass="text-[8px] xl:text-[9.5px] tracking-[0.1em]"
                   maxWidthClass="max-w-none"
                 />
               );
 
               return (
                 <div
-                  key={item.year}
+                  key={`${item.year}-${item.title}`}
                   ref={(el) => { desktopReveal.nodeRefs.current[idx] = el; }}
                   className={`flex flex-col items-center h-full motion-safe:transition-all motion-safe:duration-700 motion-safe:ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                     }`}
@@ -336,14 +395,14 @@ export default function StoryTimeline(): React.ReactElement {
                   <div className="flex flex-col items-center shrink-0">
                     <span
                       aria-hidden="true"
-                      className="w-px h-4 xl:h-5 bg-gradient-to-b from-[#c69c40]/5 via-[#c69c40] to-[#c69c40]"
+                      className="w-px h-3.5 xl:h-4 bg-gradient-to-b from-[#c69c40]/5 via-[#c69c40] to-[#c69c40]"
                     />
-                    <div className="relative my-1 z-20 w-14 xl:w-18 aspect-square">
+                    <div className="relative my-1 z-20 w-12 xl:w-15 aspect-square">
                       <YearSeal year={item.year} filled={filled} />
                     </div>
                     <span
                       aria-hidden="true"
-                      className="w-px h-4 xl:h-5 bg-gradient-to-b from-[#c69c40] via-[#c69c40] to-[#c69c40]/5"
+                      className="w-px h-3.5 xl:h-4 bg-gradient-to-b from-[#c69c40] via-[#c69c40] to-[#c69c40]/5"
                     />
                   </div>
 

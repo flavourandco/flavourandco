@@ -120,7 +120,7 @@ export default function AdminOrdersPage() {
       <div className="pb-4 border-b border-slate-200/80">
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">Order Fulfilment &amp; Transactions</h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          View customer purchases, Square payment details, cold-chain shipping addresses, and status updates.
+          View customer purchases, Square payment details, delivery addresses, and status updates.
         </p>
       </div>
 
@@ -339,28 +339,36 @@ export default function AdminOrdersPage() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                        selectedOrder.items.map((item, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/60">
-                            <td className="py-2.5 px-3">
-                              <div className="flex items-center gap-2.5">
-                                {item.image ? (
-                                  <div className="relative w-8 h-8 rounded-sm overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                                    <Image src={item.image} alt={item.name} fill className="object-cover" sizes="32px" />
-                                  </div>
-                                ) : (
-                                  <PackageCheck className="w-5 h-5 text-slate-400" />
-                                )}
-                                <span className="font-semibold text-slate-900">{item.name}</span>
-                              </div>
-                            </td>
-                            <td className="py-2.5 px-3 text-slate-500 font-medium">{item.variant || "Standard Pack"}</td>
-                            <td className="py-2.5 px-3 text-right font-mono">${item.price.toFixed(2)}</td>
-                            <td className="py-2.5 px-3 text-center font-bold">{item.quantity}</td>
-                            <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </td>
-                          </tr>
-                        ))
+                        selectedOrder.items.map((item: any, idx: number) => {
+                          const itemPrice = typeof item.price === "number" ? item.price : (typeof item.unitPrice === "number" ? item.unitPrice : 0);
+                          const itemQty = item.quantity || 1;
+                          const lineTotal = itemPrice * itemQty;
+                          const variantLabel = item.variant || item.variantName || "Standard Pack";
+                          const itemImg = item.image || item.product?.image || item.product?.images?.[0];
+
+                          return (
+                            <tr key={idx} className="hover:bg-slate-50/60">
+                              <td className="py-2.5 px-3">
+                                <div className="flex items-center gap-2.5">
+                                  {itemImg ? (
+                                    <div className="relative w-8 h-8 rounded-sm overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                                      <Image src={itemImg} alt={item.name || "Pie"} fill className="object-cover" sizes="32px" />
+                                    </div>
+                                  ) : (
+                                    <PackageCheck className="w-5 h-5 text-slate-400" />
+                                  )}
+                                  <span className="font-semibold text-slate-900">{item.name || item.product?.name || "Gourmet Pie"}</span>
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-500 font-medium">{variantLabel}</td>
+                              <td className="py-2.5 px-3 text-right font-mono">${itemPrice.toFixed(2)}</td>
+                              <td className="py-2.5 px-3 text-center font-bold">{itemQty}</td>
+                              <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono">
+                                ${lineTotal.toFixed(2)}
+                              </td>
+                            </tr>
+                          );
+                        })
                       ) : (
                         <tr>
                           <td colSpan={5} className="py-3 px-3 text-center text-slate-400">Standard Bakery Order Package</td>
@@ -386,7 +394,7 @@ export default function AdminOrdersPage() {
                     <span className="font-mono">${(selectedOrder.subtotal || selectedOrder.totalAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>Cold-Chain Shipping:</span>
+                    <span>Delivery Fee:</span>
                     <span className="font-mono">${(selectedOrder.shippingFee || 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Heart } from "lucide-react";
+import Link from "next/link";
+import { Heart, ShoppingBag, RefreshCw } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { useProductStore } from "@/store/product.store";
 import { useUIStore } from "@/store/ui.store";
@@ -18,7 +19,7 @@ export default function Products() {
   const [showWishlistOnly, setShowWishlistOnly] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(true);
   }, [fetchProducts]);
 
   const products = sortProductsByCustomOrder(rawProducts);
@@ -101,7 +102,8 @@ export default function Products() {
               />
             ))}
           </div>
-        ) : (
+        ) : showWishlistOnly ? (
+          /* Wishlist Specific Empty State */
           <div className="text-center py-16 bg-white/60 rounded-2xl border border-stone-200/60 p-8">
             <Heart className="h-10 w-10 text-stone-300 mx-auto mb-3" />
             <h3 className="font-serif text-xl font-bold text-stone-700 mb-1">
@@ -116,6 +118,32 @@ export default function Products() {
             >
               Explore All Products
             </button>
+          </div>
+        ) : (
+          /* Shop Catalog Empty State */
+          <div className="text-center py-16 bg-white/60 rounded-2xl border border-stone-200/60 p-8">
+            <ShoppingBag className="h-10 w-10 text-stone-300 mx-auto mb-3" />
+            <h3 className="font-serif text-xl font-bold text-stone-800 mb-1">
+              No Products Available Currently
+            </h3>
+            <p className="text-xs text-stone-500 max-w-md mx-auto mb-6 leading-relaxed">
+              We are handcrafting our next fresh batch of gourmet pies in our commercial kitchen. Please check back shortly or refresh the catalog.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => fetchProducts(true)}
+                className="inline-flex items-center gap-2 bg-brand-green text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full hover:bg-brand-gold hover:text-brand-green transition-all cursor-pointer shadow-xs"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Refresh Menu</span>
+              </button>
+              <Link
+                href="/wholesale"
+                className="text-stone-600 hover:text-brand-green text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full transition-colors cursor-pointer"
+              >
+                Wholesale Inquiries
+              </Link>
+            </div>
           </div>
         )}
       </div>

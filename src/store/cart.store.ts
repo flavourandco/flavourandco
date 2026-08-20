@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Product } from "@/lib/types";
 import { useUIStore } from "./ui.store";
+import { calculateShippingFee } from "@/lib/shipping";
 
 export interface CartItem {
   id: string; // product.id or product.id + "-" + variantName
@@ -21,8 +22,8 @@ interface CartState {
 
   getTotalItems: () => number;
   getSubtotal: () => number;
-  getShippingFee: () => number;
-  getTotal: () => number;
+  getShippingFee: (postcode?: string | number | null) => number;
+  getTotal: (postcode?: string | number | null) => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -93,14 +94,13 @@ export const useCartStore = create<CartState>()(
         return get().items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       },
 
-      getShippingFee: () => {
+      getShippingFee: (postcode?: string | number | null) => {
         const subtotal = get().getSubtotal();
-        if (subtotal === 0) return 0;
-        return subtotal >= 200 ? 0 : 15;
+        return calculateShippingFee(subtotal, postcode);
       },
 
-      getTotal: () => {
-        return get().getSubtotal() + get().getShippingFee();
+      getTotal: (postcode?: string | number | null) => {
+        return get().getSubtotal() + get().getShippingFee(postcode);
       },
     }),
     {

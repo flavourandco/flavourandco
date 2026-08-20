@@ -6,7 +6,7 @@ export type { Product, ProductVariant, WhyStandOutPoint, BlogPost, ReviewItem };
 export const marqueeItems = [
   "plate of origin on channel 7",
   "indo-australian pies",
-  "australia-wide delivery",
+  "sydney-wide delivery",
   "handcrafted by simran",
   "authentic heritage spices",
   "made with love",
@@ -15,7 +15,7 @@ export const marqueeItems = [
 export const tickerItems = [
   "plate of origin",
   "indo-australian",
-  "australia-wide delivery",
+  "sydney-wide delivery",
   "heritage recipes",
   "flaky butter pastry",
   "made with love",
@@ -97,13 +97,13 @@ export const faqItems: FaqItem[] = [
   },
   {
     id: "faq-4",
-    question: "Do you deliver Australia-wide?",
-    answer: "Yes. We deliver Australia-wide using cold-chain logistics to ensure your order arrives fresh and in optimal condition.\n\nShipping options and rates are calculated at checkout based on your location."
+    question: "Where do you deliver?",
+    answer: "We deliver fresh and frozen orders directly to your door across Australia. Customers can choose freshly baked or frozen packs directly when selecting their pies."
   },
   {
     id: "faq-5",
     question: "How are orders packaged for shipping?",
-    answer: "All orders are carefully packed in insulated thermal packaging with ice packs or dry ice to maintain cold-chain temperatures during transit."
+    answer: "All orders are carefully packed in food-grade insulated packaging with temperature control, ensuring your pies arrive at peak temperature and condition — whether you chose freshly baked or frozen packs."
   },
   {
     id: "faq-6",

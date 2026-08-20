@@ -54,15 +54,15 @@ export default function ProductCard({
     addItem(product, 1);
   };
 
-  const price = product.price;
-  const slug = product.name
+  const price = typeof product.price === "number" ? product.price : (Number(product.price) || 0);
+  const slug = (product.name || "pie")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
   const detailUrl = `/shop/${slug}/${product.id}`;
 
-  const image1 = product.images?.[0] || product.image;
-  const image2 = product.images?.[1] || image1;
+  const image1 = product.images?.[0] || product.image || "/products/butter-chicken-pie.png";
+  const image2 = (product.images && product.images.length > 1 && product.images[1]) ? product.images[1] : image1;
 
   return (
     <article className="product-card group relative flex flex-col justify-between overflow-hidden bg-white rounded-sm border border-[#c69c40]/25 shadow-xs hover:shadow-lg hover:border-[#c69c40]/50 transition-all duration-300 h-full w-full">
