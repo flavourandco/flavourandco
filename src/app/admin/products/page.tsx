@@ -82,6 +82,32 @@ export default function AdminProductsPage() {
   const [editingDetailIndex, setEditingDetailIndex] = useState<number | null>(null);
   const [editDetailText, setEditDetailText] = useState("");
 
+  // Item deletion confirmation state
+  const [deletingVariantIndex, setDeletingVariantIndex] = useState<number | null>(null);
+  const [deletingWhyIndex, setDeletingWhyIndex] = useState<number | null>(null);
+  const [deletingDetailIndex, setDeletingDetailIndex] = useState<number | null>(null);
+
+  const handleConfirmDeleteVariant = () => {
+    if (deletingVariantIndex !== null) {
+      removeVariant(deletingVariantIndex);
+      setDeletingVariantIndex(null);
+    }
+  };
+
+  const handleConfirmDeleteWhy = () => {
+    if (deletingWhyIndex !== null) {
+      removeWhyPoint(deletingWhyIndex);
+      setDeletingWhyIndex(null);
+    }
+  };
+
+  const handleConfirmDeleteDetail = () => {
+    if (deletingDetailIndex !== null) {
+      removeDetailPoint(deletingDetailIndex);
+      setDeletingDetailIndex(null);
+    }
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -953,7 +979,7 @@ export default function AdminProductsPage() {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => removeVariant(i)}
+                                      onClick={() => setDeletingVariantIndex(i)}
                                       className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
                                       title="Remove Variant"
                                     >
@@ -1078,7 +1104,7 @@ export default function AdminProductsPage() {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => removeWhyPoint(i)}
+                                      onClick={() => setDeletingWhyIndex(i)}
                                       className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
                                       title="Remove Highlight"
                                     >
@@ -1181,7 +1207,7 @@ export default function AdminProductsPage() {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => removeDetailPoint(i)}
+                                      onClick={() => setDeletingDetailIndex(i)}
                                       className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
                                       title="Remove Spec"
                                     >
@@ -1272,6 +1298,42 @@ export default function AdminProductsPage() {
         variant="danger"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingProductId(null)}
+      />
+
+      {/* CONFIRMATION DIALOG FOR VARIANT DELETION */}
+      <AdminConfirmModal
+        isOpen={deletingVariantIndex !== null}
+        title="Confirm Variant Deletion"
+        message={`Are you sure you want to delete variant "${deletingVariantIndex !== null ? formData.variants[deletingVariantIndex]?.name : ""}"?`}
+        confirmText="Yes, Delete Variant"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleConfirmDeleteVariant}
+        onCancel={() => setDeletingVariantIndex(null)}
+      />
+
+      {/* CONFIRMATION DIALOG FOR HIGHLIGHT DELETION */}
+      <AdminConfirmModal
+        isOpen={deletingWhyIndex !== null}
+        title="Confirm Highlight Deletion"
+        message={`Are you sure you want to delete highlight "${deletingWhyIndex !== null ? formData.whyStandOut[deletingWhyIndex]?.title : ""}"?`}
+        confirmText="Yes, Delete Highlight"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleConfirmDeleteWhy}
+        onCancel={() => setDeletingWhyIndex(null)}
+      />
+
+      {/* CONFIRMATION DIALOG FOR SPECIFICATION DELETION */}
+      <AdminConfirmModal
+        isOpen={deletingDetailIndex !== null}
+        title="Confirm Specification Deletion"
+        message={`Are you sure you want to delete specification "${deletingDetailIndex !== null ? (formData.productDetails || [])[deletingDetailIndex] : ""}"?`}
+        confirmText="Yes, Delete Spec"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleConfirmDeleteDetail}
+        onCancel={() => setDeletingDetailIndex(null)}
       />
     </div>
   );
