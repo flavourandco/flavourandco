@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { useFreeDeliveryThreshold } from "@/hooks/useFreeDeliveryThreshold";
 import {
   ShieldCheck,
   Truck,
@@ -118,8 +119,9 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getSubtotal();
-  const isEligibleForFreeShipping = isFreeDeliveryPostcode(formData.postcode) || subtotal >= 200;
-  const shippingFee = calculateShippingFee(subtotal, formData.postcode);
+  const freeDeliveryThreshold = useFreeDeliveryThreshold();
+  const isEligibleForFreeShipping = isFreeDeliveryPostcode(formData.postcode) || subtotal >= freeDeliveryThreshold;
+  const shippingFee = calculateShippingFee(subtotal, formData.postcode, freeDeliveryThreshold);
   const total = subtotal + shippingFee;
   const isPostcodeFilled = formData.postcode.trim().length === 4;
 

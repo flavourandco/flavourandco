@@ -12,9 +12,13 @@ import {
   ChevronRight,
   FileSpreadsheet,
   Mail,
+  Truck,
+  Save,
+  CheckCircle2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BoneyardStatCardSkeleton, BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { dispatchSettingsUpdated } from "@/hooks/useFreeDeliveryThreshold";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -29,9 +33,55 @@ export default function AdminDashboardPage() {
   } | null>(null);
 
   const [loadingStats, setLoadingStats] = useState(true);
-
-  // Real Users state from API
   const [realUsers, setRealUsers] = useState<any[]>([]);
+
+  // Free delivery threshold state
+  const [freeDeliveryAmount, setFreeDeliveryAmount] = useState<number | string>(200);
+  const [savingThreshold, setSavingThreshold] = useState(false);
+  const [thresholdMsg, setThresholdMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        if (data.success && typeof data.freeDeliveryThreshold === "number") {
+          setFreeDeliveryAmount(data.freeDeliveryThreshold);
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  const handleUpdateFreeDelivery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingThreshold(true);
+    setThresholdMsg(null);
+    const numericAmount = Math.max(0, Number(freeDeliveryAmount) || 0);
+
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ freeDeliveryThreshold: numericAmount }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFreeDeliveryAmount(numericAmount);
+        dispatchSettingsUpdated(numericAmount);
+        setThresholdMsg(`Free delivery threshold updated to $${numericAmount} AUD!`);
+        setTimeout(() => setThresholdMsg(null), 5000);
+      } else {
+        alert(data.error || "Failed to update free delivery amount");
+      }
+    } catch (err: any) {
+      alert("Error updating free delivery amount: " + err.message);
+    } finally {
+      setSavingThreshold(false);
+    }
+  };
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -89,6 +139,69 @@ export default function AdminDashboardPage() {
             <span>Manage Blogs</span>
           </button>
         </div>
+      </div>
+
+      {/* FREE DELIVERY THRESHOLD MANAGEMENT PANEL */}
+      <div className="bg-white rounded-md p-5 border border-slate-200/90 shadow-2xs">
+        <form onSubmit={handleUpdateFreeDelivery} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/80 shrink-0">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">
+                Free Delivery Minimum Order Amount
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Set the minimum order amount ($ AUD) for site-wide free delivery.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 font-mono">$</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                required
+                value={freeDeliveryAmount}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "") {
+                    setFreeDeliveryAmount("");
+                    return;
+                  }
+                  const num = Math.max(0, Number(val));
+                  setFreeDeliveryAmount(num);
+                }}
+                onBlur={() => {
+                  if (freeDeliveryAmount === "") {
+                    setFreeDeliveryAmount(0);
+                  }
+                }}
+                className="w-28 pl-7 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-sm text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white font-mono"
+                placeholder="0"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={savingThreshold}
+              className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-sm shadow-2xs cursor-pointer transition-colors disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{savingThreshold ? "Updating..." : "Update Amount"}</span>
+            </button>
+          </div>
+        </form>
+
+        {thresholdMsg && (
+          <div className="mt-3 p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-sm flex items-center gap-2 animate-fadeIn">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{thresholdMsg}</span>
+          </div>
+        )}
       </div>
 
       {/* 6 REAL SYNCED SUMMARY CARDS */}

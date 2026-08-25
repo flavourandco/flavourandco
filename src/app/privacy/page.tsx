@@ -87,8 +87,8 @@ export default function PrivacyPage() {
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">5. Contact Us</h2>
           <p>
             If you have questions regarding this Privacy Policy or wish to request data deletion, email our Privacy Team at{" "}
-            <a href="mailto:info@flavourandco.com.au" className="font-bold text-secondary underline">
-              info@flavourandco.com.au
+            <a href="mailto:help@flavourandco.com.au" className="font-bold text-secondary underline">
+              help@flavourandco.com.au
             </a>.
           </p>
         </section>

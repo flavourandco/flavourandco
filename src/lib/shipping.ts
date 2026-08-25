@@ -56,10 +56,11 @@ export function isFreeDeliveryPostcode(postcode?: string | number | null): boole
  */
 export function calculateShippingFee(
   subtotal: number,
-  postcode?: string | number | null
+  postcode?: string | number | null,
+  freeDeliveryThreshold = 200
 ): number {
   if (subtotal <= 0) return 0;
-  if (subtotal >= 200) return 0;
+  if (subtotal >= freeDeliveryThreshold) return 0;
   if (isFreeDeliveryPostcode(postcode)) return 0;
   return 15;
 }

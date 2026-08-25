@@ -82,7 +82,7 @@ export default function WholesaleClient() {
               Elevating Menus Nationwide
             </h2>
             <p className="text-sm sm:text-base text-[#1c1410]/80 leading-relaxed font-sans max-w-xl">
-              Flavour &amp; Co partners with cafés, caterers, 5-star hotels and foodservice key venues across Australia to deliver premium Indo-Australian pies that stand out on any menu. Handcrafted with local Australian ingredients and backed by nationwide logistics partners.
+              Flavour &amp; Co partners with cafés, caterers, 5-star hotels and key foodservice venues across Australia to deliver premium Indo-Australian food that stands out on any menu &mdash; from signature pies and South Asian breakfast offerings to handcrafted canapés. Made with quality Australian ingredients and supported by nationwide logistics partners.
             </p>
             <div className="pt-2">
               <button
@@ -236,7 +236,7 @@ export default function WholesaleClient() {
             <div className="text-left space-y-3 group sm:col-span-2 lg:col-span-1">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm">
                 <Image
-                  src="/products/PHOTOS_Flavour&Co-4.jpg"
+                  src="/parties-and-events.jpeg"
                   alt="Great for events and functions"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"

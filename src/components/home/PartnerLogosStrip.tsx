@@ -1,9 +1,6 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
 
 export const PARTNER_LOGOS = [
   { name: "The Fullerton Hotel Sydney", src: "/partners/fullerton-hotel.svg" },
@@ -12,86 +9,50 @@ export const PARTNER_LOGOS = [
   { name: "Amora Hotel Jamison Sydney", src: "/partners/amora-hotel.svg" },
   { name: "Novotel Sydney Darling Harbour", src: "/partners/novotel.svg" },
   { name: "PARKROYAL Parramatta", src: "/partners/parkroyal.svg" },
+  { name: "Cruzing Catering & Events Management", src: "/partners/cruzing.png" },
   { name: "Channel 7 Plate of Origin", src: "/partners/channel-7.svg" },
   { name: "Corporate Catering Partners", src: "/partners/corporate-catering.svg" },
 ];
 
 interface PartnerLogosStripProps {
-  title?: string;
-  speed?: number; // duration in seconds
+  eyebrow?: string;
+  heading?: string;
   className?: string;
 }
 
 export default function PartnerLogosStrip({
-  title = "PARTNERED HOTELS & BRANDS",
-  speed = 35,
+  eyebrow = "PARTNERED HOTELS & BRANDS",
+  heading = "Where We Are Trusted",
   className = "",
 }: PartnerLogosStripProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const tweenRef = useRef<gsap.core.Tween | null>(null);
-
-  useGSAP(
-    () => {
-      if (!trackRef.current) return;
-
-      tweenRef.current = gsap.to(trackRef.current, {
-        xPercent: -50,
-        ease: "none",
-        duration: speed,
-        repeat: -1,
-      });
-    },
-    { scope: containerRef, dependencies: [speed] }
-  );
-
-  const handleMouseEnter = () => {
-    if (tweenRef.current) {
-      gsap.to(tweenRef.current, { timeScale: 0.25, duration: 0.5, ease: "power1.out" });
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (tweenRef.current) {
-      gsap.to(tweenRef.current, { timeScale: 1, duration: 0.5, ease: "power1.out" });
-    }
-  };
-
-  const marqueeItems = [...PARTNER_LOGOS, ...PARTNER_LOGOS, ...PARTNER_LOGOS, ...PARTNER_LOGOS];
-
   return (
-    <section ref={containerRef} className={`w-full bg-[#f7efe6] py-8 border-y border-[#ebe3d8] overflow-hidden ${className}`}>
-      {title && (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-5 text-center">
-          <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30]">
-            {title}
-          </span>
-        </div>
-      )}
+    <section className={`w-full bg-[#f7efe6] py-14 md:py-20 border-y border-[#ebe3d8] ${className}`}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-3 mb-12">
+        <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#6b1e30] block">
+          {eyebrow}
+        </span>
+        <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1c1410]">
+          {heading}
+        </h2>
+      </div>
 
-      {/* Infinite Marquee Strip */}
-      <div
-        className="relative w-full overflow-hidden py-2 cursor-pointer"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {/* Gradient Fade Edges */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-16 sm:w-32 bg-gradient-to-r from-[#f7efe6] to-transparent" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-16 sm:w-32 bg-gradient-to-l from-[#f7efe6] to-transparent" />
-
-        {/* Moving Track */}
-        <div ref={trackRef} className="flex items-center gap-12 sm:gap-16 w-max">
-          {marqueeItems.map((logo, idx) => (
+      {/* Static Responsive Grid */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6 sm:gap-8 items-center justify-items-center">
+          {PARTNER_LOGOS.map((logo) => (
             <div
-              key={`${logo.name}-${idx}`}
-              className="relative h-12 w-44 sm:w-48 shrink-0 opacity-85 hover:opacity-100 transition-opacity"
+              key={logo.name}
+              className="bg-white/80 hover:bg-white border border-[#ebe3d8] rounded-xl p-6 w-full h-28 sm:h-32 flex items-center justify-center shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer"
+              title={logo.name}
             >
-              <Image
-                src={logo.src}
-                alt={logo.name}
-                fill
-                className="object-contain"
-              />
+              <div className="relative w-full h-full">
+                <Image
+                  src={logo.src}
+                  alt={logo.name}
+                  fill
+                  className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:scale-105"
+                />
+              </div>
             </div>
           ))}
         </div>

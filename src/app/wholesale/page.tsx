@@ -12,7 +12,7 @@ export default function WholesalePage() {
   return (
     <PageLayout
       title="Wholesale & Foodservice"
-      subtitle="Partner with Flavour & Co to deliver premium Indo-Australian pies across cafés, hotels, caterers and key venues nationwide."
+      subtitle="Partner with Flavour & Co for premium Indo-Australian foodservice solutions, spanning signature pies, South Asian breakfast and canapés for cafés, hotels, caterers and venues nationwide."
       fullWidth
     >
       <WholesaleClient />

@@ -70,7 +70,7 @@ export default function ContactForm() {
               Have A Question? We&apos;re Here To Help.
             </h2>
             <p className="text-xs sm:text-base text-[#1c1410]/75 leading-relaxed font-sans">
-              Whether you&apos;re curious about our pie range, event catering, or wholesale opportunities — we&apos;re just a message away. Reach out and a member from our team will get back to you within 24-48 business hours.
+              Whether you&apos;re exploring our Indo-Australian food range, event catering, or wholesale opportunities — we&apos;re just a message away. Reach out and a member of our team will get back to you within 24–48 business hours.
             </p>
           </div>
 

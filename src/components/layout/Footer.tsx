@@ -81,7 +81,7 @@ export default function Footer() {
               className="h-32 lg:h-36 w-auto object-contain mb-4"
             />
             <p className="text-sm leading-relaxed opacity-80">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
+              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
             </p>
             
             {/* Desktop Social Links */}
@@ -194,7 +194,7 @@ export default function Footer() {
               className="h-24 w-auto object-contain mb-3"
             />
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies.
+              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
             </p>
           </div>
 

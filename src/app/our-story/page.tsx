@@ -158,59 +158,6 @@ export default function OurStoryPage() {
         {/* Section 2: Story Timeline Component */}
         <StoryTimeline />
 
-
-
-        {/* Section 3: Our Approach (Dark Inset Background) */}
-        <div className="relative overflow-hidden py-24 md:py-32 w-full bg-[#1c1410] text-white">
-          {/* Subtle Dark Inset Overlay */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/products/PHOTOS_Flavour&Co-4.jpg"
-              alt="Flavour & Co. Gourmet background"
-              fill
-              className="object-cover opacity-50"
-              sizes="100vw"
-              quality={95}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1c1410] via-[#1c1410]/70 to-[#1c1410] shadow-[inset_0_0_80px_rgba(0,0,0,0.7)]" />
-          </div>
-
-          <div className="relative z-10 mx-auto max-w-4xl px-6 text-center lg:px-8">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#c69c40] mb-3">
-              Our Approach
-            </p>
-
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl md:text-5xl text-white leading-[1.15] font-semibold">
-              Balancing <span className="italic text-[#c69c40]">Heritage</span> &amp; Innovation
-            </h2>
-
-            <div className="mt-8 space-y-6 text-base sm:text-lg leading-relaxed text-white/85 max-w-2xl mx-auto font-sans">
-              <p className="font-semibold text-white text-lg sm:text-xl">
-                At Flavour &amp; Co, we believe great flavour comes from a balance of heritage and innovation.
-              </p>
-              <p>
-                Inspired by recipes passed down through generations, our pies bring together bold, nostalgic flavours with a refined, modern approach.
-              </p>
-              <p className="text-white/90 font-medium">
-                Every product is crafted with care, designed to deliver consistency, quality and a food experience that feels both familiar and elevated — whether it&apos;s shared at home or served at scale.
-              </p>
-            </div>
-
-            <div className="mt-10 flex flex-wrap justify-center items-center gap-x-6 gap-y-3">
-              {["Heritage", "Craft", "Consistency"].map((value, i) => (
-                <span key={value} className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold uppercase tracking-[0.2em] text-[#c69c40]">
-                  {i > 0 && <span className="h-1.5 w-1.5 rounded-full bg-[#c69c40]" />}
-                  {value}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-10">
-              <GarnetButton href="/shop">Explore Our Products</GarnetButton>
-            </div>
-          </div>
-        </div>
-
       </div>
     </PageLayout>
   );

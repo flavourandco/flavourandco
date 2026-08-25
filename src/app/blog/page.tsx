@@ -12,7 +12,7 @@ export default function BlogPage() {
   return (
     <PageLayout
       title="Blog & Journal"
-      subtitle="Recipes, heritage stories, heating guides, and founder insights from Simran and our Australian bakery."
+      subtitle="Recipes, heritage stories, heating guides, and founder insights from Simran and our Indo-Australian bakery."
       fullWidth
     >
       <BlogClient />

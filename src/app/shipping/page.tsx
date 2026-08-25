@@ -1,15 +1,13 @@
+"use client";
+
 import PageLayout from "@/components/layout/PageLayout";
 import Link from "next/link";
 import { Truck, RefreshCw, ShieldCheck, Clock } from "lucide-react";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Shipping & Delivery Policy | Flavour & Co.",
-  description:
-    "Learn about Flavour & Co's Sydney fresh and frozen delivery schedule, local delivery zones, and quality guarantees.",
-};
+import { useFreeDeliveryThreshold } from "@/hooks/useFreeDeliveryThreshold";
 
 export default function ShippingPage() {
+  const freeDeliveryThreshold = useFreeDeliveryThreshold();
+
   return (
     <PageLayout
       title="Shipping & Delivery"
@@ -25,7 +23,7 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Direct Delivery</h3>
-              <p className="text-xs text-stone-600 mt-1">Delivering handcrafted gourmet pies directly to your door with temperature-controlled packaging.</p>
+              <p className="text-xs text-stone-600 mt-1">Delivering handcrafted Indo-Australian food products directly to your door with temperature-controlled packaging.</p>
             </div>
           </div>
 
@@ -45,7 +43,7 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Cold-Chain Packaging</h3>
-              <p className="text-xs text-stone-600 mt-1">Food-grade insulated thermal liners keep your pies at optimal temperature during transit.</p>
+              <p className="text-xs text-stone-600 mt-1">For frozen orders, your products are transported in temperature-controlled packaging to help maintain optimal temperature throughout delivery.</p>
             </div>
           </div>
 
@@ -55,7 +53,7 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Freshness Guarantee</h3>
-              <p className="text-xs text-stone-600 mt-1">Full replacement or refund if your handcrafted pies arrive damaged or degraded.</p>
+              <p className="text-xs text-stone-600 mt-1">Full replacement or refund if your handcrafted products arrive damaged or degraded.</p>
             </div>
           </div>
         </div>
@@ -67,7 +65,7 @@ export default function ShippingPage() {
             Flavour &amp; Co. delivers fresh and frozen handcrafted gourmet pies across Australia. Depending on what you choose on the shop page, your order is prepared fresh or frozen and packed securely for direct doorstep delivery.
           </p>
           <p>
-            Standard express courier delivery is $15 AUD, and orders over $200 (or eligible local delivery postcodes) receive <strong>Free Delivery</strong>.
+            Standard express courier delivery is $15 AUD, and orders over ${freeDeliveryThreshold} (or eligible local delivery postcodes) receive <strong>Free Delivery</strong>.
           </p>
         </section>
 
@@ -88,7 +86,7 @@ export default function ShippingPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">3. Order Cancellations & Modifying Orders</h2>
           <p>
-            Modifications or cancellations must be submitted at least 24 hours prior to your scheduled dispatch date. Once pies are prepared and scheduled for courier dispatch, cancellations cannot be honored.
+            Modifications or cancellations must be submitted at least 24 hours prior to your scheduled dispatch date. Once products are prepared and scheduled for courier dispatch, cancellations cannot be honored.
           </p>
         </section>
 
@@ -97,8 +95,8 @@ export default function ShippingPage() {
           <h3 className="font-serif text-lg font-bold text-brand-green">Need Assistance with an Order?</h3>
           <p className="text-xs sm:text-sm text-stone-600">
             Our support team is available Monday through Saturday. Contact us at{" "}
-            <a href="mailto:info@flavourandco.com.au" className="font-bold text-secondary underline">
-              info@flavourandco.com.au
+            <a href="mailto:help@flavourandco.com.au" className="font-bold text-secondary underline">
+              help@flavourandco.com.au
             </a>{" "}
             or visit our{" "}
             <Link href="/faq" className="font-bold text-secondary underline">

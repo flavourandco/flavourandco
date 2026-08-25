@@ -12,7 +12,7 @@ export default function ContactPage() {
   return (
     <PageLayout
       title="Contact Us"
-      subtitle="Have a question about our artisan pies, event catering, or wholesale inquiries? We're here to help."
+      subtitle="Have a question about our Indo-Australian food range, event catering, or wholesale offering? We’re here to help."
       fullWidth
     >
       <ContactForm />

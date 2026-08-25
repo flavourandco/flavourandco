@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useFreeDeliveryThreshold } from "@/hooks/useFreeDeliveryThreshold";
 import {
   ShoppingBag,
   Trash2,
@@ -61,7 +62,7 @@ export default function CartPage() {
   const subtotal = getSubtotal();
   const shippingFee = getShippingFee();
   const total = getTotal();
-  const freeShippingThreshold = 200;
+  const freeShippingThreshold = useFreeDeliveryThreshold();
   const progressToFreeShipping = Math.min(100, (subtotal / freeShippingThreshold) * 100);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const totalItemsCount = items.reduce((acc, i) => acc + i.quantity, 0);
@@ -319,7 +320,7 @@ export default function CartPage() {
                         <span className="text-stone-500">Estimated Delivery</span>
                         <Truck className="w-3.5 h-3.5 text-[#07402b]" />
                       </div>
-                      {subtotal >= 200 ? (
+                      {subtotal >= freeShippingThreshold ? (
                         <span className="font-extrabold font-sans text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider">
                           FREE
                         </span>

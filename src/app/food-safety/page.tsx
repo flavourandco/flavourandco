@@ -93,6 +93,9 @@ export default function FoodSafetyPage() {
             <li><strong>Oven (Recommended):</strong> Preheat oven to 180°C (350°F). Bake frozen pie for 25–30 minutes until golden and internal temperature reaches 75°C+.</li>
             <li><strong>Air Fryer:</strong> Bake at 170°C for 20 minutes for an ultra-flaky crust.</li>
           </ul>
+          <div className="p-4 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs sm:text-sm rounded-r-md">
+            <strong>Note:</strong> Cooking times will vary with the make, model and age of the oven or air fryer.
+          </div>
         </section>
 
         {/* Contact Banner */}
@@ -100,8 +103,8 @@ export default function FoodSafetyPage() {
           <h3 className="font-serif text-lg font-bold text-brand-green">Have Allergen or Storage Questions?</h3>
           <p className="text-xs sm:text-sm text-stone-600">
             Reach out to Simran and the team at{" "}
-            <a href="mailto:info@flavourandco.com.au" className="font-bold text-secondary underline">
-              info@flavourandco.com.au
+            <a href="mailto:help@flavourandco.com.au" className="font-bold text-secondary underline">
+              help@flavourandco.com.au
             </a>{" "}
             or visit our{" "}
             <Link href="/faq" className="font-bold text-secondary underline">

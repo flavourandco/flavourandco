@@ -21,7 +21,7 @@ export default function AnnouncementBar() {
 
       {/* Desktop View: Static Highlighted Text with Uniform Gold Color */}
       <div className="hidden md:flex relative z-20 w-full items-center justify-center gap-2.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-[#E3A72B] drop-shadow-[0_0_14px_rgba(227,167,43,0.35)] px-4">
-        <span>DELIVERING SYDNEY WIDE</span>
+        <span>EXPRESS DELIVERY SYDNEY WIDE</span>
         <span className="opacity-60">•</span>
         <span>HANDCRAFTED GOURMET PIES</span>
       </div>
@@ -31,7 +31,7 @@ export default function AnnouncementBar() {
         <div className="animate-ticker flex whitespace-nowrap items-center">
           {[1, 2, 3].map((key) => (
             <span key={key} className="inline-flex items-center gap-2 px-4">
-              <span>DELIVERING SYDNEY WIDE</span>
+              <span>EXPRESS DELIVERY SYDNEY WIDE</span>
               <span className="opacity-60">•</span>
               <span>HANDCRAFTED GOURMET PIES</span>
             </span>
