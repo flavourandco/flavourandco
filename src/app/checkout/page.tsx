@@ -547,7 +547,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Section 2: Secure Payment Form */}
-                <div className="bg-white rounded-xl border border-[#c69c40]/25 p-5 sm:p-7 shadow-xs space-y-5">
+                <div className="bg-white rounded-sm border border-[#c69c40]/25 p-3.5 sm:p-7 shadow-xs space-y-4 w-full">
                   <div className="pb-3 border-b border-stone-100">
                     <h2 className="font-serif text-lg sm:text-xl font-bold text-[#07402b]">
                       Payment Method

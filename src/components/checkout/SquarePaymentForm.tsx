@@ -54,18 +54,18 @@ interface SquarePaymentFormProps {
 // Payment Brand Badges
 function VisaBadge() {
   return (
-    <div className="h-5 w-8 rounded bg-[#0E4595] flex items-center justify-center border border-white/20 shadow-2xs shrink-0" title="Visa">
-      <span className="font-sans font-black italic text-white text-[10px] tracking-tighter">VISA</span>
+    <div className="h-8 sm:h-7 w-full rounded-sm bg-[#0E4595] flex items-center justify-center border border-white/20 shadow-2xs" title="Visa">
+      <span className="font-sans font-black italic text-white text-xs tracking-tighter">VISA</span>
     </div>
   );
 }
 
 function MastercardBadge() {
   return (
-    <div className="h-5 w-8 rounded bg-[#111] flex items-center justify-center border border-white/20 shadow-2xs relative overflow-hidden shrink-0" title="Mastercard">
+    <div className="h-8 sm:h-7 w-full rounded-sm bg-[#111] flex items-center justify-center border border-white/20 shadow-2xs relative overflow-hidden" title="Mastercard">
       <div className="flex items-center -space-x-1.5">
-        <div className="h-3 w-3 rounded-full bg-[#EB001B]" />
-        <div className="h-3 w-3 rounded-full bg-[#F79E1B] opacity-90" />
+        <div className="h-3.5 w-3.5 rounded-full bg-[#EB001B]" />
+        <div className="h-3.5 w-3.5 rounded-full bg-[#F79E1B] opacity-90" />
       </div>
     </div>
   );
@@ -73,24 +73,24 @@ function MastercardBadge() {
 
 function AmexBadge() {
   return (
-    <div className="h-5 w-8 rounded bg-[#016FD0] flex items-center justify-center border border-white/20 shadow-2xs shrink-0" title="American Express">
-      <span className="font-sans font-black text-white text-[8px] tracking-tighter">AMEX</span>
+    <div className="h-8 sm:h-7 w-full rounded-sm bg-[#016FD0] flex items-center justify-center border border-white/20 shadow-2xs" title="American Express">
+      <span className="font-sans font-black text-white text-[10px] tracking-tighter">AMEX</span>
     </div>
   );
 }
 
 function ApplePayBadge() {
   return (
-    <div className="h-5 w-8 rounded bg-black flex items-center justify-center border border-white/20 shadow-2xs text-white shrink-0" title="Apple Pay">
-      <span className="font-sans font-bold text-[8px] tracking-tight">Pay</span>
+    <div className="h-8 sm:h-7 w-full rounded-sm bg-black flex items-center justify-center border border-white/20 shadow-2xs text-white" title="Apple Pay">
+      <span className="font-sans font-bold text-[10px] tracking-tight">Pay</span>
     </div>
   );
 }
 
 function GooglePayBadge() {
   return (
-    <div className="h-5 w-8 rounded bg-white flex items-center justify-center border border-stone-300 shadow-2xs shrink-0" title="Google Pay">
-      <span className="font-sans font-bold text-stone-800 text-[8px] tracking-tight">
+    <div className="h-8 sm:h-7 w-full rounded-sm bg-white flex items-center justify-center border border-stone-300 shadow-2xs" title="Google Pay">
+      <span className="font-sans font-bold text-stone-800 text-[10px] tracking-tight">
         <span className="text-[#4285F4]">G</span>Pay
       </span>
     </div>
@@ -248,11 +248,14 @@ export default function SquarePaymentForm({
   };
 
   return (
-    <div className="space-y-4 font-sans">
-      {/* Clean Payment Methods Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-stone-50 rounded-lg border border-stone-200/90">
-        <span className="text-xs font-bold text-stone-800">Accepted Payment Methods</span>
-        <div className="flex items-center gap-1.5">
+    <div className="space-y-4 font-sans w-full">
+      {/* Clean Payment Methods Header - Full Width Grid */}
+      <div className="p-3 sm:p-4 bg-stone-50 rounded-sm border border-stone-200/90 space-y-2 w-full">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] sm:text-xs font-bold text-stone-800 uppercase tracking-wider">Accepted Payment Methods</span>
+          <span className="text-[10px] text-stone-400 font-mono">100% Encrypted</span>
+        </div>
+        <div className="grid grid-cols-5 gap-1.5 sm:gap-2 w-full pt-0.5">
           <VisaBadge />
           <MastercardBadge />
           <AmexBadge />
@@ -263,7 +266,7 @@ export default function SquarePaymentForm({
 
       {/* Digital Wallets: Apple Pay & Google Pay Containers */}
       {(applePayReady || googlePayReady) && (
-        <div className="space-y-2 border-b border-stone-100 pb-4">
+        <div className="space-y-2 border-b border-stone-100 pb-4 w-full">
           <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600 block">
             Express Checkout
           </span>
@@ -273,7 +276,7 @@ export default function SquarePaymentForm({
       )}
 
       {/* Embedded Credit Card Input Container */}
-      <div className="bg-white p-4 sm:p-5 rounded-lg border border-stone-200/90 shadow-2xs space-y-3">
+      <div className="bg-white p-3.5 sm:p-5 rounded-sm border border-stone-200/90 shadow-2xs space-y-3 w-full">
         <div className="flex items-center justify-between">
           <label className="font-bold uppercase tracking-wider text-stone-800 text-[11px] flex items-center gap-1.5">
             <CreditCard className="w-4 h-4 text-[#6b1e30]" />
@@ -285,8 +288,8 @@ export default function SquarePaymentForm({
         </div>
 
         {/* Square SDK Container: Embedded Card Input Fields */}
-        <div className="bg-white p-3 rounded-md border border-stone-200 min-h-[90px] relative flex flex-col justify-center">
-          <div id="square-card-element" className="w-full min-h-[80px]" />
+        <div className="bg-white p-2 sm:p-3 rounded-sm border border-stone-200 min-h-[90px] w-full relative flex flex-col justify-center overflow-hidden">
+          <div id="square-card-element" className="w-full min-w-full min-h-[80px]" />
           {sdkLoading && (
             <div className="absolute inset-0 bg-white/95 flex items-center justify-center gap-2 text-stone-500 text-xs pointer-events-none">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#6b1e30] border-t-transparent" />
@@ -297,18 +300,18 @@ export default function SquarePaymentForm({
 
         {/* Sandbox Test Helper */}
         {environment === "sandbox" && (
-          <div className="p-3 bg-amber-50 rounded-md border border-amber-200/80 text-amber-900 text-xs space-y-1">
+          <div className="p-3 bg-amber-50 rounded-sm border border-amber-200/80 text-amber-900 text-xs space-y-1">
             <div className="font-bold flex items-center gap-1 text-[11px] uppercase tracking-wider text-amber-800">
               <Info className="w-3.5 h-3.5" /> Sandbox Test Card
             </div>
-            <p className="text-[11px] text-amber-800 font-mono">
+            <p className="text-[11px] text-amber-800 font-mono break-all">
               Card: <strong>4111 1111 1111 1111</strong> • Exp: <strong>12/30</strong> • CVV: <strong>123</strong> • Zip: <strong>2000</strong>
             </p>
           </div>
         )}
 
         {cardError && (
-          <div className="p-3 bg-red-50 rounded-md border border-red-200 text-red-700 text-xs flex items-center gap-2">
+          <div className="p-3 bg-red-50 rounded-sm border border-red-200 text-red-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{cardError}</span>
           </div>
@@ -316,23 +319,12 @@ export default function SquarePaymentForm({
       </div>
 
       {/* Buttons Row */}
-      <div className="flex items-center gap-3 pt-1">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isProcessing}
-            className="py-3.5 px-5 rounded-md border border-stone-300 hover:border-stone-400 text-stone-700 hover:text-stone-900 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 shrink-0"
-          >
-            Cancel
-          </button>
-        )}
-
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1 w-full">
         <button
           type="button"
           onClick={handlePayClick}
           disabled={isProcessing}
-          className="flex-1 py-3.5 px-6 rounded-md bg-[#6b1e30] hover:bg-[#07402b] text-white text-xs sm:text-sm font-extrabold uppercase tracking-[0.15em] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full sm:flex-1 py-4 px-6 rounded-sm bg-[#6b1e30] hover:bg-[#07402b] text-white text-xs sm:text-sm font-extrabold uppercase tracking-[0.15em] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer order-1 sm:order-2"
         >
           {isProcessing ? (
             <>
@@ -346,6 +338,17 @@ export default function SquarePaymentForm({
             </>
           )}
         </button>
+
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isProcessing}
+            className="w-full sm:w-auto py-3 px-5 rounded-sm border border-stone-300 hover:border-stone-400 text-stone-700 hover:text-stone-900 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 text-center order-2 sm:order-1"
+          >
+            Cancel &amp; Return to Cart
+          </button>
+        )}
       </div>
     </div>
   );

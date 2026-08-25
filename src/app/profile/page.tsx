@@ -203,35 +203,35 @@ export default function ProfilePage() {
                     {orders.map((ord) => (
                       <div
                         key={ord.id}
-                        className="bg-[#faf6f0] rounded-sm p-4 sm:p-5 text-xs space-y-3 shadow-xs hover:bg-[#f5efe3] transition-all"
+                        className="bg-[#faf6f0] rounded-sm p-3.5 sm:p-5 text-xs space-y-3 shadow-xs hover:bg-[#f5efe3] transition-all"
                       >
-                        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-stone-200/60 pb-3">
-                          <div>
-                            <h4 className="font-serif font-bold text-brand-green text-base sm:text-lg leading-snug">
-                              {getOrderProductTitle(ord.items)}
-                            </h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="font-mono text-[11px] text-stone-500 font-semibold bg-stone-200/60 px-2 py-0.5 rounded-sm">
-                                Order #{ord.orderNumber}
-                              </span>
-                              <span className="text-stone-300">•</span>
-                              <span className="text-[11px] text-stone-500">
-                                {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString("en-AU", { dateStyle: "medium" }) : "Recent"}
-                              </span>
-                            </div>
+                        {/* Card Header */}
+                        <div className="space-y-2 border-b border-stone-200/60 pb-3">
+                          <h4 className="font-serif font-bold text-brand-green text-base sm:text-lg leading-snug break-words">
+                            {getOrderProductTitle(ord.items)}
+                          </h4>
+                          
+                          <div className="flex flex-wrap items-center justify-between gap-y-1 gap-x-2 text-[11px]">
+                            <span className="font-mono text-stone-500 font-medium whitespace-nowrap">
+                              Order #{ord.orderNumber}
+                            </span>
+                            <span className="text-stone-500 whitespace-nowrap">
+                              {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString("en-AU", { dateStyle: "medium" }) : "Recent"}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-sm text-[10px] uppercase flex items-center gap-1">
+
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-sm text-[10px] uppercase flex items-center gap-1 shrink-0">
                               <CheckCircle className="h-3 w-3" /> Paid &amp; Confirmed
                             </span>
-                            <span className="font-sans font-bold text-sm text-[#6b1e30]">
+                            <span className="font-sans font-extrabold text-sm sm:text-base text-[#6b1e30] shrink-0 whitespace-nowrap">
                               A${ord.totalAmount.toFixed(2)}
                             </span>
                           </div>
                         </div>
 
-                        {/* Order Items Preview - Product Name Highlighted */}
-                        <div className="space-y-2 py-1">
+                        {/* Order Items Preview - Responsive Mobile Grid */}
+                        <div className="space-y-1.5 py-1">
                           {Array.isArray(ord.items) &&
                             ord.items.map((it: any, idx: number) => {
                               const itPrice = typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0);
@@ -239,21 +239,21 @@ export default function ProfilePage() {
                               const itemName = it.name || it.product?.name || "Gourmet Pie";
                               const variant = it.variantName || it.variant;
                               return (
-                                <div key={idx} className="flex justify-between items-center text-xs bg-white/70 p-2.5 rounded-sm">
-                                  <div className="flex items-center gap-2">
-                                    <span className="bg-brand-green/10 text-brand-green font-bold text-[11px] px-2 py-0.5 rounded-sm font-mono">
+                                <div key={idx} className="flex items-center justify-between text-xs bg-white/80 p-2 sm:p-2.5 rounded-sm gap-2 min-w-0">
+                                  <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1 pr-1">
+                                    <span className="bg-brand-green/10 text-brand-green font-bold text-[10px] px-1.5 py-0.5 rounded-sm font-mono shrink-0">
                                       {itQty}x
                                     </span>
-                                    <span className="font-serif font-bold text-stone-900 text-sm">
+                                    <span className="font-serif font-bold text-stone-900 text-xs sm:text-sm truncate">
                                       {itemName}
                                     </span>
                                     {variant && variant !== "Standard" && (
-                                      <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded-sm font-medium">
+                                      <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded-sm font-medium shrink-0">
                                         {variant}
                                       </span>
                                     )}
                                   </div>
-                                  <span className="font-mono text-stone-700 font-bold">
+                                  <span className="font-mono text-stone-800 font-bold shrink-0 text-xs sm:text-sm whitespace-nowrap">
                                     A${(itPrice * itQty).toFixed(2)}
                                   </span>
                                 </div>
@@ -266,7 +266,7 @@ export default function ProfilePage() {
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white bg-brand-green hover:bg-brand-gold hover:text-brand-green rounded-sm transition-all cursor-pointer shadow-xs"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white bg-brand-green hover:bg-brand-gold hover:text-brand-green rounded-sm transition-all cursor-pointer shadow-xs"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>View Order Details</span>
