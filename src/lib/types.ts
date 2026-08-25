@@ -145,6 +145,7 @@ export interface ReviewItem {
   date: string;
   comment: string;
   isVerified: boolean;
+  isFeatured?: boolean;
   status?: "pending" | "approved" | "rejected";
 }
 

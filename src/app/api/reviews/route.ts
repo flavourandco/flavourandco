@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("productId");
     const status = searchParams.get("status") || "approved";
+    const featuredOnly = searchParams.get("featured") === "true";
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
@@ -22,6 +23,10 @@ export async function GET(request: Request) {
           query = query.eq("product_id", productId);
         }
 
+        if (featuredOnly) {
+          query = query.eq("is_featured", true);
+        }
+
         if (status !== "all") {
           query = query.eq("status", status);
         }
@@ -32,7 +37,7 @@ export async function GET(request: Request) {
           const formattedReviews: ReviewItem[] = data.map((item) => ({
             id: item.id,
             productId: item.product_id || undefined,
-            productName: item.products?.name || "General Testimonial",
+            productName: item.product_name || item.products?.name || "General Testimonial",
             name: item.name,
             rating: item.rating,
             date: new Date(item.created_at).toLocaleDateString("en-US", {
@@ -42,6 +47,7 @@ export async function GET(request: Request) {
             }),
             comment: item.comment,
             isVerified: item.is_verified ?? true,
+            isFeatured: Boolean(item.is_featured),
             status: item.status || "approved",
           }));
 
@@ -65,12 +71,14 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validated = ReviewSchema.parse(body);
 
-    const record = {
+    const record: Record<string, any> = {
       product_id: validated.productId || null,
+      product_name: body.productName || null,
       name: validated.name,
       rating: validated.rating,
       comment: validated.comment,
       is_verified: validated.isVerified ?? true,
+      is_featured: validated.isFeatured ?? false,
       status: validated.status || "approved",
     };
 
@@ -84,7 +92,19 @@ export async function POST(request: Request) {
           .single();
 
         if (error) {
-          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+          // Fallback if product_name or is_featured column doesn't exist yet in DB schema
+          delete record.product_name;
+          delete record.is_featured;
+          const { data: retryData, error: retryError } = await supabase
+            .from("reviews")
+            .insert([record])
+            .select()
+            .single();
+
+          if (retryError) {
+            return NextResponse.json({ success: false, error: retryError.message }, { status: 400 });
+          }
+          return NextResponse.json({ success: true, data: retryData }, { status: 201 });
         }
 
         return NextResponse.json({ success: true, data }, { status: 201 });
@@ -107,10 +127,18 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const { id, status, isFeatured } = body;
 
-    if (!id || !["pending", "approved", "rejected"].includes(status)) {
-      return NextResponse.json({ success: false, error: "Invalid review status" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: "Review ID required" }, { status: 400 });
+    }
+
+    const updates: Record<string, any> = {};
+    if (status && ["pending", "approved", "rejected"].includes(status)) {
+      updates.status = status;
+    }
+    if (typeof isFeatured === "boolean") {
+      updates.is_featured = isFeatured;
     }
 
     if (isSupabaseConfigured()) {
@@ -118,11 +146,24 @@ export async function PUT(request: Request) {
       if (supabase) {
         const { data, error } = await supabase
           .from("reviews")
-          .update({ status })
+          .update(updates)
           .eq("id", id)
           .select();
 
         if (error) {
+          // If is_featured doesn't exist yet in DB schema, retry without it
+          delete updates.is_featured;
+          if (Object.keys(updates).length > 0) {
+            const { data: retryData, error: retryErr } = await supabase
+              .from("reviews")
+              .update(updates)
+              .eq("id", id)
+              .select();
+            if (retryErr) {
+              return NextResponse.json({ success: false, error: retryErr.message }, { status: 400 });
+            }
+            return NextResponse.json({ success: true, data: retryData });
+          }
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 

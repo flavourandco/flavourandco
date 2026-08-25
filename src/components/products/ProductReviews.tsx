@@ -1,117 +1,64 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, CheckCircle2, Send, Sparkles, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { Star, CheckCircle2, Send, X, MessageSquarePlus, UserCheck } from "lucide-react";
 import Button from "@/components/ui/Button";
 import ShowMore from "@/components/ui/ShowMore";
-
-export interface ReviewItem {
-  id: string;
-  name: string;
-  rating: number;
-  date: string;
-  comment: string;
-  isVerified: boolean;
-}
+import { useUIStore } from "@/store/ui.store";
+import { formatCustomerError } from "@/lib/error-formatter";
+import { BoneyardReviewCardSkeleton } from "@/components/ui/BoneyardSkeleton";
+import type { ReviewItem } from "@/lib/types";
 
 interface ProductReviewsProps {
   productId: string;
   productName: string;
 }
 
-const INITIAL_MOCK_REVIEWS: Record<string, ReviewItem[]> = {
-  default: [
-    {
-      id: "rev-1",
-      name: "Priya Sharma",
-      rating: 5,
-      date: "2 weeks ago",
-      comment:
-        "The pastry is flaky and golden, and the filling carries authentic Indian flavours with incredible depth. Our family finished the entire pack in one sitting!",
-      isVerified: true,
-    },
-    {
-      id: "rev-2",
-      name: "David Miller",
-      rating: 5,
-      date: "1 month ago",
-      comment:
-        "Served these at our weekend gathering and every single guest asked where I bought them. Heating in the air fryer took just 10 minutes!",
-      isVerified: true,
-    },
-    {
-      id: "rev-3",
-      name: "Ananya Patel",
-      rating: 5,
-      date: "1 month ago",
-      comment:
-        "Rich, aromatic spices and premium quality. Truly the best fusion of Australian pie pastry and authentic recipes.",
-      isVerified: true,
-    },
-    {
-      id: "rev-4",
-      name: "Marcus Vance",
-      rating: 5,
-      date: "2 months ago",
-      comment:
-        "Hands down the best butter chicken pie in Melbourne! The crust stays crispy and the meat is super tender.",
-      isVerified: true,
-    },
-    {
-      id: "rev-5",
-      name: "Sophie Lin",
-      rating: 5,
-      date: "2 months ago",
-      comment:
-        "Loved the spices and how easy they are to prepare from frozen. Will definitely order again for my next party!",
-      isVerified: true,
-    },
-    {
-      id: "rev-6",
-      name: "Liam O'Connor",
-      rating: 5,
-      date: "3 months ago",
-      comment:
-        "An absolute winner for family dinners. Everyone loved the distinct, rich flavour profile.",
-      isVerified: true,
-    },
-  ],
-};
-
-import { useUIStore } from "@/store/ui.store";
-import { formatCustomerError } from "@/lib/error-formatter";
-import { BoneyardReviewCardSkeleton } from "@/components/ui/BoneyardSkeleton";
-
 export default function ProductReviews({ productId, productName }: ProductReviewsProps) {
+  const { isSignedIn, user } = useUser();
+  const { openSignIn } = useClerk();
   const addToast = useUIStore((s) => s.addToast);
+
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [visibleCount, setVisibleCount] = useState<number>(4);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   // Form inputs
   const [newRating, setNewRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [newName, setNewName] = useState<string>("");
   const [newComment, setNewComment] = useState<string>("");
-
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const [successMsg, setSuccessMsg] = useState<string>("");
 
-  // Load reviews from Supabase API
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Load reviews strictly from Supabase API
+  const fetchProductReviews = async () => {
     setLoading(true);
-    fetch(`/api/reviews?productId=${productId}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
-          setReviews(json.data);
-        } else {
-          setReviews(INITIAL_MOCK_REVIEWS.default);
-        }
-      })
-      .catch(() => setReviews(INITIAL_MOCK_REVIEWS.default))
-      .finally(() => setLoading(false));
+    try {
+      const res = await fetch(`/api/reviews?productId=${productId}&t=${Date.now()}`);
+      const json = await res.json();
+      if (json?.success && Array.isArray(json.data)) {
+        setReviews(json.data);
+      } else {
+        setReviews([]);
+      }
+    } catch {
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductReviews();
   }, [productId]);
 
   // Handle ESC key to close modal
@@ -125,17 +72,35 @@ export default function ProductReviews({ productId, productName }: ProductReview
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
+  const handleOpenWriteReview = () => {
+    if (!isSignedIn) {
+      addToast("Please sign in to write a review.", "info");
+      openSignIn();
+      return;
+    }
+
+    const fetchedName =
+      user?.fullName ||
+      user?.firstName ||
+      user?.username ||
+      user?.primaryEmailAddress?.emailAddress ||
+      "Verified Customer";
+
+    setNewName(fetchedName);
+    setErrorMsg("");
+    setIsModalOpen(true);
+  };
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    setSuccessMsg("");
 
-    if (!newName.trim()) {
-      const msg = "Please enter your name.";
-      setErrorMsg(msg);
-      addToast(msg, "error");
+    if (!isSignedIn) {
+      addToast("Please sign in to submit a review.", "info");
+      openSignIn();
       return;
     }
+
     if (!newComment.trim()) {
       const msg = "Please write a brief review.";
       setErrorMsg(msg);
@@ -143,13 +108,16 @@ export default function ProductReviews({ productId, productName }: ProductReview
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId,
-          name: newName.trim(),
+          productName,
+          name: newName || "Verified Customer",
           rating: newRating,
           comment: newComment.trim(),
           isVerified: true,
@@ -158,22 +126,22 @@ export default function ProductReviews({ productId, productName }: ProductReview
       });
       const json = await res.json();
       if (json.success) {
-        const msg = "Thank you for your review! It's now live on our site.";
-        setSuccessMsg(msg);
-        addToast(msg, "success");
+        addToast("Review submitted successfully!", "success");
         const createdReview: ReviewItem = {
           id: json.data?.id || `rev-${Date.now()}`,
-          name: newName.trim(),
+          productId,
+          productName,
+          name: newName || "Verified Customer",
           rating: newRating,
           date: "Just now",
           comment: newComment.trim(),
           isVerified: true,
+          status: "approved",
         };
         setReviews((prev) => [createdReview, ...prev]);
-        setNewName("");
         setNewComment("");
         setNewRating(5);
-        setTimeout(() => setIsModalOpen(false), 1500);
+        setIsModalOpen(false);
       } else {
         const friendlyError = formatCustomerError(json.error);
         setErrorMsg(friendlyError);
@@ -183,6 +151,8 @@ export default function ProductReviews({ productId, productName }: ProductReview
       const friendlyError = formatCustomerError(err);
       setErrorMsg(friendlyError);
       addToast(friendlyError, "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -194,13 +164,12 @@ export default function ProductReviews({ productId, productName }: ProductReview
 
   const visibleReviews = reviews.slice(0, visibleCount);
   const hasMoreReviews = visibleCount < reviews.length;
-  const remainingReviews = reviews.length - visibleCount;
 
   return (
     <section className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-2 border-[#c69c40]/30">
       <div className="space-y-4 sm:space-y-6">
         
-        {/* Rating Summary Bar (Without review heading) */}
+        {/* Rating Summary Bar */}
         <div className="bg-white rounded-lg border border-[#c69c40]/25 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="flex items-baseline gap-2">
@@ -222,38 +191,21 @@ export default function ProductReviews({ productId, productName }: ProductReview
                 ))}
               </div>
               <span className="text-xs font-medium text-stone-500 mt-0.5 block">
-                Based on {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                {reviews.length === 0
+                  ? "No customer reviews yet"
+                  : `Based on ${reviews.length} review${reviews.length !== 1 ? "s" : ""}`}
               </span>
             </div>
           </div>
 
           <Button
             variant="primary"
-            onClick={() => {
-              setIsModalOpen(true);
-              setErrorMsg("");
-            }}
-            className="w-full sm:w-auto py-3 px-6 text-xs font-bold uppercase tracking-wider shadow-sm"
+            onClick={handleOpenWriteReview}
+            className="w-full sm:w-auto py-3 px-6 text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
           >
             Write a Review
           </Button>
         </div>
-
-        {/* Success Alert Banner */}
-        {successMsg && (
-          <div className="bg-[#07402b]/10 border border-[#07402b]/30 text-[#07402b] px-4 py-3 rounded-md text-xs sm:text-sm font-semibold flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 shrink-0 text-[#07402b]" />
-              <span>{successMsg}</span>
-            </div>
-            <button
-              onClick={() => setSuccessMsg("")}
-              className="text-stone-400 hover:text-stone-600 cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
 
         {/* Written Reviews List Grid */}
         {loading ? (
@@ -262,55 +214,65 @@ export default function ProductReviews({ productId, productName }: ProductReview
               <BoneyardReviewCardSkeleton key={i} />
             ))}
           </div>
+        ) : reviews.length === 0 ? (
+          <div className="bg-white/80 rounded-xl border border-stone-200 p-8 sm:p-12 text-center space-y-3 shadow-xs">
+            <MessageSquarePlus className="h-10 w-10 text-[#6b1e30]/40 mx-auto" />
+            <h4 className="font-serif text-lg font-bold text-[#07402b]">
+              Be the first to review {productName}!
+            </h4>
+            <p className="text-xs text-stone-600 max-w-sm mx-auto">
+              Have you tried this pie? Click the button above to share your experience with other food lovers.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {visibleReviews.map((rev) => (
-            <article
-              key={rev.id}
-              className="bg-white rounded-lg border border-stone-200/90 p-5 shadow-xs flex flex-col justify-between space-y-4 hover:border-[#c69c40]/40 transition-all"
-            >
-              <div className="space-y-3">
-                {/* Rating Stars & Date */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-0.5 text-brand-gold">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-3.5 w-3.5 ${
-                          i < rev.rating
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-stone-200"
-                        }`}
-                      />
-                    ))}
+            {visibleReviews.map((rev) => (
+              <article
+                key={rev.id}
+                className="bg-white rounded-lg border border-stone-200/90 p-5 shadow-xs flex flex-col justify-between space-y-4 hover:border-[#c69c40]/40 transition-all"
+              >
+                <div className="space-y-3">
+                  {/* Rating Stars & Date */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0.5 text-brand-gold">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-3.5 w-3.5 ${
+                            i < rev.rating
+                              ? "fill-brand-gold text-brand-gold"
+                              : "text-stone-200"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[11px] text-stone-400 font-medium">{rev.date}</span>
                   </div>
-                  <span className="text-[11px] text-stone-400 font-medium">{rev.date}</span>
+
+                  {/* Review Written Content */}
+                  <p className="text-stone-700 text-xs leading-relaxed italic">
+                    &ldquo;{rev.comment}&rdquo;
+                  </p>
                 </div>
 
-                {/* Review Written Content */}
-                <p className="text-stone-700 text-xs leading-relaxed italic">
-                  &ldquo;{rev.comment}&rdquo;
-                </p>
-              </div>
-
-              {/* Reviewer Info */}
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
-                <span className="font-serif font-bold text-xs text-[#6b1e30]">
-                  {rev.name}
-                </span>
-                {rev.isVerified && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#07402b] bg-[#07402b]/10 px-2 py-0.5 rounded">
-                    <CheckCircle2 className="h-3 w-3" />
-                    Verified Buyer
+                {/* Reviewer Info */}
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                  <span className="font-serif font-bold text-xs text-[#6b1e30]">
+                    {rev.name}
                   </span>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
+                  {rev.isVerified && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#07402b] bg-[#07402b]/10 px-2 py-0.5 rounded">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Verified Buyer
+                    </span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
         )}
 
-        {/* Reusable ShowMore Component (Only shown if total reviews > 4) */}
+        {/* Reusable ShowMore Component */}
         <ShowMore
           onClick={() => setVisibleCount((prev) => prev + 4)}
           hasMore={hasMoreReviews}
@@ -320,18 +282,18 @@ export default function ProductReviews({ productId, productName }: ProductReview
       </div>
 
       {/* ───────────────────────────────────────────────────────────
-          WRITE A REVIEW POPUP MODAL WITH BACKDROP OVERLAY
+          WRITE A REVIEW FULL SCREEN POPUP MODAL (REACT PORTAL TO DOCUMENT.BODY)
          ─────────────────────────────────────────────────────────── */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-fadeIn overflow-y-auto" data-lenis-prevent>
+      {mounted && isModalOpen && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-sm animate-fadeIn overflow-y-auto" data-lenis-prevent>
           {/* Backdrop Click Dismiss */}
           <div
-            className="absolute inset-0"
+            className="fixed inset-0"
             onClick={() => setIsModalOpen(false)}
           />
 
           {/* Modal Body Container */}
-          <div className="relative z-10 w-full max-w-lg bg-cream rounded-xl border-2 border-[#6b1e30]/30 shadow-2xl p-6 sm:p-8 space-y-5 my-auto shrink-0 max-h-[88vh] overflow-y-auto overscroll-contain" data-lenis-prevent>
+          <div className="relative z-10 w-full max-w-lg bg-cream rounded-xl border-2 border-[#6b1e30]/30 shadow-2xl p-6 sm:p-8 space-y-5 my-auto shrink-0 max-h-[90vh] overflow-y-auto overscroll-contain" data-lenis-prevent>
             {/* Header */}
             <div className="flex items-start justify-between border-b border-stone-200/80 pb-4">
               <div>
@@ -392,19 +354,20 @@ export default function ProductReviews({ productId, productName }: ProductReview
                 </div>
               </div>
 
-              {/* Name Input */}
+              {/* Reviewer Name (Auto-fetched from Clerk Account — Non-editable) */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-stone-700">
-                  Your Name <span className="text-red-500">*</span>
+                  Reviewer Name
                 </label>
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g. Sarah J."
-                  className="w-full bg-white border border-stone-300 rounded-md px-3.5 py-2.5 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#6b1e30]"
-                  required
-                />
+                <div className="w-full bg-stone-100 border border-stone-300 rounded-md px-3.5 py-2.5 text-xs font-semibold text-stone-800 flex items-center justify-between cursor-not-allowed select-none">
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="h-4 w-4 text-[#07402b]" />
+                    <span>{newName || "Logged-in Customer"}</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-[#07402b] bg-[#07402b]/10 px-2 py-0.5 rounded border border-[#07402b]/20 uppercase">
+                    Verified Account
+                  </span>
+                </div>
               </div>
 
               {/* Review Text Input */}
@@ -434,15 +397,17 @@ export default function ProductReviews({ productId, productName }: ProductReview
                 <Button
                   type="submit"
                   variant="primary"
-                  className="py-2.5 px-6 text-xs font-bold uppercase tracking-wider gap-2 shadow-md"
+                  disabled={isSubmitting}
+                  className="py-2.5 px-6 text-xs font-bold uppercase tracking-wider gap-2 shadow-md cursor-pointer disabled:opacity-50"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  <span>Submit Review</span>
+                  <span>{isSubmitting ? "Submitting..." : "Submit Review"}</span>
                 </Button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

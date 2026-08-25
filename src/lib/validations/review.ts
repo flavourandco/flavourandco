@@ -2,11 +2,13 @@ import { z } from "zod";
 
 export const ReviewSchema = z.object({
   id: z.string().optional(),
-  productId: z.string().optional(),
+  productId: z.string().optional().nullable(),
+  productName: z.string().optional().nullable(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   rating: z.number().int().min(1).max(5),
   comment: z.string().min(5, "Comment must be at least 5 characters"),
   isVerified: z.boolean().default(true),
+  isFeatured: z.boolean().default(false),
   status: z.enum(["pending", "approved", "rejected"]).default("approved"),
 });
 
