@@ -88,13 +88,15 @@ CREATE TABLE IF NOT EXISTS public.contact_inquiries (
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number TEXT UNIQUE NOT NULL,
+    user_id TEXT,
+    idempotency_key TEXT,
     customer_name TEXT NOT NULL,
     customer_email TEXT NOT NULL,
     customer_phone TEXT,
     shipping_address JSONB DEFAULT '{}'::jsonb,
     shipping_method TEXT DEFAULT 'Standard Express Delivery',
     payment_method TEXT DEFAULT 'Square Credit Card',
-    payment_status TEXT DEFAULT 'paid' CHECK (payment_status IN ('paid', 'pending', 'refunded', 'failed')),
+    payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('paid', 'pending', 'refunded', 'failed', 'canceled')),
     square_payment_id TEXT,
     square_transaction_id TEXT,
     square_receipt_url TEXT,
@@ -103,7 +105,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     shipping_fee NUMERIC(10, 2) DEFAULT 0.00,
     tax_amount NUMERIC(10, 2) DEFAULT 0.00,
     total_amount NUMERIC(10, 2) NOT NULL,
-    status TEXT DEFAULT 'completed' CHECK (status IN ('completed', 'processing', 'shipped', 'pending', 'cancelled')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('completed', 'processing', 'shipped', 'pending', 'cancelled')),
     items_count INTEGER DEFAULT 1,
     fulfillment_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -119,6 +121,32 @@ CREATE TABLE IF NOT EXISTS public.users (
     image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 8. PAYMENT ATTEMPTS TABLE (Tracking Server-Authoritative Attempts & Idempotency)
+CREATE TABLE IF NOT EXISTS public.payment_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+    order_number TEXT NOT NULL,
+    user_id TEXT,
+    idempotency_key TEXT UNIQUE NOT NULL,
+    square_payment_id TEXT,
+    amount NUMERIC(10, 2) NOT NULL,
+    currency TEXT DEFAULT 'AUD',
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'canceled')),
+    raw_response JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. WEBHOOK EVENTS TABLE (Square Webhook Event Deduplication & Idempotency)
+CREATE TABLE IF NOT EXISTS public.webhook_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id TEXT UNIQUE NOT NULL,
+    event_type TEXT NOT NULL,
+    status TEXT DEFAULT 'processed' CHECK (status IN ('processed', 'ignored', 'failed')),
+    payload JSONB DEFAULT '{}'::jsonb,
+    processed_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- =====================================================================

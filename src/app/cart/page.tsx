@@ -36,6 +36,7 @@ export default function CartPage() {
   const getSubtotal = useCartStore((s) => s.getSubtotal);
   const getShippingFee = useCartStore((s) => s.getShippingFee);
   const getTotal = useCartStore((s) => s.getTotal);
+  const freeShippingThreshold = useFreeDeliveryThreshold();
 
   useEffect(() => {
     setMounted(true);
@@ -50,7 +51,7 @@ export default function CartPage() {
         hideHeader
       >
         <div className="bg-[#fdfbf7] min-h-[75vh] flex flex-col items-center justify-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-[#6b1e30] border-t-transparent" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#6b1e30] border-t-transparent" />
           <span className="text-xs font-serif font-semibold text-stone-500 uppercase tracking-widest">
             Loading your cart...
           </span>
@@ -62,7 +63,6 @@ export default function CartPage() {
   const subtotal = getSubtotal();
   const shippingFee = getShippingFee();
   const total = getTotal();
-  const freeShippingThreshold = useFreeDeliveryThreshold();
   const progressToFreeShipping = Math.min(100, (subtotal / freeShippingThreshold) * 100);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const totalItemsCount = items.reduce((acc, i) => acc + i.quantity, 0);
@@ -92,7 +92,7 @@ export default function CartPage() {
             </div>
 
             {/* Stepper Pill */}
-            <div className="flex items-center gap-2 text-xs font-medium text-stone-500 bg-white px-4 py-2 rounded-full border border-[#c69c40]/20 shadow-2xs">
+            <div className="flex items-center gap-2 text-xs font-medium text-stone-500 bg-white px-4 py-2 rounded-lg border border-[#c69c40]/20 shadow-2xs">
               <span className="text-[#6b1e30] font-bold flex items-center gap-1">
                 Cart ({totalItemsCount})
               </span>
@@ -105,8 +105,8 @@ export default function CartPage() {
           
           {items.length === 0 ? (
             /* EMPTY CART LUXURY STATE */
-            <div className="mx-auto max-w-2xl text-center py-20 bg-white rounded-3xl border border-[#c69c40]/25 p-8 sm:p-12 shadow-sm space-y-5">
-              <div className="h-20 w-20 mx-auto rounded-full bg-[#faf6f0] border border-[#c69c40]/20 flex items-center justify-center text-[#6b1e30] shadow-xs">
+            <div className="mx-auto max-w-2xl text-center py-20 bg-white rounded-xl border border-[#c69c40]/25 p-8 sm:p-12 shadow-sm space-y-5">
+              <div className="h-20 w-20 mx-auto rounded-xl bg-[#faf6f0] border border-[#c69c40]/20 flex items-center justify-center text-[#6b1e30] shadow-xs">
                 <ShoppingBag className="h-9 w-9 stroke-[1.5]" />
               </div>
               <div className="space-y-2">
@@ -119,7 +119,7 @@ export default function CartPage() {
               </div>
               <div className="pt-4">
                 <Link href="/shop">
-                  <Button variant="primary" className="py-3.5 px-8 text-xs font-bold uppercase tracking-widest rounded-full shadow-md hover:shadow-lg">
+                  <Button variant="primary" className="py-3.5 px-8 text-xs font-bold uppercase tracking-widest rounded-lg shadow-md hover:shadow-lg">
                     Explore Gourmet Menu
                   </Button>
                 </Link>
@@ -133,7 +133,7 @@ export default function CartPage() {
               <div className="lg:col-span-7 space-y-6">
                 
                 {/* Free Shipping Progress Indicator */}
-                <div className="bg-white rounded-2xl border border-[#c69c40]/25 p-5 shadow-xs space-y-2.5">
+                <div className="bg-white rounded-lg border border-[#c69c40]/25 p-5 shadow-xs space-y-2.5">
                   <div className="flex items-center justify-between text-xs font-bold text-stone-700">
                     <span className="flex items-center gap-2 text-[#07402b]">
                       <Truck className="h-4 w-4 text-[#07402b]" />
@@ -149,16 +149,16 @@ export default function CartPage() {
                     </span>
                     <span className="font-mono text-stone-400 text-[11px]">{progressToFreeShipping.toFixed(0)}%</span>
                   </div>
-                  <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-stone-100 rounded-md overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#c69c40] via-[#07402b] to-emerald-600 transition-all duration-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-[#c69c40] via-[#07402b] to-emerald-600 transition-all duration-500 rounded-md"
                       style={{ width: `${progressToFreeShipping}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Items List Container */}
-                <div className="bg-white rounded-3xl border border-[#c69c40]/25 p-6 sm:p-7 shadow-xs space-y-5">
+                <div className="bg-white rounded-xl border border-[#c69c40]/25 p-6 sm:p-7 shadow-xs space-y-5">
                   <div className="flex items-center justify-between pb-4 border-b border-stone-100">
                     <h2 className="font-serif text-lg sm:text-xl font-bold text-[#07402b]">
                       Selected Items ({totalItemsCount})
@@ -178,13 +178,14 @@ export default function CartPage() {
 
                   <div className="divide-y divide-stone-100 space-y-4">
                     {items.map((item) => {
-                      const slug = item.product.name
+                      if (!item || !item.product) return null;
+                      const slug = (item.product.name || "pie")
                         .toLowerCase()
                         .replace(/[^a-z0-9]+/g, "-")
                         .replace(/(^-|-$)+/g, "");
                       const detailUrl = `/shop/${slug}/${item.product.id}`;
-                      const lineTotal = item.unitPrice * item.quantity;
-                      const imageSrc = item.product.images?.[0] || item.product.image;
+                      const lineTotal = (item.unitPrice || item.product.price || 0) * (item.quantity || 1);
+                      const imageSrc = item.product.images?.[0] || item.product.image || "/products/butter-chicken-pie.png";
 
                       return (
                         <div
@@ -192,34 +193,59 @@ export default function CartPage() {
                           className="pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all"
                         >
                           {/* Thumbnail & Product Info */}
-                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                          <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
                             <Link
                               href={detailUrl}
-                              className="relative h-20 w-20 sm:h-22 sm:w-22 shrink-0 overflow-hidden rounded-2xl border border-[#c69c40]/25 bg-[#faf6f0] shadow-2xs group"
+                              className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-lg border border-[#c69c40]/25 bg-[#faf6f0] shadow-2xs group mt-0.5 sm:mt-0"
                             >
                               <Image
                                 src={imageSrc}
                                 alt={item.product.name}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                sizes="88px"
+                                sizes="96px"
                               />
                             </Link>
 
-                            <div className="space-y-1 min-w-0">
+                            <div className="space-y-1.5 min-w-0 flex-1">
+                              {/* Badges / Category Pills */}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {item.product.badge && (
+                                  <span className="bg-[#6b1e30] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+                                    {item.product.badge}
+                                  </span>
+                                )}
+                                {item.product.category && (
+                                  <span className="bg-[#07402b]/10 text-[#07402b] text-[9px] font-extrabold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+                                    {item.product.category.replace(/-/g, " ")}
+                                  </span>
+                                )}
+                              </div>
+
                               <Link href={detailUrl} className="hover:text-[#6b1e30] transition-colors block">
-                                <h3 className="font-serif font-bold text-stone-900 text-sm sm:text-base leading-snug truncate">
+                                <h3 className="font-serif font-bold text-stone-900 text-sm sm:text-base leading-snug break-words whitespace-normal">
                                   {item.product.name}
                                 </h3>
                               </Link>
+
+                              {item.product.shortDescription && (
+                                <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
+                                  {item.product.shortDescription}
+                                </p>
+                              )}
                               
-                              <div className="flex flex-wrap items-center gap-2 text-[10px]">
+                              <div className="flex flex-wrap items-center gap-2 text-[10px] pt-0.5">
                                 {item.variantName && (
-                                  <span className="bg-stone-100 text-stone-700 font-semibold px-2 py-0.5 rounded border border-stone-200">
-                                    {item.variantName}
+                                  <span className="bg-stone-100 text-stone-800 font-semibold px-2 py-0.5 rounded-sm border border-stone-200">
+                                    Option: {item.variantName}
                                   </span>
                                 )}
-                                <span className="text-stone-400 font-mono">
+                                {item.product.packInfo && (
+                                  <span className="bg-[#faf6f0] text-stone-700 font-medium px-2 py-0.5 rounded-sm border border-[#c69c40]/30 font-mono">
+                                    {item.product.packInfo}
+                                  </span>
+                                )}
+                                <span className="text-stone-400 font-mono font-semibold">
                                   A${item.unitPrice.toFixed(2)} each
                                 </span>
                               </div>
@@ -229,11 +255,11 @@ export default function CartPage() {
                           {/* Stepper, Total, & Remove */}
                           <div className="flex items-center justify-between w-full sm:w-auto gap-5 border-t sm:border-t-0 pt-3 sm:pt-0 border-stone-100">
                             {/* Stepper */}
-                            <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-xl p-1 shadow-2xs">
+                            <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-md p-1 shadow-2xs">
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="h-7 w-7 rounded-lg bg-white hover:bg-[#6b1e30] text-stone-600 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-stone-200 shadow-2xs"
+                                className="h-7 w-7 rounded-md bg-white hover:bg-[#6b1e30] text-stone-600 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-stone-200 shadow-2xs"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-3 w-3" />
@@ -244,7 +270,7 @@ export default function CartPage() {
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="h-7 w-7 rounded-lg bg-white hover:bg-[#6b1e30] text-stone-600 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-stone-200 shadow-2xs"
+                                className="h-7 w-7 rounded-md bg-white hover:bg-[#6b1e30] text-stone-600 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-stone-200 shadow-2xs"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-3 w-3" />
@@ -262,7 +288,7 @@ export default function CartPage() {
                             <button
                               type="button"
                               onClick={() => removeItem(item.id)}
-                              className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                              className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
                               aria-label="Remove item"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -290,7 +316,7 @@ export default function CartPage() {
               <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-[132px] self-start">
                 
                 {/* Luxury Receipt Card */}
-                <div className="bg-white rounded-3xl border border-[#c69c40]/30 p-6 sm:p-7 shadow-md space-y-6 relative overflow-hidden">
+                <div className="bg-white rounded-xl border border-[#c69c40]/30 p-6 sm:p-7 shadow-md space-y-6 relative overflow-hidden">
                   
                   {/* Top Decorative Gold Foil Header Accent */}
                   <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#07402b] via-[#c69c40] to-[#6b1e30]" />
@@ -304,7 +330,7 @@ export default function CartPage() {
                         Estimated Total
                       </h3>
                     </div>
-                    <span className="text-xs font-mono font-extrabold text-[#6b1e30] bg-[#6b1e30]/10 px-3 py-1 rounded-full">
+                    <span className="text-xs font-mono font-extrabold text-[#6b1e30] bg-[#6b1e30]/10 px-3 py-1 rounded-md">
                       {totalItemsCount} {totalItemsCount === 1 ? "Item" : "Items"}
                     </span>
                   </div>
@@ -321,7 +347,7 @@ export default function CartPage() {
                         <Truck className="w-3.5 h-3.5 text-[#07402b]" />
                       </div>
                       {subtotal >= freeShippingThreshold ? (
-                        <span className="font-extrabold font-sans text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider">
+                        <span className="font-extrabold font-sans text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider">
                           FREE
                         </span>
                       ) : (
@@ -350,26 +376,21 @@ export default function CartPage() {
                   <Button
                     onClick={() => router.push("/checkout")}
                     variant="primary"
-                    className="w-full py-4 px-6 text-xs font-bold uppercase tracking-widest gap-2 shadow-md hover:shadow-lg rounded-full"
+                    className="w-full py-4 px-6 text-xs font-bold uppercase tracking-widest gap-2 shadow-md hover:shadow-lg rounded-lg"
                   >
                     <span>Proceed to Secure Checkout</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
 
-                  {/* Trust Footer Badges */}
-                  <div className="bg-[#faf6f0] p-4 rounded-2xl border border-[#c69c40]/25 space-y-2 text-[11px] text-stone-700">
-                    <div className="flex items-center gap-2.5">
-                      <Truck className="h-4 w-4 text-[#07402b] shrink-0" />
-                      <span><strong>Direct Cold-Chain Delivery</strong> across Australia</span>
+                  {/* Artisanal Bakery Order Promise Box */}
+                  <div className="bg-stone-50 p-4 rounded-lg border border-stone-200/80 text-xs space-y-2 text-stone-700">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-[#07402b]">
+                      <span>Small-Batch Artisanal Baking</span>
+                      <span className="text-[#6b1e30]">Freshly Prepared</span>
                     </div>
-                    <div className="flex items-center gap-2.5">
-                      <Flame className="h-4 w-4 text-[#6b1e30] shrink-0" />
-                      <span><strong>Oven &amp; Air Fryer Ready</strong> in minutes</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <ShieldCheck className="h-4 w-4 text-[#c69c40] shrink-0" />
-                      <span><strong>100% Satisfaction &amp; Quality</strong> Guarantee</span>
-                    </div>
+                    <p className="text-[11px] text-stone-500 leading-relaxed">
+                      Every pie and pastry is handcrafted using authentic Australian ingredients and original secret spice blends.
+                    </p>
                   </div>
 
                 </div>
