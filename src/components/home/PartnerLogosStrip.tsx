@@ -50,6 +50,7 @@ export default function PartnerLogosStrip({
                   src={logo.src}
                   alt={logo.name}
                   fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
                   className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:scale-105"
                 />
               </div>

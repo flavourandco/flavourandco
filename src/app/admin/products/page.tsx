@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Edit2, Trash2, Search, X, Tag, Eye } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, X, Tag, Eye, ChevronUp, ChevronDown, Check } from "lucide-react";
 import { Product, ProductVariant, WhyStandOutPoint } from "@/lib/types";
 import { useProductStore } from "@/store/product.store";
 import { useUIStore } from "@/store/ui.store";
@@ -67,6 +67,20 @@ export default function AdminProductsPage() {
   const [newWhyTitle, setNewWhyTitle] = useState("");
   const [newWhyDesc, setNewWhyDesc] = useState("");
   const [newDetailInput, setNewDetailInput] = useState("");
+
+  // Variant editing & reordering state
+  const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null);
+  const [editVariantName, setEditVariantName] = useState("");
+  const [editVariantPrice, setEditVariantPrice] = useState<number>(0);
+
+  // Highlights editing & reordering state
+  const [editingWhyIndex, setEditingWhyIndex] = useState<number | null>(null);
+  const [editWhyTitle, setEditWhyTitle] = useState("");
+  const [editWhyDesc, setEditWhyDesc] = useState("");
+
+  // Product Specs / Details editing & reordering state
+  const [editingDetailIndex, setEditingDetailIndex] = useState<number | null>(null);
+  const [editDetailText, setEditDetailText] = useState("");
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -247,7 +261,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  // Helper additions
+  // Variant helpers
   const addVariant = () => {
     if (!newVariantName.trim()) return;
     const v: ProductVariant = {
@@ -259,10 +273,52 @@ export default function AdminProductsPage() {
     setNewVariantPrice(0);
   };
 
-  const removeVariant = (name: string) => {
-    setFormData((prev) => ({ ...prev, variants: prev.variants.filter((v) => v.name !== name) }));
+  const removeVariant = (index: number) => {
+    setFormData((prev) => ({ ...prev, variants: prev.variants.filter((_, i) => i !== index) }));
+    if (editingVariantIndex === index) setEditingVariantIndex(null);
   };
 
+  const startEditVariant = (index: number) => {
+    const v = formData.variants[index];
+    if (!v) return;
+    setEditingVariantIndex(index);
+    setEditVariantName(v.name);
+    setEditVariantPrice(v.price);
+  };
+
+  const saveEditVariant = (index: number) => {
+    if (!editVariantName.trim()) return;
+    setFormData((prev) => {
+      const updated = [...prev.variants];
+      updated[index] = { name: editVariantName.trim(), price: Number(editVariantPrice) };
+      return { ...prev, variants: updated };
+    });
+    setEditingVariantIndex(null);
+  };
+
+  const moveVariantUp = (index: number) => {
+    if (index <= 0) return;
+    setFormData((prev) => {
+      const updated = [...prev.variants];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, variants: updated };
+    });
+  };
+
+  const moveVariantDown = (index: number) => {
+    if (index >= formData.variants.length - 1) return;
+    setFormData((prev) => {
+      const updated = [...prev.variants];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, variants: updated };
+    });
+  };
+
+  // Highlights helpers
   const addWhyPoint = () => {
     if (!newWhyTitle.trim()) return;
     const item: WhyStandOutPoint = {
@@ -276,6 +332,98 @@ export default function AdminProductsPage() {
 
   const removeWhyPoint = (index: number) => {
     setFormData((prev) => ({ ...prev, whyStandOut: prev.whyStandOut.filter((_, i) => i !== index) }));
+    if (editingWhyIndex === index) setEditingWhyIndex(null);
+  };
+
+  const startEditWhyPoint = (index: number) => {
+    const pt = formData.whyStandOut[index];
+    if (!pt) return;
+    setEditingWhyIndex(index);
+    setEditWhyTitle(pt.title);
+    setEditWhyDesc(pt.text);
+  };
+
+  const saveEditWhyPoint = (index: number) => {
+    if (!editWhyTitle.trim()) return;
+    setFormData((prev) => {
+      const updated = [...prev.whyStandOut];
+      updated[index] = { title: editWhyTitle.trim(), text: editWhyDesc.trim() };
+      return { ...prev, whyStandOut: updated };
+    });
+    setEditingWhyIndex(null);
+  };
+
+  const moveWhyPointUp = (index: number) => {
+    if (index <= 0) return;
+    setFormData((prev) => {
+      const updated = [...prev.whyStandOut];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, whyStandOut: updated };
+    });
+  };
+
+  const moveWhyPointDown = (index: number) => {
+    if (index >= formData.whyStandOut.length - 1) return;
+    setFormData((prev) => {
+      const updated = [...prev.whyStandOut];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, whyStandOut: updated };
+    });
+  };
+
+  // Specs / Details helpers
+  const addDetailPoint = () => {
+    if (!newDetailInput.trim()) return;
+    setFormData((prev) => ({ ...prev, productDetails: [...(prev.productDetails || []), newDetailInput.trim()] }));
+    setNewDetailInput("");
+  };
+
+  const removeDetailPoint = (index: number) => {
+    setFormData((prev) => ({ ...prev, productDetails: (prev.productDetails || []).filter((_, i) => i !== index) }));
+    if (editingDetailIndex === index) setEditingDetailIndex(null);
+  };
+
+  const startEditDetailPoint = (index: number) => {
+    const text = (formData.productDetails || [])[index];
+    if (text === undefined) return;
+    setEditingDetailIndex(index);
+    setEditDetailText(text);
+  };
+
+  const saveEditDetailPoint = (index: number) => {
+    if (!editDetailText.trim()) return;
+    setFormData((prev) => {
+      const updated = [...(prev.productDetails || [])];
+      updated[index] = editDetailText.trim();
+      return { ...prev, productDetails: updated };
+    });
+    setEditingDetailIndex(null);
+  };
+
+  const moveDetailUp = (index: number) => {
+    if (index <= 0) return;
+    setFormData((prev) => {
+      const updated = [...(prev.productDetails || [])];
+      const temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, productDetails: updated };
+    });
+  };
+
+  const moveDetailDown = (index: number) => {
+    if (index >= (formData.productDetails || []).length - 1) return;
+    setFormData((prev) => {
+      const updated = [...(prev.productDetails || [])];
+      const temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      return { ...prev, productDetails: updated };
+    });
   };
 
   const filteredProducts = products.filter((p) => {
@@ -459,14 +607,19 @@ export default function AdminProductsPage() {
                 <div className="space-y-2 flex-1">
                   <span className="px-2.5 py-0.5 bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-sm">{viewingProduct.category}</span>
                   <h3 className="font-bold text-lg text-slate-900">{viewingProduct.name}</h3>
-                  <p className="text-slate-500 italic text-xs">{viewingProduct.tagline || "No tagline set"}</p>
+                  {viewingProduct.tagline && (
+                    <p className="text-amber-900 font-serif italic text-xs font-medium">&ldquo;{viewingProduct.tagline}&rdquo;</p>
+                  )}
+                  {viewingProduct.shortDescription && (
+                    <p className="text-slate-600 text-xs leading-relaxed">{viewingProduct.shortDescription}</p>
+                  )}
                   <div className="pt-2 flex items-center gap-4 border-t border-slate-200/60">
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">PRICE</span>
                       <span className="font-extrabold text-lg text-slate-900">${viewingProduct.price.toFixed(2)} AUD</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">PACKAGING</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase block">SERVINGS / PACK</span>
                       <span className="font-semibold text-slate-800 text-xs">{viewingProduct.packInfo}</span>
                     </div>
                     {viewingProduct.badge && (
@@ -491,7 +644,7 @@ export default function AdminProductsPage() {
                     {viewingProduct.variants.map((v, i) => (
                       <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-sm flex items-center justify-between">
                         <span className="font-bold text-slate-800 text-xs">{v.name}</span>
-                        <span className="font-extrabold text-slate-900 text-xs">${v.price.toFixed(2)}</span>
+                        <span className="font-extrabold text-slate-900 text-xs">${v.price.toFixed(2)} AUD</span>
                       </div>
                     ))}
                   </div>
@@ -506,6 +659,19 @@ export default function AdminProductsPage() {
                       <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-sm space-y-1">
                         <p className="font-bold text-slate-900 text-xs">{pt.title}</p>
                         <p className="text-xs text-slate-600 leading-relaxed">{pt.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {viewingProduct.productDetails && viewingProduct.productDetails.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">Key Features &amp; Specifications</h4>
+                  <div className="space-y-1">
+                    {viewingProduct.productDetails.map((detail, i) => (
+                      <div key={i} className="p-2.5 bg-slate-50 border border-slate-200 rounded-sm text-xs font-medium text-slate-800">
+                        {detail}
                       </div>
                     ))}
                   </div>
@@ -527,7 +693,7 @@ export default function AdminProductsPage() {
                 <h2 className="text-base font-bold text-slate-900">
                   {editingProduct ? `Edit Product — ${editingProduct.name}` : "Create New Product"}
                 </h2>
-                <p className="text-[11px] text-slate-500">Configure database attributes, pricing, media, and features.</p>
+                <p className="text-[11px] text-slate-500">Configure database attributes, pricing, tagline, short description, media, and features.</p>
               </div>
               <button
                 onClick={handleAttemptCloseEdit}
@@ -569,9 +735,10 @@ export default function AdminProductsPage() {
               <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 overscroll-contain" data-lenis-prevent>
                 {activeTab === "basic" && (
                   <div className="space-y-4">
+                    {/* Row 1: Product ID/Slug & Product Name */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">* Product ID / Slug</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">* Slug</label>
                         <input
                           type="text"
                           required
@@ -595,7 +762,22 @@ export default function AdminProductsPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Row 2: Tagline */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Tagline
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.tagline}
+                        onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                        placeholder='e.g. Tender chicken in a rich, aromatic tomato and butter gravy encased in flaky pastry'
+                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-serif italic text-amber-950"
+                      />
+                    </div>
+
+                    {/* Row 3: Category, Base Price, Servings & Pack Info, Badge Tag */}
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">* Category</label>
                         <select
@@ -609,7 +791,7 @@ export default function AdminProductsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">* Price ($ AUD)</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">* Base Price ($ AUD)</label>
                         <input
                           type="number"
                           step="0.01"
@@ -620,24 +802,49 @@ export default function AdminProductsPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Pack Info</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Servings &amp; Pack Info</label>
                         <input
                           type="text"
                           value={formData.packInfo}
                           onChange={(e) => setFormData({ ...formData, packInfo: e.target.value })}
-                          placeholder="e.g. Pack of 12"
+                          placeholder="e.g. Pack of 12 (12 Servings)"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Badge Tag</label>
+                        <input
+                          type="text"
+                          value={formData.badge}
+                          onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+                          placeholder="e.g. Best Seller, Chef Special"
                           className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
                         />
                       </div>
                     </div>
 
+                    {/* Row 4: Short Description */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Full Description</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Short Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={formData.shortDescription}
+                        onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                        placeholder="e.g. Delicious handcrafted 12-pack gourmet pies delivered temperature-controlled directly to your door Sydney-wide."
+                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                      />
+                    </div>
+
+                    {/* Row 5: Full Product Description */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Full Detailed Description</label>
                       <textarea
                         rows={5}
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        placeholder="Detailed product story and description..."
+                        placeholder="Detailed product story, ingredient craftsmanship, heating notes, and description..."
                         className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
                       />
                     </div>
@@ -659,56 +866,334 @@ export default function AdminProductsPage() {
                 )}
 
                 {activeTab === "variants" && (
-                  <div className="space-y-4">
-                    <label className="block text-xs font-bold text-slate-700">Variants</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newVariantName}
-                        onChange={(e) => setNewVariantName(e.target.value)}
-                        placeholder="Variant Name"
-                        className="flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm"
-                      />
-                      <input
-                        type="number"
-                        value={newVariantPrice}
-                        onChange={(e) => setNewVariantPrice(parseFloat(e.target.value) || 0)}
-                        placeholder="Price"
-                        className="w-28 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm"
-                      />
-                      <button type="button" onClick={addVariant} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm cursor-pointer hover:bg-black transition-colors">Add</button>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-900 mb-1">Add Product Variant</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newVariantName}
+                          onChange={(e) => setNewVariantName(e.target.value)}
+                          placeholder="Variant Name (e.g. Pack of 6)"
+                          className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                        />
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={newVariantPrice}
+                          onChange={(e) => setNewVariantPrice(parseFloat(e.target.value) || 0)}
+                          placeholder="Price ($ AUD)"
+                          className="w-32 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                        />
+                        <button type="button" onClick={addVariant} className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-sm cursor-pointer hover:bg-black transition-colors flex items-center gap-1">
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Variant</span>
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="space-y-1.5 pt-2">
-                      {formData.variants.map((v, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 bg-slate-50 border border-slate-200 rounded-sm text-xs">
-                          <span className="font-bold text-slate-800">{v.name} — ${v.price.toFixed(2)}</span>
-                          <button type="button" onClick={() => removeVariant(v.name)} className="text-rose-600 font-bold hover:underline cursor-pointer">Remove</button>
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">Configured Variants ({formData.variants.length})</label>
+                      </div>
+
+                      {formData.variants.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic p-3 bg-slate-50 border border-slate-200 rounded-sm">No variants added yet. Default product price will be used.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {formData.variants.map((v, i) => (
+                            <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-sm text-xs flex items-center justify-between gap-3">
+                              {editingVariantIndex === i ? (
+                                <div className="flex items-center gap-2 flex-1">
+                                  <input
+                                    type="text"
+                                    value={editVariantName}
+                                    onChange={(e) => setEditVariantName(e.target.value)}
+                                    className="flex-1 px-2.5 py-1 text-xs bg-white border border-slate-300 rounded-sm font-semibold"
+                                  />
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={editVariantPrice}
+                                    onChange={(e) => setEditVariantPrice(parseFloat(e.target.value) || 0)}
+                                    className="w-24 px-2.5 py-1 text-xs bg-white border border-slate-300 rounded-sm font-bold"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => saveEditVariant(i)}
+                                    className="p-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-sm cursor-pointer"
+                                    title="Save Variant"
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingVariantIndex(null)}
+                                    className="p-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-sm cursor-pointer"
+                                    title="Cancel"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="font-bold text-slate-800 text-xs flex-1">
+                                    {v.name} &mdash; <span className="text-slate-900">${v.price.toFixed(2)} AUD</span>
+                                  </span>
+
+                                  <div className="flex items-center gap-1">
+                                    {/* Edit & Delete Buttons */}
+                                    <button
+                                      type="button"
+                                      onClick={() => startEditVariant(i)}
+                                      className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer"
+                                      title="Edit Variant"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeVariant(i)}
+                                      className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
+                                      title="Remove Variant"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 )}
 
                 {activeTab === "highlights" && (
-                  <div className="space-y-4">
-                    <label className="block text-xs font-bold text-slate-700">Highlights &amp; Key Features</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="text" value={newWhyTitle} onChange={(e) => setNewWhyTitle(e.target.value)} placeholder="Highlight Title" className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm" />
-                      <input type="text" value={newWhyDesc} onChange={(e) => setNewWhyDesc(e.target.value)} placeholder="Description Text" className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-sm" />
-                    </div>
-                    <button type="button" onClick={addWhyPoint} className="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-sm cursor-pointer hover:bg-black transition-colors">Add Highlight</button>
+                  <div className="space-y-6">
+                    {/* SECTION 1: HIGHLIGHTS & WHY STAND OUT POINTS */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-slate-900">Highlights &amp; Why Stand Out ({formData.whyStandOut.length})</label>
+                        <span className="text-[11px] text-slate-400">Use arrows to rearrange highlight order</span>
+                      </div>
 
-                    <div className="space-y-2 pt-2">
-                      {formData.whyStandOut.map((pt, i) => (
-                        <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-sm text-xs flex items-start justify-between">
-                          <div>
-                            <p className="font-bold text-slate-900">{pt.title}</p>
-                            <p className="text-slate-600 text-[11px]">{pt.text}</p>
-                          </div>
-                          <button type="button" onClick={() => removeWhyPoint(i)} className="text-rose-600 font-bold text-xs hover:underline cursor-pointer">Remove</button>
-                        </div>
-                      ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={newWhyTitle}
+                          onChange={(e) => setNewWhyTitle(e.target.value)}
+                          placeholder="Highlight Title (e.g. Authentic Spice Blend)"
+                          className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-semibold"
+                        />
+                        <input
+                          type="text"
+                          value={newWhyDesc}
+                          onChange={(e) => setNewWhyDesc(e.target.value)}
+                          placeholder="Description Text"
+                          className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                        />
+                      </div>
+                      <button type="button" onClick={addWhyPoint} className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-sm cursor-pointer hover:bg-black transition-colors flex items-center gap-1">
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Highlight</span>
+                      </button>
+
+                      <div className="space-y-2 pt-2">
+                        {formData.whyStandOut.length === 0 ? (
+                          <p className="text-xs text-slate-400 italic p-3 bg-slate-50 border border-slate-200 rounded-sm">No highlights added yet.</p>
+                        ) : (
+                          formData.whyStandOut.map((pt, i) => (
+                            <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-sm text-xs flex items-start justify-between gap-3">
+                              {editingWhyIndex === i ? (
+                                <div className="space-y-2 flex-1">
+                                  <input
+                                    type="text"
+                                    value={editWhyTitle}
+                                    onChange={(e) => setEditWhyTitle(e.target.value)}
+                                    placeholder="Highlight Title"
+                                    className="w-full px-2.5 py-1 text-xs bg-white border border-slate-300 rounded-sm font-bold"
+                                  />
+                                  <textarea
+                                    rows={2}
+                                    value={editWhyDesc}
+                                    onChange={(e) => setEditWhyDesc(e.target.value)}
+                                    placeholder="Description Text"
+                                    className="w-full px-2.5 py-1 text-xs bg-white border border-slate-300 rounded-sm"
+                                  />
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => saveEditWhyPoint(i)}
+                                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-sm cursor-pointer flex items-center gap-1"
+                                    >
+                                      <Check className="w-3.5 h-3.5" /> Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingWhyIndex(null)}
+                                      className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-medium rounded-sm cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="space-y-0.5 flex-1">
+                                    <p className="font-bold text-slate-900 text-xs">{pt.title}</p>
+                                    <p className="text-slate-600 text-[11px] leading-relaxed">{pt.text}</p>
+                                  </div>
+
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {/* Reorder Buttons */}
+                                    <button
+                                      type="button"
+                                      disabled={i === 0}
+                                      onClick={() => moveWhyPointUp(i)}
+                                      className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Move Up"
+                                    >
+                                      <ChevronUp className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={i === formData.whyStandOut.length - 1}
+                                      onClick={() => moveWhyPointDown(i)}
+                                      className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Move Down"
+                                    >
+                                      <ChevronDown className="w-4 h-4" />
+                                    </button>
+
+                                    {/* Edit & Delete Buttons */}
+                                    <button
+                                      type="button"
+                                      onClick={() => startEditWhyPoint(i)}
+                                      className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer ml-1"
+                                      title="Edit Highlight"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeWhyPoint(i)}
+                                      className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
+                                      title="Remove Highlight"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* SECTION 2: KEY PRODUCT DETAILS & SPECS */}
+                    <div className="space-y-3 pt-4 border-t border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-slate-900">Key Features &amp; Specifications ({ (formData.productDetails || []).length })</label>
+                        <span className="text-[11px] text-slate-400">Use arrows to rearrange specification order</span>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newDetailInput}
+                          onChange={(e) => setNewDetailInput(e.target.value)}
+                          placeholder="Feature / Spec (e.g. Pastry: Flaky All-Butter Puff Pastry)"
+                          className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                        />
+                        <button type="button" onClick={addDetailPoint} className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-sm cursor-pointer hover:bg-black transition-colors flex items-center gap-1">
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Spec</span>
+                        </button>
+                      </div>
+
+                      <div className="space-y-2 pt-1">
+                        {(formData.productDetails || []).length === 0 ? (
+                          <p className="text-xs text-slate-400 italic p-3 bg-slate-50 border border-slate-200 rounded-sm">No key features added yet.</p>
+                        ) : (
+                          (formData.productDetails || []).map((detail, i) => (
+                            <div key={i} className="p-2.5 bg-slate-50 border border-slate-200 rounded-sm text-xs flex items-center justify-between gap-3">
+                              {editingDetailIndex === i ? (
+                                <div className="flex items-center gap-2 flex-1">
+                                  <input
+                                    type="text"
+                                    value={editDetailText}
+                                    onChange={(e) => setEditDetailText(e.target.value)}
+                                    className="flex-1 px-2.5 py-1 text-xs bg-white border border-slate-300 rounded-sm font-medium"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => saveEditDetailPoint(i)}
+                                    className="p-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-sm cursor-pointer"
+                                    title="Save Spec"
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingDetailIndex(null)}
+                                    className="p-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-sm cursor-pointer"
+                                    title="Cancel"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="font-semibold text-slate-800 text-xs flex-1">{detail}</span>
+
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {/* Reorder Buttons */}
+                                    <button
+                                      type="button"
+                                      disabled={i === 0}
+                                      onClick={() => moveDetailUp(i)}
+                                      className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Move Up"
+                                    >
+                                      <ChevronUp className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={i === (formData.productDetails || []).length - 1}
+                                      onClick={() => moveDetailDown(i)}
+                                      className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                      title="Move Down"
+                                    >
+                                      <ChevronDown className="w-4 h-4" />
+                                    </button>
+
+                                    {/* Edit & Delete Buttons */}
+                                    <button
+                                      type="button"
+                                      onClick={() => startEditDetailPoint(i)}
+                                      className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-sm cursor-pointer ml-1"
+                                      title="Edit Spec"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeDetailPoint(i)}
+                                      className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-100 rounded-sm cursor-pointer"
+                                      title="Remove Spec"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
