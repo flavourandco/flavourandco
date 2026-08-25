@@ -24,6 +24,16 @@ import { useAuthStore } from "@/store/auth.store";
 import { BoneyardProfilePageSkeleton } from "@/components/ui/BoneyardSkeleton";
 import type { Order } from "@/lib/types";
 
+function getOrderProductTitle(items?: any[]): string {
+  if (!Array.isArray(items) || items.length === 0) return "Gourmet Pie Order";
+  const names = items
+    .map((it) => it.name || it.product?.name || "Gourmet Pie")
+    .filter(Boolean);
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} & ${names[1]}`;
+  return `${names[0]} & ${names.length - 1} more items`;
+}
+
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { signOut } = useClerk();
@@ -134,7 +144,7 @@ export default function ProfilePage() {
           {/* Main Grid: Left Column Profile & Right Column Recent Orders */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
             {/* Left Column: Minimal Profile */}
-            <div className="md:col-span-4 flex flex-col items-center text-center p-4 bg-white rounded-2xl border border-stone-200 shadow-xs">
+            <div className="md:col-span-4 flex flex-col items-center text-center p-4 bg-white rounded-sm border-0 shadow-xs">
               {/* Minimal Avatar */}
               <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden my-4 shadow-sm bg-brand-green text-brand-gold flex items-center justify-center text-3xl font-serif font-bold">
                 {avatarUrl ? (
@@ -172,7 +182,7 @@ export default function ProfilePage() {
 
             {/* Right Column: Recent Orders */}
             <div className="md:col-span-8 space-y-6">
-              <div className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 shadow-xs">
+              <div className="bg-white rounded-sm border-0 p-4 sm:p-6 shadow-xs">
                 <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-200/80">
                   <h3 className="font-serif text-xl sm:text-2xl font-bold text-brand-green flex items-center gap-2.5">
                     <ShoppingBag className="h-5 w-5 text-brand-gold" />
@@ -193,19 +203,25 @@ export default function ProfilePage() {
                     {orders.map((ord) => (
                       <div
                         key={ord.id}
-                        className="bg-[#faf6f0] rounded-xl border border-[#c69c40]/25 p-4 sm:p-5 text-xs space-y-3"
+                        className="bg-[#faf6f0] rounded-sm p-4 sm:p-5 text-xs space-y-3 shadow-xs hover:bg-[#f5efe3] transition-all"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200/60 pb-3">
+                        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-stone-200/60 pb-3">
                           <div>
-                            <span className="font-mono font-bold text-brand-green text-sm block">
-                              #{ord.orderNumber}
-                            </span>
-                            <span className="text-[10px] text-stone-500">
-                              {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString("en-AU", { dateStyle: "medium" }) : "Recent"}
-                            </span>
+                            <h4 className="font-serif font-bold text-brand-green text-base sm:text-lg leading-snug">
+                              {getOrderProductTitle(ord.items)}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="font-mono text-[11px] text-stone-500 font-semibold bg-stone-200/60 px-2 py-0.5 rounded-sm">
+                                Order #{ord.orderNumber}
+                              </span>
+                              <span className="text-stone-300">•</span>
+                              <span className="text-[11px] text-stone-500">
+                                {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString("en-AU", { dateStyle: "medium" }) : "Recent"}
+                              </span>
+                            </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase flex items-center gap-1">
+                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-sm text-[10px] uppercase flex items-center gap-1">
                               <CheckCircle className="h-3 w-3" /> Paid &amp; Confirmed
                             </span>
                             <span className="font-sans font-bold text-sm text-[#6b1e30]">
@@ -214,18 +230,30 @@ export default function ProfilePage() {
                           </div>
                         </div>
 
-                        {/* Order Items Preview */}
-                        <div className="space-y-1.5 text-stone-700">
+                        {/* Order Items Preview - Product Name Highlighted */}
+                        <div className="space-y-2 py-1">
                           {Array.isArray(ord.items) &&
                             ord.items.map((it: any, idx: number) => {
                               const itPrice = typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0);
                               const itQty = it.quantity || 1;
+                              const itemName = it.name || it.product?.name || "Gourmet Pie";
+                              const variant = it.variantName || it.variant;
                               return (
-                                <div key={idx} className="flex justify-between items-center text-xs">
-                                  <span className="font-medium">
-                                    {itQty}x {it.name || it.product?.name || "Gourmet Pie"} {it.variantName || it.variant ? `(${it.variantName || it.variant})` : ""}
-                                  </span>
-                                  <span className="font-mono text-stone-500">
+                                <div key={idx} className="flex justify-between items-center text-xs bg-white/70 p-2.5 rounded-sm">
+                                  <div className="flex items-center gap-2">
+                                    <span className="bg-brand-green/10 text-brand-green font-bold text-[11px] px-2 py-0.5 rounded-sm font-mono">
+                                      {itQty}x
+                                    </span>
+                                    <span className="font-serif font-bold text-stone-900 text-sm">
+                                      {itemName}
+                                    </span>
+                                    {variant && variant !== "Standard" && (
+                                      <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded-sm font-medium">
+                                        {variant}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="font-mono text-stone-700 font-bold">
                                     A${(itPrice * itQty).toFixed(2)}
                                   </span>
                                 </div>
@@ -238,7 +266,7 @@ export default function ProfilePage() {
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white bg-brand-green hover:bg-brand-gold hover:text-brand-green rounded-md transition-all cursor-pointer shadow-xs"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white bg-brand-green hover:bg-brand-gold hover:text-brand-green rounded-sm transition-all cursor-pointer shadow-xs"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>View Order Details</span>
@@ -290,26 +318,26 @@ export default function ProfilePage() {
           className="fixed inset-0 z-[9999] bg-stone-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn"
           data-lenis-prevent
         >
-          <div className="bg-white w-full max-w-2xl sm:max-w-3xl max-h-[90vh] rounded-2xl border border-[#c69c40]/30 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+          <div className="bg-white w-full max-w-2xl sm:max-w-3xl max-h-[90vh] rounded-sm border-0 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-[#faf6f0] shrink-0">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-stone-500 uppercase tracking-wider">
-                    Order Receipt
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold uppercase rounded-sm flex items-center gap-1">
+                    <CheckCircle className="w-2.5 h-2.5" /> Paid &amp; Confirmed
                   </span>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[9px] font-bold uppercase rounded-full">
-                    Paid &amp; Confirmed
+                  <span className="text-[11px] font-mono text-stone-500 font-semibold">
+                    Order #{selectedOrder.orderNumber}
                   </span>
                 </div>
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-[#07402b]">
-                  #{selectedOrder.orderNumber}
+                <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#07402b]">
+                  {getOrderProductTitle(selectedOrder.items)}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="p-1.5 rounded-full text-stone-400 hover:text-stone-800 hover:bg-stone-200 transition-colors cursor-pointer"
+                className="p-1.5 rounded-sm text-stone-400 hover:text-stone-800 hover:bg-stone-200 transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -321,7 +349,7 @@ export default function ProfilePage() {
               {/* Order Info & Delivery Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Delivery Address */}
-                <div className="p-4 bg-[#faf6f0] rounded-xl border border-[#c69c40]/20 space-y-2">
+                <div className="p-4 bg-[#faf6f0] rounded-sm space-y-2">
                   <div className="flex items-center gap-1.5 text-[#07402b] font-bold border-b border-stone-200 pb-2">
                     <MapPin className="w-4 h-4 text-[#6b1e30]" />
                     <span>Delivery Address</span>
@@ -338,7 +366,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Payment & Date Summary */}
-                <div className="p-4 bg-[#faf6f0] rounded-xl border border-[#c69c40]/20 space-y-2">
+                <div className="p-4 bg-[#faf6f0] rounded-sm space-y-2">
                   <div className="flex items-center gap-1.5 text-[#07402b] font-bold border-b border-stone-200 pb-2">
                     <CreditCard className="w-4 h-4 text-[#6b1e30]" />
                     <span>Payment &amp; Schedule</span>
@@ -370,7 +398,7 @@ export default function ProfilePage() {
                   Items in this Order ({Array.isArray(selectedOrder.items) ? selectedOrder.items.length : 0})
                 </h4>
 
-                <div className="border border-stone-200 rounded-xl overflow-hidden bg-white">
+                <div className="rounded-sm overflow-hidden bg-white">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-[#faf6f0] border-b border-stone-200 text-stone-600 font-bold text-[10px] uppercase tracking-wider">
                       <tr>
@@ -395,13 +423,15 @@ export default function ProfilePage() {
                               <td className="py-2.5 px-3">
                                 <div className="flex items-center gap-2.5">
                                   {itemImg ? (
-                                    <div className="relative w-8 h-8 rounded overflow-hidden bg-stone-100 shrink-0 border border-stone-200">
-                                      <Image src={itemImg} alt={item.name || "Pie"} fill className="object-cover" sizes="32px" />
+                                    <div className="relative w-9 h-9 rounded-sm overflow-hidden bg-stone-100 shrink-0 border-0 shadow-xs">
+                                      <Image src={itemImg} alt={item.name || "Pie"} fill className="object-cover" sizes="36px" />
                                     </div>
                                   ) : (
-                                    <PackageCheck className="w-4 h-4 text-stone-400" />
+                                    <PackageCheck className="w-4 h-4 text-brand-green" />
                                   )}
-                                  <span className="font-serif font-bold text-stone-900">{item.name || item.product?.name || "Gourmet Pie"}</span>
+                                  <span className="font-serif font-bold text-brand-green text-sm sm:text-base">
+                                    {item.name || item.product?.name || "Gourmet Pie"}
+                                  </span>
                                 </div>
                               </td>
                               <td className="py-2.5 px-3 text-stone-500">{variantLabel}</td>
@@ -424,7 +454,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Financial Calculation */}
-              <div className="bg-[#faf6f0] p-4 rounded-xl border border-[#c69c40]/20 flex flex-col sm:flex-row justify-between gap-4">
+              <div className="bg-[#faf6f0] p-4 rounded-sm flex flex-col sm:flex-row justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Special Instructions</span>
                   <p className="text-stone-700 text-xs italic">
@@ -454,7 +484,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-5 py-2 bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer shadow-xs"
+                className="px-5 py-2 bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-xs"
               >
                 Close Details
               </button>
