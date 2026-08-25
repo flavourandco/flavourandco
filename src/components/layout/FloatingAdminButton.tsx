@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronUp } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
-// Custom SVG matching the uploaded Shield User icon
+// Custom SVG matching the Shield User icon
 function AdminShieldIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg
@@ -27,75 +26,32 @@ function AdminShieldIcon({ className = "w-5 h-5" }: { className?: string }) {
 export default function FloatingAdminButton() {
   const pathname = usePathname();
   const { user, isSignedIn, isLoaded } = useUser();
-  const [scrolled, setScrolled] = useState(false);
 
   const role = (user?.publicMetadata as { role?: string } | undefined)?.role;
   const isAdmin = isLoaded && isSignedIn && role === "admin";
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 120) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    // Initial check
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  // Do not render floating admin button inside admin dashboard pages or if not admin
+  // Do not render inside admin dashboard pages or if user is not admin
   if (pathname?.startsWith("/admin") || !isAdmin) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end">
-      {/* Scroll to Top Button (Clean matte amber, smooth 500ms spring-like animation) */}
-      <button
-        onClick={scrollToTop}
-        aria-label="Scroll to top"
-        title="Scroll to top"
-        className={`group flex items-center justify-center w-12 h-12 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-full shadow-2xl active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
-          scrolled
-            ? "opacity-100 scale-100 translate-y-0 pointer-events-auto hover:scale-105"
-            : "opacity-0 scale-75 translate-y-6 pointer-events-none absolute"
-        }`}
-      >
-        <ChevronUp className="w-6 h-6 stroke-[2.5] group-hover:-translate-y-0.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
-      </button>
-
-      {/* Admin Button (Clean matte dark slate-950, borderless, silky smooth 500ms uncollapse transition) */}
+    <div className="fixed bottom-6 right-6 z-[9999] flex items-center justify-end">
       <Link
         href="/admin/dashboard"
         target="_blank"
         rel="noopener noreferrer"
         title="Admin Panel"
         aria-label="Admin Panel"
-        className={`group flex items-center bg-slate-950 hover:bg-black text-white p-3.5 rounded-full shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
-          scrolled
-            ? "opacity-0 scale-75 translate-y-6 pointer-events-none absolute"
-            : "opacity-100 scale-100 translate-y-0 pointer-events-auto hover:scale-105"
-        }`}
+        className="group flex items-center bg-slate-950 hover:bg-black text-white p-3.5 rounded-full shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 border border-slate-800/80 cursor-pointer"
       >
         {/* Shield Icon */}
-        <div className="w-[22px] h-[22px] flex items-center justify-center text-amber-400 group-hover:text-amber-300 transition-colors duration-500 shrink-0">
+        <div className="w-[22px] h-[22px] flex items-center justify-center text-amber-400 group-hover:text-amber-300 transition-colors duration-300 shrink-0">
           <AdminShieldIcon className="w-[22px] h-[22px]" />
         </div>
 
-        {/* Text revealed smoothly on hover with a 500ms silky cubic-bezier easing */}
-        <span className="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-3 group-hover:mr-1.5 whitespace-nowrap overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] text-xs font-medium tracking-wider font-sans text-slate-100">
+        {/* Text revealed smoothly on hover; collapses on mouse leave */}
+        <span className="max-w-0 opacity-0 group-hover:max-w-[120px] group-hover:opacity-100 group-hover:ml-2.5 group-hover:mr-1 whitespace-nowrap overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] text-xs font-semibold tracking-wider font-sans text-slate-100">
           Admin Panel
         </span>
       </Link>
