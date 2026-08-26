@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useProductStore } from "@/store/product.store";
 import { useCartStore } from "@/store/cart.store";
+import { getValidProductImages } from "@/lib/media";
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import ProductReviews from "@/components/products/ProductReviews";
@@ -47,6 +48,7 @@ export default function ProductDetailPage({
   }, [fetchProducts]);
 
   const product = storeProducts.find((p) => p.id === productId);
+  const validImages = getValidProductImages(product);
 
   // States
   const [selectedVariantIdx, setSelectedVariantIdx] = useState<number>(0);
@@ -70,14 +72,14 @@ export default function ProductDetailPage({
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartX || !touchEndX || !product || product.images.length <= 1) return;
+    if (!touchStartX || !touchEndX || !product || validImages.length <= 1) return;
     const distance = touchStartX - touchEndX;
     if (distance > minSwipeDistance) {
       // Swiped left -> next image
-      setActiveImageIdx((prev) => (prev + 1) % product.images.length);
+      setActiveImageIdx((prev) => (prev + 1) % validImages.length);
     } else if (distance < -minSwipeDistance) {
       // Swiped right -> previous image
-      setActiveImageIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
+      setActiveImageIdx((prev) => (prev - 1 + validImages.length) % validImages.length);
     }
   };
 
@@ -130,7 +132,7 @@ export default function ProductDetailPage({
                   className="relative aspect-[4/3] sm:aspect-square sm:max-h-[380px] w-full overflow-hidden rounded-md border border-[#c69c40]/20 shadow-sm bg-white group select-none touch-pan-y"
                 >
                   <Image
-                    src={product.images[activeImageIdx] || product.image}
+                    src={validImages[activeImageIdx] || validImages[0]}
                     alt={product.name}
                     fill
                     className="object-cover transition-all duration-500 group-hover:scale-105"
@@ -153,10 +155,10 @@ export default function ProductDetailPage({
                   </div>
                 </div>
 
-                {/* Thumbnails Row */}
-                {product.images.length > 1 && (
+                {/* Thumbnails Row (Only render if there are 2 or more real images) */}
+                {validImages.length > 1 && (
                   <div className="flex items-center gap-3 overflow-x-auto py-2.5 px-1 -mx-1">
-                    {product.images.map((img, i) => {
+                    {validImages.map((img, i) => {
                       const isActive = activeImageIdx === i;
                       return (
                         <button

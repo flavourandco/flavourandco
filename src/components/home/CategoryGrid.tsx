@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { media } from "@/lib/media";
+import { media, getProductImage } from "@/lib/media";
 
 const categories = [
   {
@@ -59,7 +59,7 @@ export default function CategoryGrid() {
             >
               <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-cream">
                 <Image
-                  src={cat.image}
+                  src={getProductImage(cat.image)}
                   alt={cat.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"

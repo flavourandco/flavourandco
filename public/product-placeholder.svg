@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <rect width="800" height="600" fill="#e5e7eb"/>
+  
+  <g transform="translate(400, 275)">
+    <!-- Plate / Dish Circle -->
+    <ellipse cx="0" cy="30" rx="90" ry="35" fill="#d1d5db" opacity="0.6"/>
+    <!-- Cloche / Dome icon -->
+    <path d="M-60 25 C-60 -35, 60 -35, 60 25 Z" fill="#9ca3af"/>
+    <!-- Knob -->
+    <circle cx="0" cy="-40" r="10" fill="#6b7280"/>
+    <!-- Tray Rim -->
+    <rect x="-75" y="22" width="150" height="8" rx="4" fill="#6b7280"/>
+  </g>
+
+  <!-- Text Label -->
+  <text x="400" y="385" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="#6b7280" text-anchor="middle">
+    FLAVOUR &amp; CO.
+  </text>
+</svg>

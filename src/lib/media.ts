@@ -1,4 +1,47 @@
-// Media asset registry for Flavour & Co.
+export const PRODUCT_PLACEHOLDER = "/product-placeholder.svg";
+
+export function isRealImage(src?: string | null): boolean {
+  if (!src || typeof src !== "string") return false;
+  const trimmed = src.trim();
+  if (
+    !trimmed ||
+    trimmed === PRODUCT_PLACEHOLDER ||
+    trimmed === "/grey-product-placeholder.svg" ||
+    trimmed.startsWith("/products/")
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export function getProductImage(src?: string | null): string {
+  if (!isRealImage(src)) {
+    return PRODUCT_PLACEHOLDER;
+  }
+  return src!;
+}
+
+export function getValidProductImages(product?: { image?: string | null; images?: (string | null)[] | null } | null): string[] {
+  if (!product) return [PRODUCT_PLACEHOLDER];
+
+  const rawList: string[] = [];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    product.images.forEach((img) => {
+      if (img && typeof img === "string") rawList.push(img);
+    });
+  }
+  if (product.image && typeof product.image === "string" && !rawList.includes(product.image)) {
+    rawList.push(product.image);
+  }
+
+  const realImages = rawList.filter((img) => isRealImage(img));
+
+  if (realImages.length > 0) {
+    return realImages;
+  }
+
+  return [PRODUCT_PLACEHOLDER];
+}
 
 export const media = {
   logo: "/navbar_brand_logo.png",
@@ -6,19 +49,19 @@ export const media = {
   footerLogo: "/footer_brand_logo.png",
   heroVideo: "/pies.mp4",
 
-  // Local high-quality pie and bakery images from /products/
+  // Product images default to grey product placeholder until Cloudinary images are uploaded
   products: {
-    butterChicken: "/products/PHOTOS_Flavour&Co-3.jpg",
-    samosaPie: "/products/PHOTOS_Flavour&Co-4.jpg",
-    lambKeema: "/products/PHOTOS_Flavour&Co-5.jpg",
-    paneerTikka: "/products/PHOTOS_Flavour&Co-6.jpg",
+    butterChicken: PRODUCT_PLACEHOLDER,
+    samosaPie: PRODUCT_PLACEHOLDER,
+    lambKeema: PRODUCT_PLACEHOLDER,
+    paneerTikka: PRODUCT_PLACEHOLDER,
   },
 
   moods: {
-    gather: "/products/PHOTOS_Flavour&Co-7.jpg",
-    celebrate: "/products/PHOTOS_Flavour&Co-8.jpg",
-    unwind: "/products/PHOTOS_Flavour&Co-9.jpg",
-    entertain: "/products/PHOTOS_Flavour&Co-3.jpg",
+    gather: PRODUCT_PLACEHOLDER,
+    celebrate: PRODUCT_PLACEHOLDER,
+    unwind: PRODUCT_PLACEHOLDER,
+    entertain: PRODUCT_PLACEHOLDER,
   },
 
   about: {

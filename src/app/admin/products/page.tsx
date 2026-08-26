@@ -13,6 +13,7 @@ import { MediaUploader } from "@/components/ui/MediaUploader";
 import { useStagedMedia } from "@/hooks/useStagedMedia";
 import { RefreshCw } from "lucide-react";
 import { notifyContentUpdated } from "@/lib/realtime";
+import { getValidProductImages } from "@/lib/media";
 
 type TabType = "basic" | "media" | "variants" | "highlights" | "flags";
 
@@ -49,8 +50,8 @@ export default function AdminProductsPage() {
     price: 34.99,
     packInfo: "Pack of 12",
     badge: "Best Seller",
-    image: "https://example.com/image.jpg",
-    images: ["https://example.com/image.jpg"],
+    image: "/product-placeholder.svg",
+    images: ["/product-placeholder.svg"],
     variants: [] as ProductVariant[],
     preparationOptions: [] as string[],
     whyStandOut: [] as WhyStandOutPoint[],
@@ -143,8 +144,8 @@ export default function AdminProductsPage() {
       price: 34.99,
       packInfo: "Pack of 12",
       badge: "Best Seller",
-      image: "https://example.com/image.jpg",
-      images: ["https://example.com/image.jpg"],
+      image: "/product-placeholder.svg",
+      images: ["/product-placeholder.svg"],
       variants: [],
       preparationOptions: ["Freshly Baked", "Frozen"],
       whyStandOut: [],
@@ -239,7 +240,7 @@ export default function AdminProductsPage() {
           .filter(Boolean);
       }
 
-      const primaryImage = finalImages[0] || formData.image || "https://example.com/image.jpg";
+      const primaryImage = finalImages[0] || formData.image || "/product-placeholder.svg";
 
       const payload = {
         ...formData,
@@ -534,7 +535,7 @@ export default function AdminProductsPage() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-sm overflow-hidden bg-slate-100 border border-slate-200/60 shrink-0">
-                          <Image src={p.image} alt={p.name} fill className="object-cover" sizes="40px" />
+                          <Image src={getValidProductImages(p)[0]} alt={p.name} fill className="object-cover" sizes="40px" />
                         </div>
                         <div>
                           <p className="font-semibold text-slate-900">{p.name}</p>
@@ -628,7 +629,7 @@ export default function AdminProductsPage() {
             <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-slate-700 overscroll-contain" data-lenis-prevent>
               <div className="flex flex-col sm:flex-row items-start gap-6 bg-slate-50 p-4 rounded-sm border border-slate-200/80">
                 <div className="relative w-36 h-36 rounded-sm overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-                  <Image src={viewingProduct.image} alt={viewingProduct.name} fill className="object-cover" sizes="144px" />
+                  <Image src={getValidProductImages(viewingProduct)[0]} alt={viewingProduct.name} fill className="object-cover" sizes="144px" />
                 </div>
                 <div className="space-y-2 flex-1">
                   <span className="px-2.5 py-0.5 bg-slate-200 text-slate-700 text-[10px] font-bold uppercase rounded-sm">{viewingProduct.category}</span>
@@ -878,7 +879,7 @@ export default function AdminProductsPage() {
                 )}
 
                 {activeTab === "media" && (
-                  <div className="space-y-4">
+                  <div className="space-y-4 py-2">
                     <label className="block text-xs font-bold text-slate-700">Product Media Gallery</label>
                     <MediaUploader
                       stagedMedia={stagedMedia}

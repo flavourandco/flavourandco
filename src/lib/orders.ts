@@ -141,7 +141,7 @@ export async function calculateAuthoritativeOrderTotals(
 
     let unitPrice = 0;
     let productName = "";
-    let productImage = "/products/butter-chicken-pie.png";
+    let productImage = "/product-placeholder.svg";
 
     if (matchedProd) {
       // Product found in database! Use trusted DB details
@@ -150,7 +150,7 @@ export async function calculateAuthoritativeOrderTotals(
       productImage =
         matchedProd.image ||
         (Array.isArray(matchedProd.images) && matchedProd.images.length > 0 ? matchedProd.images[0] : "") ||
-        "/products/butter-chicken-pie.png";
+        "/product-placeholder.svg";
 
       // If variant is requested, check DB variant price
       if (variantName && Array.isArray(matchedProd.variants)) {
@@ -170,7 +170,7 @@ export async function calculateAuthoritativeOrderTotals(
         rawItem.product.image ||
         (Array.isArray(rawItem.product.images) && rawItem.product.images.length > 0
           ? rawItem.product.images[0]
-          : "/products/butter-chicken-pie.png");
+          : "/product-placeholder.svg");
     } else if (rawItem.unitPrice && Number(rawItem.unitPrice) > 0) {
       unitPrice = Number(rawItem.unitPrice);
       productName = rawItem.product?.name || rawItem.id;

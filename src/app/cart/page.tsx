@@ -23,6 +23,7 @@ import {
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import { useCartStore } from "@/store/cart.store";
+import { getValidProductImages } from "@/lib/media";
 
 export default function CartPage() {
   const router = useRouter();
@@ -185,7 +186,7 @@ export default function CartPage() {
                         .replace(/(^-|-$)+/g, "");
                       const detailUrl = `/shop/${slug}/${item.product.id}`;
                       const lineTotal = (item.unitPrice || item.product.price || 0) * (item.quantity || 1);
-                      const imageSrc = item.product.images?.[0] || item.product.image || "/products/butter-chicken-pie.png";
+                      const imageSrc = getValidProductImages(item.product)[0];
 
                       return (
                         <div

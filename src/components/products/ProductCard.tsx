@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, Heart, Plus, Minus } from "lucide-react";
 import type { Product } from "@/lib/types";
+import { getValidProductImages } from "@/lib/media";
 import Button from "@/components/ui/Button";
 import { useCartStore } from "@/store/cart.store";
 
@@ -61,8 +62,9 @@ export default function ProductCard({
     .replace(/(^-|-$)+/g, "");
   const detailUrl = `/shop/${slug}/${product.id}`;
 
-  const image1 = product.images?.[0] || product.image || "/products/butter-chicken-pie.png";
-  const image2 = (product.images && product.images.length > 1 && product.images[1]) ? product.images[1] : image1;
+  const productImages = getValidProductImages(product);
+  const image1 = productImages[0];
+  const image2 = productImages.length > 1 ? productImages[1] : null;
 
   return (
     <article className="product-card group relative flex flex-col justify-between overflow-hidden bg-white rounded-sm border border-[#c69c40]/25 shadow-xs hover:shadow-lg hover:border-[#c69c40]/50 transition-all duration-300 h-full w-full">
@@ -79,7 +81,7 @@ export default function ProductCard({
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
           {/* Secondary / Hover image */}
-          {image2 !== image1 && (
+          {image2 && (
             <Image
               src={image2}
               alt={`${product.name} alternate view`}

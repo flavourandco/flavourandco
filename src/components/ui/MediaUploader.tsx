@@ -236,34 +236,47 @@ export function MediaUploader(props: MediaUploaderProps) {
       )}
 
       {/* Media Content Display */}
-      {!multiple && hasItems ? (
-        // Single Media Preview
-        renderItemPreview(stagedItems[0])
-      ) : multiple && hasItems ? (
-        // Multiple Media Grid
+      {multiple ? (
+        // Multiple Media Grid Mode (Starts top-left, matching exact image aspect ratio)
         <div className="space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {stagedItems.map((item) => renderItemPreview(item))}
 
-            {/* Add More Media Card if under max limit */}
+            {/* Upload Card if under max limit */}
             {stagedItems.length < maxFiles && (
               <button
                 type="button"
                 onClick={handleOpenPicker}
                 disabled={disabled || isUploading}
-                className={`flex flex-col items-center justify-center gap-1.5 ${aspectRatioClassName} rounded-sm border-2 border-dashed border-slate-300 hover:border-slate-800 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all cursor-pointer`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                aria-label={label}
+                className={`flex flex-col items-center justify-center gap-1.5 ${aspectRatioClassName} rounded-sm border-2 border-dashed border-slate-300 hover:border-slate-800 bg-slate-50/80 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all cursor-pointer p-4 text-center select-none ${
+                  isDragOver ? "border-slate-900 bg-slate-100 scale-[0.99]" : ""
+                } ${disabled || isUploading ? "opacity-50 pointer-events-none" : ""}`}
               >
-                <Plus className="w-6 h-6" />
-                <span className="text-xs font-bold">Add Media</span>
+                <div className="w-9 h-9 rounded-full bg-slate-200/80 flex items-center justify-center text-slate-700">
+                  <Plus className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">{label}</span>
+                <span className="text-[10px] text-slate-500 leading-tight font-sans">
+                  {hasItems ? "Add Media" : "Click or drag & drop"}
+                </span>
               </button>
             )}
           </div>
-          <p className="text-[11px] text-slate-500 font-medium">
-            {stagedItems.length} of {maxFiles} media items staged locally.
-          </p>
+          {hasItems && (
+            <p className="text-[11px] text-slate-500 font-medium">
+              {stagedItems.length} of {maxFiles} media items staged.
+            </p>
+          )}
         </div>
+      ) : hasItems ? (
+        // Single Media Preview
+        renderItemPreview(stagedItems[0])
       ) : (
-        // Empty Upload Zone
+        // Single Empty Upload Card (aligned left, matching aspect ratio)
         <div
           role="button"
           tabIndex={disabled || isUploading ? -1 : 0}
@@ -278,18 +291,17 @@ export function MediaUploader(props: MediaUploaderProps) {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           aria-label={label}
-          className={`relative w-full ${aspectRatioClassName} rounded-sm border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 text-center cursor-pointer select-none ${
+          className={`relative w-48 sm:w-64 ${aspectRatioClassName} rounded-sm border-2 border-dashed transition-all flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none ${
             isDragOver
               ? "border-slate-900 bg-slate-100 scale-[0.99]"
               : "border-slate-300/80 hover:border-slate-800 bg-slate-50/80 hover:bg-slate-100/60"
           } ${disabled || isUploading ? "opacity-50 pointer-events-none" : ""}`}
         >
-          <div className="w-12 h-12 rounded-full bg-slate-200/80 flex items-center justify-center mb-3 text-slate-700 group-hover:scale-110 transition-transform">
-            <Plus className="w-6 h-6 stroke-[2.5]" />
+          <div className="w-9 h-9 rounded-full bg-slate-200/80 flex items-center justify-center mb-2 text-slate-700">
+            <Plus className="w-5 h-5 stroke-[2.5]" />
           </div>
-
           <p className="text-xs font-bold text-slate-900 tracking-tight">{label}</p>
-          <p className="text-[11px] text-slate-500 max-w-xs mt-1 leading-relaxed font-sans">{helperText}</p>
+          <p className="text-[10px] text-slate-500 max-w-xs mt-0.5 leading-relaxed font-sans">{helperText}</p>
         </div>
       )}
     </div>
