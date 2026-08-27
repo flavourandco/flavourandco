@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { CreditCard, Lock, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { CreditCard, Lock, CheckCircle2, AlertCircle, Info, MapPin } from "lucide-react";
 
 declare global {
   interface Window {
@@ -10,9 +10,9 @@ declare global {
         appId: string,
         locationId: string
       ) => Promise<{
-        card: () => Promise<{
+        card: (options?: { includePostalCode?: boolean }) => Promise<{
           attach: (selector: string) => Promise<void>;
-          tokenize: () => Promise<{
+          tokenize: (options?: { postalCode?: string }) => Promise<{
             status: string;
             token?: string;
             errors?: Array<{ message: string }>;
@@ -49,6 +49,8 @@ interface SquarePaymentFormProps {
   onCancel?: () => void;
   isProcessing: boolean;
   totalAmount: number;
+  postcode?: string;
+  addressSummary?: string;
 }
 
 // Payment Brand Badges
@@ -102,6 +104,8 @@ export default function SquarePaymentForm({
   onCancel,
   isProcessing,
   totalAmount,
+  postcode,
+  addressSummary,
 }: SquarePaymentFormProps) {
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkLoading, setSdkLoading] = useState(true);
@@ -225,10 +229,12 @@ export default function SquarePaymentForm({
     e.preventDefault();
     setCardError(null);
 
-    // If active Card element exists, tokenize details securely
+    // If active Card element exists, tokenize details securely with postcode if provided
     if (cardRef.current && sdkReady) {
       try {
-        const result = await cardRef.current.tokenize();
+        const result = await cardRef.current.tokenize(
+          postcode ? { postalCode: postcode } : undefined
+        );
         if (result.status === "OK" && result.token) {
           onSubmitPayment(result.token);
           return;
@@ -287,6 +293,21 @@ export default function SquarePaymentForm({
           </span>
         </div>
 
+        {/* Address & Postcode Auto-Sync Badge */}
+        {addressSummary && (
+          <div className="p-2.5 bg-[#07402b]/5 rounded-sm border border-[#07402b]/15 text-stone-700 text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <MapPin className="w-3.5 h-3.5 text-[#07402b] shrink-0" />
+              <span className="truncate text-[11px] font-medium">
+                <strong className="text-[#07402b]">Address &amp; Postcode for Payment:</strong> {addressSummary}
+              </span>
+            </div>
+            <span className="text-[10px] text-[#07402b] font-bold shrink-0 bg-[#07402b]/10 px-1.5 py-0.5 rounded border border-[#07402b]/20">
+              Active
+            </span>
+          </div>
+        )}
+
         {/* Square SDK Container: Embedded Card Input Fields */}
         <div className="bg-white p-2 sm:p-3 rounded-sm border border-stone-200 min-h-[90px] w-full relative flex flex-col justify-center overflow-hidden">
           <div id="square-card-element" className="w-full min-w-full min-h-[80px]" />
@@ -298,17 +319,7 @@ export default function SquarePaymentForm({
           )}
         </div>
 
-        {/* Sandbox Test Helper */}
-        {environment === "sandbox" && (
-          <div className="p-3 bg-amber-50 rounded-sm border border-amber-200/80 text-amber-900 text-xs space-y-1">
-            <div className="font-bold flex items-center gap-1 text-[11px] uppercase tracking-wider text-amber-800">
-              <Info className="w-3.5 h-3.5" /> Sandbox Test Card
-            </div>
-            <p className="text-[11px] text-amber-800 font-mono break-all">
-              Card: <strong>4111 1111 1111 1111</strong> • Exp: <strong>12/30</strong> • CVV: <strong>123</strong> • Zip: <strong>2000</strong>
-            </p>
-          </div>
-        )}
+
 
         {cardError && (
           <div className="p-3 bg-red-50 rounded-sm border border-red-200 text-red-700 text-xs flex items-center gap-2">

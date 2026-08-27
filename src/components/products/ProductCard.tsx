@@ -94,11 +94,11 @@ export default function ProductCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity duration-300" />
         </Link>
 
-        {/* Badge */}
-        {showBadge && (product.badge || product.isBestSeller || product.isNewArrival) && (
+        {/* Ribbon Badge */}
+        {showBadge && product.badge && (
           <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 pointer-events-none">
             <span className="inline-flex items-center text-[8px] sm:text-[9px] font-sans font-extrabold uppercase tracking-wider text-white bg-[#6b1e30]/95 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-sm border border-[#E3A72B]/40 shadow-xs">
-              {product.badge || (product.isBestSeller ? "Best Seller" : "New Arrival")}
+              {product.badge}
             </span>
           </div>
         )}

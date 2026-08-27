@@ -36,11 +36,20 @@ export const useCartStore = create<CartState>()(
         const itemId = variantName ? `${product.id}-${variantName}` : product.id;
 
         const currentItems = get().items;
-        const existingIndex = currentItems.findIndex((item) => item.id === itemId);
+        const existingIndex = currentItems.findIndex(
+          (item) => item.productId === product.id || item.id === itemId || item.id === product.id
+        );
 
         if (existingIndex > -1) {
           const updatedItems = [...currentItems];
-          updatedItems[existingIndex].quantity += quantity;
+          const existingItem = updatedItems[existingIndex];
+          updatedItems[existingIndex] = {
+            ...existingItem,
+            id: itemId,
+            quantity: existingItem.quantity + quantity,
+            variantName: variantName || existingItem.variantName,
+            unitPrice: itemUnitPrice || existingItem.unitPrice,
+          };
           set({ items: updatedItems });
         } else {
           const newItem: CartItem = {
@@ -61,9 +70,9 @@ export const useCartStore = create<CartState>()(
       },
 
       removeItem: (id) => {
-        const itemToRemove = get().items.find((item) => item.id === id);
+        const itemToRemove = get().items.find((item) => item.id === id || item.productId === id);
         set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
+          items: state.items.filter((item) => item.id !== id && item.productId !== id),
         }));
         if (itemToRemove) {
           useUIStore.getState().addToast(`Removed ${itemToRemove.product.name} from cart`, "info");
@@ -77,7 +86,7 @@ export const useCartStore = create<CartState>()(
         }
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id ? { ...item, quantity } : item
+            item.id === id || item.productId === id ? { ...item, quantity } : item
           ),
         }));
       },

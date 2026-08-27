@@ -560,6 +560,12 @@ export default function CheckoutPage() {
                     onCancel={() => router.push("/cart")}
                     isProcessing={isProcessing}
                     totalAmount={total}
+                    postcode={formData.postcode}
+                    addressSummary={
+                      formData.address
+                        ? `${formData.address}${formData.city ? `, ${formData.city}` : ""} ${formData.state} ${formData.postcode}`.trim()
+                        : undefined
+                    }
                   />
                 </div>
 

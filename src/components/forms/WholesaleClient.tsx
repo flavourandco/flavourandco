@@ -98,7 +98,7 @@ export default function WholesaleClient() {
           <div className="lg:col-span-6 relative">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-md">
               <Image
-                src="/product-placeholder.svg"
+                src="/wholesale/elevating-menus.jpg"
                 alt="Flavour & Co. Wholesale Gourmet Pies"
                 fill
                 className="object-cover"
@@ -196,7 +196,7 @@ export default function WholesaleClient() {
             <div className="text-left space-y-3 group">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm">
                 <Image
-                  src="/product-placeholder.svg"
+                  src="/wholesale/cabinet-display.jpg"
                   alt="Perfect for cabinet display"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -216,7 +216,7 @@ export default function WholesaleClient() {
             <div className="text-left space-y-3 group">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm">
                 <Image
-                  src="/product-placeholder.svg"
+                  src="/wholesale/catering-menus.jpg"
                   alt="Ideal for catering menus"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -19,9 +19,13 @@ import {
   ShieldCheck,
   Package,
   Zap,
+  ChevronDown,
+  Check,
+  RotateCcw,
 } from "lucide-react";
 import { useProductStore } from "@/store/product.store";
 import { useCartStore } from "@/store/cart.store";
+import { useUIStore } from "@/store/ui.store";
 import { getValidProductImages } from "@/lib/media";
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
@@ -40,8 +44,11 @@ export default function ProductDetailPage({
   const router = useRouter();
   const storeProducts = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const cartItems = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
+  const addToast = useUIStore((s) => s.addToast);
 
   useEffect(() => {
     fetchProducts(true);
@@ -55,6 +62,44 @@ export default function ProductDetailPage({
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
+  const [isCustomQtyInput, setIsCustomQtyInput] = useState<boolean>(false);
+  const [customQtyValue, setCustomQtyValue] = useState<string>("10");
+
+  // Active Variant & Unit Price
+  const activeVariant = product?.variants?.[selectedVariantIdx];
+  const unitPrice = activeVariant ? activeVariant.price : (product?.price || 0);
+
+  // Check if product / variant is already in cart
+  const itemId = activeVariant ? `${product?.id}-${activeVariant.name}` : (product?.id || "");
+  const isInCart = cartItems.some((i) => i.productId === product?.id || i.id === itemId);
+
+  // Sync quantity state with cart item if present
+  useEffect(() => {
+    const existingCartItem = cartItems.find((i) => i.id === itemId || i.productId === product?.id);
+    if (existingCartItem) {
+      setQuantity(existingCartItem.quantity);
+      if (existingCartItem.quantity >= 10) {
+        setIsCustomQtyInput(true);
+        setCustomQtyValue(String(existingCartItem.quantity));
+      }
+    }
+  }, [itemId, cartItems, product?.id]);
+
+  const handleCustomQtySubmit = () => {
+    const parsed = parseInt(customQtyValue, 10);
+    const newQty = isNaN(parsed) || parsed < 1 ? 1 : parsed;
+    setQuantity(newQty);
+    setCustomQtyValue(String(newQty));
+    if (newQty < 10) {
+      setIsCustomQtyInput(false);
+    }
+    if (isInCart) {
+      updateQuantity(itemId, newQty);
+    }
+    if (product) {
+      addToast(`Quantity updated to ${newQty} for ${product.name}!`, "success");
+    }
+  };
 
   // Touch Swipe Gesture State
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -106,10 +151,6 @@ export default function ProductDetailPage({
     );
   }
 
-  // Active Variant & Unit Price (Static unit price display, does not multiply by quantity)
-  const activeVariant = product.variants?.[selectedVariantIdx];
-  const unitPrice = activeVariant ? activeVariant.price : product.price;
-
   return (
     <PageLayout title={product.name} subtitle="" fullWidth hideHeader={true}>
       <div className="bg-cream text-stone-800 min-h-screen pt-4 sm:pt-6 md:pt-8 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
@@ -141,18 +182,13 @@ export default function ProductDetailPage({
                     loading="eager"
                   />
                   {/* Category & Badge Overlay */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
-                    {product.badge && (
+                  {product.badge && (
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
                       <span className="text-[10px] font-extrabold uppercase tracking-widest text-white bg-[#6b1e30] px-3 py-1 rounded shadow-sm">
                         {product.badge}
                       </span>
-                    )}
-                    {product.isBestSeller && (
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-white bg-[#07402b] px-3 py-1 rounded shadow-sm">
-                        Best Seller
-                      </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Thumbnails Row (Only render if there are 2 or more real images) */}
@@ -188,18 +224,31 @@ export default function ProductDetailPage({
 
               {/* Side-by-Side Action Buttons & Perks Container */}
               <div className="bg-white rounded-md border border-[#c69c40]/20 p-4 shadow-sm space-y-4">
-                {/* Add to Cart & Order Now side-by-side */}
+                {/* Add to Cart / Go to Cart & Order Now side-by-side */}
                 <div className="flex flex-row gap-3">
-                  <Button
-                    onClick={() => {
-                      addItem(product, quantity, activeVariant?.name, unitPrice);
-                    }}
-                    variant="primary"
-                    className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
-                  >
-                    <ShoppingBag className="h-4 w-4 shrink-0" />
-                    <span className="truncate">Add to Cart</span>
-                  </Button>
+                  {isInCart ? (
+                    <Button
+                      onClick={() => {
+                        router.push("/cart");
+                      }}
+                      variant="primary"
+                      className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md bg-[#07402b] hover:bg-[#6b1e30]"
+                    >
+                      <ShoppingBag className="h-4 w-4 shrink-0" />
+                      <span className="truncate">Go to Cart</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        addItem(product, quantity, activeVariant?.name, unitPrice);
+                      }}
+                      variant="primary"
+                      className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
+                    >
+                      <ShoppingBag className="h-4 w-4 shrink-0" />
+                      <span className="truncate">Add to Cart</span>
+                    </Button>
+                  )}
 
                   <Button
                     onClick={() => {
@@ -319,30 +368,94 @@ export default function ProductDetailPage({
                   </div>
                 </div>
 
-                {/* Quantity Stepper */}
+                {/* Quantity Select Dropdown or Custom 10+ Input */}
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                  <label htmlFor="product-quantity-dropdown" className="text-xs font-bold uppercase tracking-wider text-stone-600">
                     Quantity:
-                  </span>
-                  <div className="flex items-center gap-1.5 p-1 bg-transparent">
-                    <button
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="h-7 w-7 rounded flex items-center justify-center bg-stone-100 hover:bg-[#6b1e30] text-[#6b1e30] hover:text-white transition-colors cursor-pointer"
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </button>
-                    <span className="font-mono text-sm font-bold text-[#07402b] w-6 text-center">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => setQuantity((q) => q + 1)}
-                      className="h-7 w-7 rounded flex items-center justify-center bg-stone-100 hover:bg-[#6b1e30] text-[#6b1e30] hover:text-white transition-colors cursor-pointer"
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </button>
-                  </div>
+                  </label>
+                  {isCustomQtyInput ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        min={1}
+                        max={999}
+                        value={customQtyValue}
+                        onChange={(e) => setCustomQtyValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleCustomQtySubmit();
+                          }
+                        }}
+                        className="w-20 h-9 bg-stone-50 text-[#07402b] font-mono text-sm font-bold px-3 rounded-md border border-[#07402b] focus:outline-none focus:ring-2 focus:ring-[#07402b]/30"
+                        placeholder="Qty"
+                        autoFocus
+                      />
+                      {/* Square Tick Box Button */}
+                      <button
+                        type="button"
+                        onClick={handleCustomQtySubmit}
+                        className="h-9 w-9 flex items-center justify-center bg-[#07402b] hover:bg-[#6b1e30] text-white rounded-md shadow-xs transition-colors cursor-pointer shrink-0"
+                        aria-label="Confirm custom quantity"
+                        title="Confirm quantity"
+                      >
+                        <Check className="h-4 w-4 stroke-[2.5]" />
+                      </button>
+                      {/* Round Reset Icon Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCustomQtyInput(false);
+                          setQuantity(1);
+                          if (isInCart) {
+                            updateQuantity(itemId, 1);
+                          }
+                        }}
+                        className="h-9 w-9 flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 border border-stone-300 rounded-full shadow-xs transition-colors cursor-pointer shrink-0"
+                        aria-label="Reset to dropdown"
+                        title="Reset to dropdown"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative inline-block">
+                      <select
+                        id="product-quantity-dropdown"
+                        value={quantity >= 10 ? "10+" : quantity}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === "10+") {
+                            setIsCustomQtyInput(true);
+                            setCustomQtyValue(quantity >= 10 ? String(quantity) : "10");
+                            const targetQty = quantity >= 10 ? quantity : 10;
+                            setQuantity(targetQty);
+                            if (isInCart) {
+                              updateQuantity(itemId, targetQty);
+                            }
+                            addToast(`Quantity set to ${targetQty}+! Enter exact amount.`, "info");
+                          } else {
+                            const newQty = parseInt(val, 10);
+                            setQuantity(newQty);
+                            if (isInCart) {
+                              updateQuantity(itemId, newQty);
+                            }
+                            addToast(`Quantity updated to ${newQty} for ${product.name}!`, "success");
+                          }
+                        }}
+                        className="appearance-none bg-stone-50 hover:bg-stone-100 text-[#07402b] font-mono text-sm font-bold py-1.5 pl-3.5 pr-8 rounded border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#07402b]/20 transition-colors cursor-pointer"
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                          <option key={num} value={num}>
+                            {num}
+                          </option>
+                        ))}
+                        <option value="10+">10+</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#07402b]">
+                        <ChevronDown className="h-4 w-4" />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

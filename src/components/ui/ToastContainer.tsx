@@ -2,7 +2,8 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Toaster } from "react-hot-toast";
+import { Toaster, ToastBar, toast } from "react-hot-toast";
+import { X } from "lucide-react";
 
 export default function ToastContainer() {
   const pathname = usePathname();
@@ -107,6 +108,27 @@ export default function ToastContainer() {
         zIndex: 999999,
       }}
       toastOptions={isAdmin ? adminToastOptions : storeToastOptions}
-    />
+    >
+      {(t) => (
+        <ToastBar toast={t}>
+          {({ icon, message }) => (
+            <div className="flex items-center justify-between gap-2.5 w-full select-none">
+              <div className="flex items-center gap-2">
+                {icon}
+                {message}
+              </div>
+              <button
+                type="button"
+                onClick={() => toast.dismiss(t.id)}
+                className="ml-2.5 p-1 rounded-sm hover:bg-white/20 transition-colors cursor-pointer shrink-0 opacity-80 hover:opacity-100"
+                aria-label="Close notification"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </ToastBar>
+      )}
+    </Toaster>
   );
 }

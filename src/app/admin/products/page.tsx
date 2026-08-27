@@ -49,7 +49,7 @@ export default function AdminProductsPage() {
     category: "frozen" as "freshly-baked" | "frozen" | "grazing-box",
     price: 34.99,
     packInfo: "Pack of 12",
-    badge: "Best Seller",
+    badge: "",
     image: "/product-placeholder.svg",
     images: ["/product-placeholder.svg"],
     variants: [] as ProductVariant[],
@@ -143,7 +143,7 @@ export default function AdminProductsPage() {
       category: "frozen",
       price: 34.99,
       packInfo: "Pack of 12",
-      badge: "Best Seller",
+      badge: "",
       image: "/product-placeholder.svg",
       images: ["/product-placeholder.svg"],
       variants: [],
@@ -839,14 +839,17 @@ export default function AdminProductsPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Badge Tag</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Custom Ribbon / Badge Tag</label>
                         <input
                           type="text"
                           value={formData.badge}
                           onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                          placeholder="e.g. Best Seller, Chef Special"
-                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
+                          placeholder="e.g. Best Seller, Hot Deal, Chef Special, 20% OFF..."
+                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-sans"
                         />
+                        <span className="text-[10px] text-slate-500 block mt-1">
+                          Full custom control: Whatever text you type here will appear on product cards & detail page. Leave empty for no ribbon.
+                        </span>
                       </div>
                     </div>
 
@@ -1227,6 +1230,19 @@ export default function AdminProductsPage() {
 
                 {activeTab === "flags" && (
                   <div className="space-y-4">
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-sm space-y-2">
+                      <label className="text-xs font-bold text-slate-900 block">Custom Product Ribbon Tag</label>
+                      <input
+                        type="text"
+                        value={formData.badge}
+                        onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+                        placeholder="e.g. Best Seller, Limited Edition, Hot Deal, Gibberish Text..."
+                        className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-sm focus:outline-none focus:border-slate-900"
+                      />
+                      <span className="text-[11px] text-slate-500 block">
+                        Enter any text here to show as a custom ribbon tag on product cards and product pages. Leave blank to hide the ribbon tag.
+                      </span>
+                    </div>
                     <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-sm">
                       <div>
                         <span className="text-xs font-bold text-slate-900 block">Featured Product</span>
@@ -1236,8 +1252,8 @@ export default function AdminProductsPage() {
                     </div>
                     <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-sm">
                       <div>
-                        <span className="text-xs font-bold text-slate-900 block">Best Seller Badge</span>
-                        <span className="text-[11px] text-slate-500">Highlight this product with a Best Seller tag.</span>
+                        <span className="text-xs font-bold text-slate-900 block">Best Seller Status</span>
+                        <span className="text-[11px] text-slate-500">Mark as best seller for filtering and promotion.</span>
                       </div>
                       <input type="checkbox" checked={formData.isBestSeller} onChange={(e) => setFormData({ ...formData, isBestSeller: e.target.checked })} className="w-4 h-4 rounded border-slate-300 text-slate-900 cursor-pointer" />
                     </div>
