@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
-  <!-- Star Icon -->
-  <path d="M 28 16 L 31.5 24 L 40 25 L 34 31 L 35.5 39 L 28 35 L 20.5 39 L 22 31 L 16 25 L 24.5 24 Z" fill="#c69c40" />
-  <!-- Text -->
-  <text x="48" y="27" font-family="Georgia, serif" font-size="12" font-weight="bold" fill="#1c1410" letter-spacing="2">CORPORATE CATERING</text>
-  <text x="48" y="41" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#6b1e30" letter-spacing="3">FOODSERVICE PARTNERS</text>
-</svg>

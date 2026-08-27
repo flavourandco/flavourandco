@@ -3,15 +3,15 @@
 import Image from "next/image";
 
 export const PARTNER_LOGOS = [
-  { name: "The Fullerton Hotel Sydney", src: "/partners/fullerton-hotel.svg" },
+  { name: "The Fullerton Hotel Sydney", src: "/partners/The-Fullerton-Hotel-Sydney.png" },
   { name: "Hyatt Regency Sydney", src: "/partners/hyatt-regency.svg" },
-  { name: "Sheraton Grand Sydney Hyde Park", src: "/partners/sheraton-grand.svg" },
-  { name: "Amora Hotel Jamison Sydney", src: "/partners/amora-hotel.svg" },
-  { name: "Novotel Sydney Darling Harbour", src: "/partners/novotel.svg" },
+  { name: "Sheraton Grand Sydney Hyde Park", src: "/partners/sheraton-grand.avif" },
+  { name: "Amora Hotel Jamison Sydney", src: "/partners/amora-hotel.webp" },
+  { name: "Novotel Sydney Darling Harbour", src: "/partners/novotel.webp" },
   { name: "PARKROYAL Parramatta", src: "/partners/parkroyal.svg" },
   { name: "Cruzing Catering & Events Management", src: "/partners/cruzing.png" },
   { name: "Channel 7 Plate of Origin", src: "/partners/channel-7.svg" },
-  { name: "Corporate Catering Partners", src: "/partners/corporate-catering.svg" },
+  { name: "Corporate Catering Partners", src: "/partners/corporate-catering.avif" },
 ];
 
 interface PartnerLogosStripProps {
@@ -51,7 +51,7 @@ export default function PartnerLogosStrip({
                   alt={logo.name}
                   fill
                   sizes="(max-width: 768px) 50vw, 33vw"
-                  className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:scale-105"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
             </div>
