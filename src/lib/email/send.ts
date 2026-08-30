@@ -159,7 +159,16 @@ export async function sendTransactionalEmail(options: SendEmailOptions): Promise
       payload.replyTo = replyTo;
     }
 
-    const { data, error } = await resend.emails.send(payload);
+    let sendResult = await resend.emails.send(payload);
+
+    // Fallback: If custom domain is not yet verified in DNS, retry once via verified onboarding domain
+    if (sendResult.error && (sendResult.error.message.toLowerCase().includes("domain") || sendResult.error.message.toLowerCase().includes("verify") || sendResult.error.message.toLowerCase().includes("not verified"))) {
+      console.warn(`[RESEND DOMAIN NOTICE] Domain not verified for "${fromAddress}". Retrying with "Flavour & Co. <onboarding@resend.dev>"...`);
+      payload.from = "Flavour & Co. <onboarding@resend.dev>";
+      sendResult = await resend.emails.send(payload);
+    }
+
+    const { data, error } = sendResult;
 
     if (error) {
       console.error(`[RESEND API ERROR] Order #${orderNumber} [Event: ${event}] to ${primaryRecipient}:`, error.message);

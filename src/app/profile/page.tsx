@@ -20,6 +20,9 @@ import {
   Download,
   Printer,
   FileText,
+  Star,
+  Clock,
+  Check,
 } from "lucide-react";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/layout/Footer";
@@ -205,92 +208,187 @@ export default function ProfilePage() {
                   </div>
                 ) : orders.length > 0 ? (
                   <div className="space-y-4">
-                    {orders.map((ord) => (
-                      <div
-                        key={ord.id}
-                        className="bg-[#faf6f0] rounded-sm p-3.5 sm:p-5 text-xs space-y-3 shadow-xs hover:bg-[#f5efe3] transition-all"
-                      >
-                        {/* Card Header */}
-                        <div className="space-y-2 border-b border-stone-200/60 pb-3">
-                          <h4 className="font-serif font-bold text-brand-green text-base sm:text-lg leading-snug break-words">
-                            {getOrderProductTitle(ord.items)}
-                          </h4>
-                          
-                          <div className="flex flex-wrap items-center justify-between gap-y-1 gap-x-2 text-[11px]">
-                            <span className="font-mono text-stone-500 font-medium whitespace-nowrap">
-                              Order #{ord.orderNumber}
-                            </span>
-                            <span className="text-stone-500 whitespace-nowrap">
-                              {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString("en-AU", { dateStyle: "medium" }) : "Recent"}
-                            </span>
+                    {orders.map((ord) => {
+                      const isCompleted = ord.status === "completed";
+                      const isCancelled = ord.status === "cancelled";
+                      const isShipped = ord.status === "shipped";
+                      const isProcessing = ord.status === "processing";
+
+                      // First item product URL for review shortcut
+                      const firstItem = Array.isArray(ord.items) && ord.items.length > 0 ? (ord.items[0] as any) : null;
+                      const firstItemName = firstItem?.name || firstItem?.product?.name || "pie";
+                      const firstItemSlug = firstItemName
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/(^-|-$)+/g, "");
+                      const firstItemId = firstItem?.id || firstItem?.productId || firstItem?.product_id;
+                      const reviewUrl = firstItemId ? `/shop/${firstItemSlug}/${firstItemId}#reviews` : "/shop";
+
+                      return (
+                        <div
+                          key={ord.id}
+                          className="bg-[#faf6f0] rounded-sm p-4 sm:p-5 text-xs space-y-3.5 shadow-2xs hover:bg-[#f5efe3] transition-colors border-0"
+                        >
+                          {/* Card Header: Order #, Date, Status Badge & Price */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-stone-200/50">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-stone-500 font-medium text-[11px]">
+                                  #{ord.orderNumber}
+                                </span>
+                                <span className="text-stone-300">&bull;</span>
+                                <span className="text-stone-500 font-medium text-[11px]">
+                                  {ord.createdAt
+                                    ? new Date(ord.createdAt).toLocaleDateString("en-AU", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })
+                                    : "Recent"}
+                                </span>
+                              </div>
+                              <h4 className="font-serif font-bold text-[#07402b] text-base sm:text-lg mt-0.5">
+                                {getOrderProductTitle(ord.items)}
+                              </h4>
+                            </div>
+
+                            <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
+                              {isCompleted ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                                  <CheckCircle className="w-3 h-3 text-emerald-700" />
+                                  <span>Delivered</span>
+                                </span>
+                              ) : isCancelled ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">
+                                  <X className="w-3 h-3 text-rose-700" />
+                                  <span>Cancelled</span>
+                                </span>
+                              ) : isShipped ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">
+                                  <Truck className="w-3 h-3 text-blue-700" />
+                                  <span>Shipped</span>
+                                </span>
+                              ) : isProcessing ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900">
+                                  <Clock className="w-3 h-3 text-amber-700" />
+                                  <span>In Kitchen</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-stone-200 text-stone-700">
+                                  <Package className="w-3 h-3 text-stone-500" />
+                                  <span>Placed</span>
+                                </span>
+                              )}
+
+                              <span className="font-mono font-black text-sm sm:text-base text-[#6b1e30]">
+                                A${ord.totalAmount.toFixed(2)}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="flex items-center justify-between gap-2 pt-1">
-                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-sm text-[10px] uppercase flex items-center gap-1 shrink-0">
-                              <CheckCircle className="h-3 w-3" /> Paid &amp; Confirmed
-                            </span>
-                            <span className="font-sans font-extrabold text-sm sm:text-base text-[#6b1e30] shrink-0 whitespace-nowrap">
-                              A${ord.totalAmount.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
+                          {/* Minimal Items Preview */}
+                          <div className="space-y-1 py-0.5">
+                            {Array.isArray(ord.items) &&
+                              ord.items.map((it: any, idx: number) => {
+                                const itPrice = typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0);
+                                const itQty = it.quantity || 1;
+                                const itemName = it.name || it.product?.name || "Gourmet Pie";
+                                const itemImg = it.image || it.product?.image || it.product?.images?.[0];
 
-                        {/* Order Items Preview - Responsive Mobile Grid */}
-                        <div className="space-y-1.5 py-1">
-                          {Array.isArray(ord.items) &&
-                            ord.items.map((it: any, idx: number) => {
-                              const itPrice = typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0);
-                              const itQty = it.quantity || 1;
-                              const itemName = it.name || it.product?.name || "Gourmet Pie";
-                              const variant = it.variantName || it.variant;
-                              return (
-                                <div key={idx} className="flex items-center justify-between text-xs bg-white/80 p-2 sm:p-2.5 rounded-sm gap-2 min-w-0">
-                                  <div className="flex flex-wrap items-center gap-1.5 min-w-0 flex-1 pr-1">
-                                    <span className="bg-brand-green/10 text-brand-green font-bold text-[10px] px-1.5 py-0.5 rounded-sm font-mono shrink-0">
-                                      {itQty}x
+                                return (
+                                  <div key={idx} className="flex items-center justify-between py-1.5 px-0.5 text-xs">
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                      {itemImg ? (
+                                        <div className="relative w-7 h-7 rounded-xs overflow-hidden bg-stone-200/50 shrink-0">
+                                          <Image src={itemImg} alt={itemName} fill className="object-cover" sizes="28px" />
+                                        </div>
+                                      ) : (
+                                        <PackageCheck className="w-3.5 h-3.5 text-[#07402b] shrink-0" />
+                                      )}
+                                      <p className="font-serif text-xs sm:text-sm font-bold text-stone-900 truncate m-0 flex items-center">
+                                        <span className="font-sans font-semibold text-stone-500 text-xs sm:text-sm mr-1.5 shrink-0">
+                                          {itQty}x
+                                        </span>
+                                        <span className="truncate">{itemName}</span>
+                                      </p>
+                                    </div>
+                                    <span className="font-mono text-stone-800 font-bold shrink-0 text-xs whitespace-nowrap pl-2">
+                                      A${(itPrice * itQty).toFixed(2)}
                                     </span>
-                                    <span className="font-serif font-bold text-stone-900 text-xs sm:text-sm truncate">
-                                      {itemName}
-                                    </span>
-                                    {variant && variant !== "Standard" && (
-                                      <span className="text-[10px] bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded-sm font-medium shrink-0">
-                                        {variant}
-                                      </span>
-                                    )}
                                   </div>
-                                  <span className="font-mono text-stone-800 font-bold shrink-0 text-xs sm:text-sm whitespace-nowrap">
-                                    A${(itPrice * itQty).toFixed(2)}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                        </div>
+                                );
+                              })}
+                          </div>
 
-                        {/* Order Actions: View Details & Download Receipt */}
-                        <div className="pt-2.5 border-t border-stone-200/60 flex flex-wrap items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setReceiptOrder(ord);
-                            }}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-[#07402b] bg-[#faf6f0] hover:bg-[#E3A72B] hover:text-[#07402b] border border-stone-300/80 rounded-sm transition-all cursor-pointer shadow-2xs"
-                            title="Download official receipt as PDF"
-                          >
-                            <Download className="w-3.5 h-3.5 text-[#6b1e30]" />
-                            <span>Download Receipt</span>
-                          </button>
+                          {/* Card Footer Actions */}
+                          <div className="pt-2 border-t border-stone-200/50 flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                              {isCompleted ? (
+                                <Link
+                                  href={reviewUrl}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#c69c40] bg-white hover:bg-[#c69c40] hover:text-white rounded-sm transition-all shadow-2xs cursor-pointer"
+                                >
+                                  <Star className="w-3.5 h-3.5 fill-current" />
+                                  <span>Review</span>
+                                </Link>
+                              ) : isCancelled ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-rose-700 bg-rose-100/70 rounded-sm">
+                                  <X className="w-3 h-3 text-rose-600" />
+                                  <span>Cancelled</span>
+                                </span>
+                              ) : isShipped ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedOrder(ord)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100/70 hover:bg-blue-200/70 rounded-sm transition-all cursor-pointer"
+                                >
+                                  <Truck className="w-3.5 h-3.5 text-blue-600" />
+                                  <span>Shipped</span>
+                                </button>
+                              ) : isProcessing ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedOrder(ord)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 hover:bg-amber-200/70 rounded-sm transition-all cursor-pointer"
+                                >
+                                  <Clock className="w-3.5 h-3.5 text-amber-700" />
+                                  <span>In Kitchen</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedOrder(ord)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-700 bg-stone-200/70 hover:bg-stone-300/70 rounded-sm transition-all cursor-pointer"
+                                >
+                                  <Package className="w-3.5 h-3.5 text-stone-500" />
+                                  <span>Order Placed</span>
+                                </button>
+                              )}
+                            </div>
 
-                          <button
-                            type="button"
-                            onClick={() => setSelectedOrder(ord)}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white bg-brand-green hover:bg-brand-gold hover:text-brand-green rounded-sm transition-all cursor-pointer shadow-xs"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>View Order Details</span>
-                          </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setReceiptOrder(ord)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#07402b] bg-white hover:bg-[#E3A72B] hover:text-[#07402b] rounded-sm transition-all cursor-pointer shadow-2xs"
+                              >
+                                <Download className="w-3 h-3 text-[#6b1e30]" />
+                                <span>Receipt</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setSelectedOrder(ord)}
+                                className="inline-flex items-center gap-1 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white bg-[#07402b] hover:bg-[#c69c40] hover:text-[#07402b] rounded-sm transition-all cursor-pointer shadow-xs"
+                              >
+                                <Eye className="w-3 h-3" />
+                                <span>View Details</span>
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   /* Minimal Empty State Card */
@@ -363,6 +461,141 @@ export default function ProfilePage() {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-stone-700 overscroll-contain">
+              {/* MODAL STATUS SECTION: HORIZONTAL TIMELINE OR DELIVERED BANNER */}
+              {(() => {
+                const isCompleted = selectedOrder.status === "completed";
+                const isCancelled = selectedOrder.status === "cancelled";
+                const isShipped = selectedOrder.status === "shipped";
+                const isProcessing = selectedOrder.status === "processing";
+
+                const modalFirstItem = Array.isArray(selectedOrder.items) && selectedOrder.items.length > 0 ? (selectedOrder.items[0] as any) : null;
+                const modalItemName = modalFirstItem?.name || modalFirstItem?.product?.name || "pie";
+                const modalItemSlug = modalItemName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+                const modalItemId = modalFirstItem?.id || modalFirstItem?.productId || modalFirstItem?.product_id;
+                const modalReviewUrl = modalItemId ? `/shop/${modalItemSlug}/${modalItemId}#reviews` : "/shop";
+
+                if (isCompleted) {
+                  return (
+                    <div className="bg-[#e6f4ea] border border-[#b7e1cd] rounded-sm p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                          <CheckCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="font-serif font-bold text-sm text-[#07402b] block">Delivered Fresh &bull; Order Completed</span>
+                          <span className="text-xs text-emerald-900">We hope you loved every bite of your gourmet pies!</span>
+                        </div>
+                      </div>
+                      <Link
+                        href={modalReviewUrl}
+                        onClick={() => setSelectedOrder(null)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#c69c40] hover:bg-[#b08832] text-white text-xs font-bold uppercase tracking-wider rounded-sm transition-colors shadow-2xs shrink-0 self-end sm:self-auto"
+                      >
+                        <Star className="w-3.5 h-3.5 fill-white text-white" />
+                        <span>Rate &amp; Review</span>
+                      </Link>
+                    </div>
+                  );
+                }
+
+                if (isCancelled) {
+                  return (
+                    <div className="bg-rose-50 border border-rose-200 rounded-sm p-3.5 flex items-center gap-2.5 text-rose-900">
+                      <X className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>This order was cancelled. Please contact support if you have any questions.</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="bg-[#faf6f0] border border-[#ede3d7] rounded-sm p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-2 flex-wrap mb-3.5">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#c69c40]">
+                        Order Fulfilment Status
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider shadow-2xs ${isShipped
+                          ? "bg-blue-600 text-white font-extrabold"
+                          : isProcessing
+                            ? "bg-amber-600 text-white font-extrabold"
+                            : "bg-[#07402b] text-white font-extrabold"
+                          }`}
+                      >
+                        <span className="text-white/80 font-semibold">Current Status:</span>
+                        <span className="text-white font-black">
+                          {isShipped ? "Shipped" : isProcessing ? "In Preparation" : "Order Placed"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="relative pt-1 pb-1">
+                      {/* Line */}
+                      <div className="absolute top-4 left-6 right-6 h-0.5 bg-stone-200 z-0" />
+                      <div
+                        className="absolute top-4 left-6 h-0.5 bg-emerald-600 z-0 transition-all duration-500"
+                        style={{
+                          width: isShipped ? "calc(100% - 48px)" : isProcessing ? "calc(50% - 24px)" : "0%",
+                        }}
+                      />
+
+                      <div className="relative z-10 grid grid-cols-3 text-center">
+                        {/* Step 1: Placed */}
+                        <div className="flex flex-col items-center">
+                          <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          </div>
+                          <span className="font-bold text-stone-800 text-[11px] mt-1.5">Placed</span>
+                        </div>
+
+                        {/* Step 2: Processing */}
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-2xs ${isShipped
+                              ? "bg-emerald-600 text-white"
+                              : isProcessing
+                                ? "bg-amber-500 text-white ring-4 ring-amber-100"
+                                : "bg-stone-200 text-stone-500"
+                              }`}
+                          >
+                            {isShipped ? (
+                              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                            ) : isProcessing ? (
+                              <Clock className="w-3.5 h-3.5" />
+                            ) : (
+                              "2"
+                            )}
+                          </div>
+                          <span
+                            className={`text-[11px] mt-1.5 ${isProcessing ? "font-bold text-amber-900" : isShipped ? "font-bold text-stone-800" : "font-medium text-stone-400"
+                              }`}
+                          >
+                            Processing
+                          </span>
+                        </div>
+
+                        {/* Step 3: Shipped */}
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-2xs ${isShipped
+                              ? "bg-blue-600 text-white ring-4 ring-blue-100 animate-bounce"
+                              : "bg-stone-200 text-stone-500"
+                              }`}
+                          >
+                            {isShipped ? <Truck className="w-3.5 h-3.5" /> : "3"}
+                          </div>
+                          <span
+                            className={`text-[11px] mt-1.5 ${isShipped ? "font-bold text-blue-900" : "font-medium text-stone-400"
+                              }`}
+                          >
+                            Shipped
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Order Info & Delivery Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Delivery Address */}

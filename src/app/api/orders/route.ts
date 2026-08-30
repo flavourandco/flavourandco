@@ -99,37 +99,68 @@ export async function PATCH(req: Request) {
       if (courierName !== undefined) updatePayload.courier_name = courierName;
       if (estimatedDelivery !== undefined) updatePayload.estimated_delivery = estimatedDelivery;
 
-      const { data: updData, error: updErr } = await supabase
+      // 1. Try updating by internal ID
+      let { data: updData, error: updErr } = await supabase
         .from("orders")
         .update(updatePayload)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (!updErr && updData) {
+      // 2. Fallback: Try updating by order_number
+      if (!updData) {
+        const { data: updByOrdNum } = await supabase
+          .from("orders")
+          .update(updatePayload)
+          .eq("order_number", id)
+          .select()
+          .maybeSingle();
+        if (updByOrdNum) {
+          updData = updByOrdNum;
+        }
+      }
+
+      // 3. Fallback: If not returned, query the order record to get all customer details
+      if (!updData) {
+        const { data: existingOrd } = await supabase
+          .from("orders")
+          .select("*")
+          .or(`id.eq.${id},order_number.eq.${id}`)
+          .maybeSingle();
+
+        if (existingOrd) {
+          updData = { ...existingOrd, ...updatePayload };
+        }
+      }
+
+      if (updData) {
         updatedOrder = updData;
       }
     }
 
-    // Trigger Status Update Email Notification (Non-blocking safe side effect)
+    // Trigger Status Update Email Notification (Awaited for guaranteed serverless dispatch)
     if (updatedOrder && status) {
-      sendStatusUpdateNotification(
-        {
-          ...updatedOrder,
-          trackingNumber: trackingNumber || updatedOrder.tracking_number,
-          trackingUrl: trackingUrl || updatedOrder.tracking_url,
-          courierName: courierName || updatedOrder.courier_name,
-          estimatedDelivery: estimatedDelivery || updatedOrder.estimated_delivery,
-          refundAmount: refundAmount || updatedOrder.refund_amount,
-        },
-        status
-      ).catch((notifyErr) => {
+      try {
+        const emailRes = await sendStatusUpdateNotification(
+          {
+            ...updatedOrder,
+            trackingNumber: trackingNumber || updatedOrder.tracking_number,
+            trackingUrl: trackingUrl || updatedOrder.tracking_url,
+            courierName: courierName || updatedOrder.courier_name,
+            estimatedDelivery: estimatedDelivery || updatedOrder.estimated_delivery,
+            refundAmount: refundAmount || updatedOrder.refund_amount,
+          },
+          status
+        );
+        console.log(`[ORDER STATUS EMAIL DISPATCH] Order #${updatedOrder.order_number || id} -> ${status}:`, emailRes);
+      } catch (notifyErr) {
         console.error("[STATUS UPDATE EMAIL ERROR]", notifyErr);
-      });
+      }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, order: updatedOrder });
   } catch (err: any) {
+    console.error("[ORDER PATCH ERROR]", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

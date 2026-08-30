@@ -31,13 +31,17 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
         <style>{`
           body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
           table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-          img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+          img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
           table { border-collapse: collapse !important; }
           body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #fdf8f3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
           @media screen and (max-width: 600px) {
             .mobile-container { width: 100% !important; max-width: 100% !important; }
-            .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
-            .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; direction: ltr !important; }
+            .mobile-padding { padding-left: 14px !important; padding-right: 14px !important; }
+            .mobile-stack { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; text-align: left !important; }
+            .mobile-center { text-align: center !important; }
+            .mobile-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+            .mobile-hide { display: none !important; }
+            .mobile-title { font-size: 20px !important; }
           }
         `}</style>
       </head>

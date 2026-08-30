@@ -166,7 +166,7 @@ export default function AdminOrdersPage() {
         </div>
 
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
-          {["all", "completed", "processing", "shipped", "cancelled"].map((st) => (
+          {["all", "processing", "shipped", "completed", "cancelled"].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
@@ -276,7 +276,7 @@ export default function AdminOrdersPage() {
               <div className="p-3.5 bg-slate-100/80 border border-slate-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span className="text-xs font-bold text-slate-900">UPDATE FULFILMENT STATUS</span>
                 <div className="flex flex-wrap gap-2">
-                  {(["completed", "processing", "shipped", "cancelled"] as const).map((st) => {
+                  {(["processing", "shipped", "completed", "cancelled"] as const).map((st) => {
                     const isSelected = (stagedStatus || selectedOrder.status) === st;
                     const isUpdating = updatingOrderId === selectedOrder.id;
 

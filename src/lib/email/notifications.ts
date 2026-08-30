@@ -48,17 +48,29 @@ function normalizeShippingAddress(addr: ShippingAddress | string | any): Formatt
 /**
  * Normalizes raw order item array into clean typed OrderItem[].
  */
-function normalizeOrderItems(rawItems: any[]): OrderItem[] {
+function normalizeOrderItems(rawItems: any[], appBaseUrl?: string): OrderItem[] {
   if (!Array.isArray(rawItems)) return [];
+  const base = appBaseUrl || getAppBaseUrl();
 
-  return rawItems.map((it) => ({
-    id: it.id || it.productId || "",
-    name: it.name || it.product?.name || "Gourmet Pie",
-    price: typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0),
-    quantity: typeof it.quantity === "number" ? it.quantity : 1,
-    image: it.image || it.product?.image || it.product?.images?.[0] || "",
-    variant: it.variant || it.variantName || undefined,
-  }));
+  return rawItems.map((it) => {
+    const id = it.id || it.productId || it.product_id || it.product?.id || "";
+    const name = it.name || it.product?.name || "Gourmet Pie";
+    const slug = (name || "pie")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+    const productUrl = id ? `${base}/shop/${slug}/${id}#reviews` : `${base}/shop`;
+
+    return {
+      id,
+      name,
+      price: typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0),
+      quantity: typeof it.quantity === "number" ? it.quantity : 1,
+      image: it.image || it.product?.image || it.product?.images?.[0] || "",
+      variant: it.variant || it.variantName || undefined,
+      productUrl,
+    };
+  });
 }
 
 /**
@@ -74,11 +86,11 @@ export function formatOrderForEmail(order: any): EmailOrderData {
   const shippingFee = Number(order.shippingFee ?? order.shipping_fee ?? 0);
   const taxAmount = Number(order.taxAmount ?? order.tax_amount ?? ((totalAmount * 10) / 110));
 
-  const items = normalizeOrderItems(order.items);
+  const items = normalizeOrderItems(order.items, appBaseUrl);
   const shippingAddress = normalizeShippingAddress(order.shippingAddress || order.shipping_address);
 
   // Deep links
-  const viewOrderUrl = `${appBaseUrl}/checkout/success?orderId=${encodeURIComponent(orderId)}`;
+  const viewOrderUrl = `${appBaseUrl}/profile`;
   const adminOrderUrl = `${appBaseUrl}/admin/orders`;
 
   return {
@@ -204,14 +216,14 @@ export async function sendStatusUpdateNotification(
 
   switch (normalizedStatus) {
     case "processing":
-      subject = `Your order #${order.orderNumber} is being prepared 📦`;
+      subject = `Your order #${order.orderNumber} is being prepared 👨‍🍳`;
       templateComponent = React.createElement(OrderProcessing, { order });
       eventName = "order_processing";
       templateName = "OrderProcessing";
       break;
 
     case "shipped":
-      subject = `Your order #${order.orderNumber} has shipped 🚚`;
+      subject = `Your order #${order.orderNumber} has shipped! 🚚`;
       templateComponent = React.createElement(OrderShipped, { order });
       eventName = "order_shipped";
       templateName = "OrderShipped";
@@ -219,7 +231,7 @@ export async function sendStatusUpdateNotification(
 
     case "completed":
     case "delivered":
-      subject = `Your order #${order.orderNumber} has been delivered 🎉`;
+      subject = `Thank you for your order! Please rate your pies (Order #${order.orderNumber}) ⭐`;
       templateComponent = React.createElement(OrderDelivered, { order });
       eventName = "order_delivered";
       templateName = "OrderDelivered";

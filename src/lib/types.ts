@@ -65,6 +65,7 @@ export interface OrderItem {
   quantity: number;
   image?: string;
   variant?: string;
+  productUrl?: string;
 }
 
 export interface ShippingAddress {

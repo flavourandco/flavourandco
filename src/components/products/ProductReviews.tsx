@@ -166,7 +166,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
   const hasMoreReviews = visibleCount < reviews.length;
 
   return (
-    <section className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-2 border-[#c69c40]/30">
+    <section id="reviews" className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-2 border-[#c69c40]/30 scroll-mt-24">
       <div className="space-y-4 sm:space-y-6">
         
         {/* Rating Summary Bar */}

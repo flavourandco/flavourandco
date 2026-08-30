@@ -45,7 +45,7 @@ export function getEmailFromAddress(): string {
   if (configured && configured.trim().length > 0) {
     return configured.trim();
   }
-  return "Flavour & Co. <help@flavourandco.com.au>";
+  return "Flavour & Co. <onboarding@resend.dev>";
 }
 
 /**

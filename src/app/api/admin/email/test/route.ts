@@ -56,7 +56,7 @@ const SAMPLE_MOCK_ORDER: EmailOrderData = {
   status: "completed",
   fulfillmentNotes: "Please leave at front door if no answer. Ring bell twice.",
   createdAt: new Date().toISOString(),
-  viewOrderUrl: "http://localhost:3000/checkout/success?orderId=FC-ORD-TEST-SAMPLE",
+  viewOrderUrl: "http://localhost:3000/profile",
   adminOrderUrl: "http://localhost:3000/admin/orders",
   trackingNumber: "AP-EXP-9928172AU",
   trackingUrl: "https://auspost.com.au/mypost/track/#/details/AP-EXP-9928172AU",
@@ -91,12 +91,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const orderData: EmailOrderData = customOrder
-      ? formatOrderForEmail(customOrder)
-      : {
-          ...SAMPLE_MOCK_ORDER,
-          customerEmail: recipientEmail || SAMPLE_MOCK_ORDER.customerEmail,
-        };
+    const orderData: EmailOrderData = formatOrderForEmail(
+      customOrder || {
+        ...SAMPLE_MOCK_ORDER,
+        customerEmail: recipientEmail || SAMPLE_MOCK_ORDER.customerEmail,
+      }
+    );
 
     const targetEmail = recipientEmail || orderData.customerEmail;
     if (!targetEmail) {
@@ -124,19 +124,19 @@ export async function POST(req: Request) {
         break;
 
       case "order_processing":
-        subject = `[TEST] Your order #${orderData.orderNumber} is being prepared 📦`;
+        subject = `[TEST] Your order #${orderData.orderNumber} is being prepared 👨‍🍳`;
         templateComponent = React.createElement(OrderProcessing, { order: orderData });
         templateName = "OrderProcessing";
         break;
 
       case "order_shipped":
-        subject = `[TEST] Your order #${orderData.orderNumber} has shipped 🚚`;
+        subject = `[TEST] Your order #${orderData.orderNumber} has shipped! 🚚`;
         templateComponent = React.createElement(OrderShipped, { order: orderData });
         templateName = "OrderShipped";
         break;
 
       case "order_delivered":
-        subject = `[TEST] Your order #${orderData.orderNumber} has been delivered 🎉`;
+        subject = `[TEST] Thank you for your order! Please rate your pies (Order #${orderData.orderNumber}) ⭐`;
         templateComponent = React.createElement(OrderDelivered, { order: orderData });
         templateName = "OrderDelivered";
         break;
