@@ -164,6 +164,15 @@ export async function PUT(request: Request) {
             }
             return NextResponse.json({ success: true, data: retryData });
           }
+          if (error.message?.includes("is_featured") || error.message?.includes("schema cache")) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: "The 'is_featured' column is missing in Supabase. Please run: ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;",
+              },
+              { status: 400 }
+            );
+          }
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 

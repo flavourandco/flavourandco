@@ -50,13 +50,19 @@ CREATE TABLE IF NOT EXISTS public.blogs (
 CREATE TABLE IF NOT EXISTS public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id TEXT REFERENCES public.products(id) ON DELETE CASCADE,
+    product_name TEXT,
     name TEXT NOT NULL,
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment TEXT NOT NULL,
     is_verified BOOLEAN DEFAULT TRUE,
+    is_featured BOOLEAN DEFAULT FALSE,
     status TEXT DEFAULT 'approved' CHECK (status IN ('pending', 'approved', 'rejected')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration commands for existing database deployments:
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS product_name TEXT;
 
 -- 4. WHOLESALE INQUIRIES TABLE
 CREATE TABLE IF NOT EXISTS public.wholesale_inquiries (

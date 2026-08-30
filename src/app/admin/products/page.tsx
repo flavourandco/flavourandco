@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Edit2, Trash2, Search, X, Tag, Eye, ChevronUp, ChevronDown, Check } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, X, Tag, Eye, ChevronUp, ChevronDown, Check, Loader2 } from "lucide-react";
 import { Product, ProductVariant, WhyStandOutPoint } from "@/lib/types";
 import { useProductStore } from "@/store/product.store";
 import { useUIStore } from "@/store/ui.store";
@@ -22,6 +22,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [togglingFeaturedProductId, setTogglingFeaturedProductId] = useState<string | null>(null);
 
   const stagedMedia = useStagedMedia({ multiple: true, maxFiles: 10 });
 
@@ -128,6 +129,38 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const handleToggleFeaturedProduct = async (product: Product) => {
+    if (togglingFeaturedProductId) return;
+    const nextFeatured = !product.isFeatured;
+    setTogglingFeaturedProductId(product.id);
+
+    try {
+      const res = await fetch(`/api/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured: nextFeatured }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === product.id ? { ...p, isFeatured: nextFeatured } : p))
+        );
+        useProductStore.getState().fetchProducts(true);
+        notifyContentUpdated("products");
+        addToast(
+          nextFeatured ? `"${product.name}" featured on Home!` : `"${product.name}" unfeatured from Home.`,
+          "success"
+        );
+      } else {
+        addToast(formatCustomerError(json.error), "error");
+      }
+    } catch (err) {
+      addToast(formatCustomerError(err), "error");
+    } finally {
+      setTogglingFeaturedProductId(null);
+    }
+  };
 
   const handleOpenCreate = () => {
     setEditingProduct(null);
@@ -570,11 +603,43 @@ export default function AdminProductsPage() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="inline-flex items-center gap-1">
+                      <div className="inline-flex items-center gap-1.5">
+                        {/* On/Off Toggle for Featured (Shortcut) */}
+                        <button
+                          type="button"
+                          disabled={togglingFeaturedProductId === p.id}
+                          onClick={() => handleToggleFeaturedProduct(p)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer select-none ${
+                            p.isFeatured
+                              ? "bg-amber-100/90 text-amber-950 hover:bg-amber-200/90"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          } ${togglingFeaturedProductId === p.id ? "opacity-75 cursor-not-allowed" : ""}`}
+                          title={p.isFeatured ? "Featured on Homepage" : "Not Featured"}
+                        >
+                          <span className="text-[11px]">Featured</span>
+                          
+                          {/* Interactive On/Off Pill Switch */}
+                          <div
+                            className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                              p.isFeatured ? "bg-amber-600" : "bg-slate-300"
+                            }`}
+                          >
+                            <div
+                              className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
+                                p.isFeatured ? "translate-x-3" : "translate-x-0"
+                              }`}
+                            >
+                              {togglingFeaturedProductId === p.id && (
+                                <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
+                              )}
+                            </div>
+                          </div>
+                        </button>
+
                         {/* VIEW BUTTON (Row primary action) */}
                         <button
                           onClick={() => setViewingProduct(p)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer"
                         >
                           <Eye className="w-3 h-3 text-slate-500" /> View
                         </button>
@@ -582,7 +647,7 @@ export default function AdminProductsPage() {
                         {/* DELETE BUTTON */}
                         <button
                           onClick={() => setDeletingProductId(p.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm border border-rose-200/80 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3 h-3" /> Delete
                         </button>

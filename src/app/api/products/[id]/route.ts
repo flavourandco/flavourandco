@@ -100,6 +100,59 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { error: authError } = await requireAdminApi();
+  if (authError) return authError;
+
+  try {
+    const { id } = await params;
+    const body = await request.json();
+
+    if (isSupabaseConfigured()) {
+      const supabase = getSupabaseServerClient();
+      if (supabase) {
+        const updatePayload: Record<string, any> = {
+          updated_at: new Date().toISOString(),
+        };
+        if (typeof body.isFeatured === "boolean") {
+          updatePayload.is_featured = body.isFeatured;
+        }
+        if (typeof body.isBestSeller === "boolean") {
+          updatePayload.is_best_seller = body.isBestSeller;
+        }
+        if (typeof body.isNewArrival === "boolean") {
+          updatePayload.is_new_arrival = body.isNewArrival;
+        }
+
+        const { data, error } = await supabase
+          .from("products")
+          .update(updatePayload)
+          .eq("id", id)
+          .select();
+
+        if (error) {
+          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+        }
+
+        revalidatePath("/api/products");
+        revalidatePath(`/api/products/${id}`);
+        revalidatePath("/shop");
+        revalidatePath("/");
+
+        return NextResponse.json({ success: true, data });
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "Product flags updated (mock)" });
+  } catch (err: unknown) {
+    const error = err as Error;
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

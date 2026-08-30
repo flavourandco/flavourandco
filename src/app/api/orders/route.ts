@@ -23,35 +23,45 @@ export async function GET() {
       return NextResponse.json({ success: true, data: [] });
     }
 
-    const formatted = data.map((o: any) => ({
-      id: o.id,
-      orderNumber: o.order_number,
-      customerName: o.customer_name,
-      customerEmail: o.customer_email,
-      customerPhone: o.customer_phone || "+61 400 000 000",
-      shippingAddress: o.shipping_address || {
-        street: "124 George Street",
-        city: "Sydney",
-        state: "NSW",
-        postalCode: "2000",
-        country: "Australia",
-      },
-      shippingMethod: o.shipping_method || "Standard Express Delivery",
-      paymentMethod: o.payment_method || "Square Credit Card",
-      paymentStatus: o.payment_status || "paid",
-      squarePaymentId: o.square_payment_id || `sq_pay_${o.order_number?.toLowerCase() || "ord"}`,
-      squareTransactionId: o.square_transaction_id || `sq_tx_${o.order_number?.toLowerCase() || "ord"}`,
-      squareReceiptUrl: o.square_receipt_url || `https://squareupsandbox.com/receipt/preview/${o.order_number || "ord"}`,
-      items: o.items || [],
-      subtotal: Number(o.subtotal || o.total_amount || 0),
-      shippingFee: Number(o.shipping_fee || 0),
-      taxAmount: Number(o.tax_amount || 0),
-      totalAmount: Number(o.total_amount || 0),
-      status: o.status || "completed",
-      itemsCount: o.items_count || (Array.isArray(o.items) ? o.items.length : 1),
-      fulfillmentNotes: o.fulfillment_notes || "Order fulfilled successfully.",
-      createdAt: o.created_at,
-    }));
+    const formatted = data.map((o: any) => {
+      const shippingAddr = o.shipping_address || {};
+      const deliveryNotes =
+        (typeof shippingAddr === "object" && shippingAddr?.notes) ||
+        o.fulfillment_notes ||
+        "";
+
+      return {
+        id: o.id,
+        orderNumber: o.order_number,
+        customerName: o.customer_name,
+        customerEmail: o.customer_email,
+        customerPhone: o.customer_phone || "+61 400 000 000",
+        shippingAddress: typeof shippingAddr === "object" ? {
+          street: shippingAddr.street || "124 George Street",
+          unit: shippingAddr.unit || "",
+          city: shippingAddr.city || "Sydney",
+          state: shippingAddr.state || "NSW",
+          postalCode: shippingAddr.postalCode || shippingAddr.postcode || "2000",
+          country: shippingAddr.country || "Australia",
+          notes: deliveryNotes,
+        } : shippingAddr,
+        shippingMethod: o.shipping_method || "Standard Express Delivery",
+        paymentMethod: o.payment_method || "Square Credit Card",
+        paymentStatus: o.payment_status || "paid",
+        squarePaymentId: o.square_payment_id || `sq_pay_${o.order_number?.toLowerCase() || "ord"}`,
+        squareTransactionId: o.square_transaction_id || `sq_tx_${o.order_number?.toLowerCase() || "ord"}`,
+        squareReceiptUrl: o.square_receipt_url || `https://squareupsandbox.com/receipt/preview/${o.order_number || "ord"}`,
+        items: o.items || [],
+        subtotal: Number(o.subtotal || o.total_amount || 0),
+        shippingFee: Number(o.shipping_fee || 0),
+        taxAmount: Number(o.tax_amount || 0),
+        totalAmount: Number(o.total_amount || 0),
+        status: o.status || "completed",
+        itemsCount: o.items_count || (Array.isArray(o.items) ? o.items.length : 1),
+        fulfillmentNotes: deliveryNotes || "No special instructions attached to this order.",
+        createdAt: o.created_at,
+      };
+    });
 
     return NextResponse.json({ success: true, data: formatted });
   } catch (err: any) {

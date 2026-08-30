@@ -37,12 +37,14 @@ export const useUIStore = create<UIState>((set) => ({
   setOfferModalOpen: (offerModalOpen) => set({ offerModalOpen }),
 
   addToast: (message, type = "info") => {
+    if (!message) return;
+    const toastId = `${type}:${message.trim()}`;
     if (type === "success") {
-      toast.success(message);
+      toast.success(message, { id: toastId });
     } else if (type === "error") {
-      toast.error(message);
+      toast.error(message, { id: toastId });
     } else {
-      toast(message);
+      toast(message, { id: toastId });
     }
   },
 

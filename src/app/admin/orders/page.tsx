@@ -29,8 +29,20 @@ export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [stagedStatus, setStagedStatus] = useState<Order["status"] | null>(null);
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const addToast = useUIStore((s) => s.addToast);
+
+  const handleOpenOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setStagedStatus(order.status);
+  };
+
+  const handleCloseOrder = () => {
+    setSelectedOrder(null);
+    setStagedStatus(null);
+  };
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -52,6 +64,16 @@ export default function AdminOrdersPage() {
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: Order["status"]) => {
+    // 1. Prevent action if already in this status
+    const currentOrder = orders.find((o) => o.id === id) || (selectedOrder?.id === id ? selectedOrder : null);
+    if (currentOrder && currentOrder.status === newStatus) {
+      return;
+    }
+
+    // 2. Prevent concurrent clicks while updating
+    if (updatingOrderId) return;
+    setUpdatingOrderId(id);
+
     try {
       const res = await fetch("/api/orders", {
         method: "PATCH",
@@ -62,13 +84,15 @@ export default function AdminOrdersPage() {
         setOrders((prev) =>
           prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o))
         );
-        if (selectedOrder?.id === id) {
-          setSelectedOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
-        }
+        handleCloseOrder();
         addToast(`Order status updated to ${newStatus}.`, "success");
+      } else {
+        addToast("Failed to update order status.", "error");
       }
     } catch {
       addToast("Failed to update order status.", "error");
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -207,7 +231,7 @@ export default function AdminOrdersPage() {
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       {/* VIEW ORDER BUTTON */}
                       <button
-                        onClick={() => setSelectedOrder(o)}
+                        onClick={() => handleOpenOrder(o)}
                         className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
                       >
                         <Eye className="w-3 h-3 text-slate-500" /> View
@@ -248,6 +272,33 @@ export default function AdminOrdersPage() {
             {/* Scrollable Modal Content */}
             <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-slate-700 overscroll-contain" data-lenis-prevent>
               
+              {/* Status Controls (Positioned on Top) */}
+              <div className="p-3.5 bg-slate-100/80 border border-slate-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="text-xs font-bold text-slate-900">UPDATE FULFILMENT STATUS</span>
+                <div className="flex flex-wrap gap-2">
+                  {(["completed", "processing", "shipped", "cancelled"] as const).map((st) => {
+                    const isSelected = (stagedStatus || selectedOrder.status) === st;
+                    const isUpdating = updatingOrderId === selectedOrder.id;
+
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => setStagedStatus(st)}
+                        className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-slate-900 text-white shadow-xs"
+                            : "bg-white text-slate-700 hover:bg-slate-200 border border-slate-200"
+                        } ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        {st}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Top Row: Customer & Delivery Info + Square Payment Info Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
@@ -274,6 +325,31 @@ export default function AdminOrdersPage() {
                     <span className="text-[10px] font-bold text-slate-500 block pt-1">
                       Method: <span className="text-slate-900">{selectedOrder.shippingMethod || "Standard Express Delivery"}</span>
                     </span>
+                  </div>
+
+                  {/* Dedicated Delivery Instructions Callout Box */}
+                  <div className="pt-2 border-t border-slate-200/60 space-y-1.5">
+                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                      <Truck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>Delivery Instructions / Doorstep Note</span>
+                    </div>
+                    <div className="p-3 bg-amber-50/90 border border-amber-200/80 rounded-sm text-xs text-amber-950 font-medium leading-relaxed">
+                      {(() => {
+                        const notes =
+                          (typeof selectedOrder.shippingAddress === "object" && selectedOrder.shippingAddress?.notes) ||
+                          selectedOrder.fulfillmentNotes ||
+                          "";
+                        const isSystemPlaceholder =
+                          notes.toLowerCase().includes("paid & confirmed via") ||
+                          notes.toLowerCase().includes("order pending payment") ||
+                          notes.toLowerCase().includes("order fulfilled successfully");
+                        return notes && !isSystemPlaceholder ? (
+                          <p className="font-semibold text-slate-900 break-words">"{notes}"</p>
+                        ) : (
+                          <p className="text-slate-400 italic text-[11px]">No special delivery instructions provided for this order.</p>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
 
@@ -386,9 +462,9 @@ export default function AdminOrdersPage() {
               {/* Financial Summary Calculation Card */}
               <div className="bg-slate-50 p-4 rounded-sm border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">FULFILMENT NOTES</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">ORDER STATUS &amp; CARE</span>
                   <p className="text-slate-700 text-xs italic">
-                    {selectedOrder.fulfillmentNotes || "No special instructions attached to this order."}
+                    Current Status: <strong className="text-slate-900 uppercase font-sans">{selectedOrder.status}</strong>
                   </p>
                 </div>
 
@@ -412,26 +488,6 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              {/* Status Controls */}
-              <div className="p-3.5 bg-slate-100/70 border border-slate-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <span className="text-xs font-bold text-slate-900">UPDATE FULFILMENT STATUS</span>
-                <div className="flex flex-wrap gap-2">
-                  {(["completed", "processing", "shipped", "cancelled"] as const).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => handleUpdateStatus(selectedOrder.id, st)}
-                      className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase cursor-pointer transition-colors ${
-                        selectedOrder.status === st
-                          ? "bg-slate-900 text-white shadow-xs"
-                          : "bg-white text-slate-700 hover:bg-slate-200 border border-slate-200"
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
             </div>
 
             {/* Footer */}
@@ -445,12 +501,26 @@ export default function AdminOrdersPage() {
                 <span>Download Receipt</span>
               </button>
 
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-2">
+                {stagedStatus && stagedStatus !== selectedOrder.status && (
+                  <button
+                    type="button"
+                    disabled={updatingOrderId === selectedOrder.id}
+                    onClick={() => handleUpdateStatus(selectedOrder.id, stagedStatus)}
+                    className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
+                  >
+                    {updatingOrderId === selectedOrder.id ? "Saving..." : "Save Changes"}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleCloseOrder}
+                  className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-sm transition-colors cursor-pointer border border-slate-300"
+                >
+                  Close
+                </button>
+              </div>
             </div>
 
           </div>

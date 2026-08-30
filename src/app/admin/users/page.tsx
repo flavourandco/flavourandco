@@ -13,12 +13,8 @@ import {
   Mail,
   Calendar,
   Database,
-  Eye,
-  X,
-  Key,
-  Shield,
 } from "lucide-react";
-import { BoneyardTableSkeleton, BoneyardStatCardSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 interface AdminUser {
   id?: string;
@@ -44,7 +40,6 @@ export default function AdminUsersPage() {
   const [syncing, setSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const fetchUsers = useCallback(async () => {
@@ -301,8 +296,7 @@ export default function AdminUsersPage() {
                   <th className="py-3 px-4">Email Address</th>
                   <th className="py-3 px-4">Role</th>
                   <th className="py-3 px-4">Clerk User ID</th>
-                  <th className="py-3 px-4">Joined Date</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 text-right">Joined Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -393,21 +387,11 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Joined Date */}
-                      <td className="py-3 px-4 text-[11px] text-slate-500">
-                        <div className="flex items-center gap-1">
+                      <td className="py-3 px-4 text-[11px] text-slate-500 text-right">
+                        <div className="inline-flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-slate-400" />
                           <span>{dateStr}</span>
                         </div>
-                      </td>
-
-                      {/* VIEW ACTION BUTTON */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => setSelectedUser(u)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
-                        >
-                          <Eye className="w-3 h-3 text-slate-500" /> View
-                        </button>
                       </td>
                     </tr>
                   );
@@ -417,93 +401,6 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
-
-      {/* READ-ONLY USER PROFILE DETAILS MODAL (FIXED BIGGER POPUP) */}
-      {selectedUser && (
-        <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
-          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
-            
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
-              <div>
-                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">User Account Profile</span>
-                <h2 className="text-base font-bold text-slate-900">{selectedUser.name}</h2>
-              </div>
-              <button
-                onClick={() => setSelectedUser(null)}
-                className="p-1 rounded-sm text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Scrollable Body */}
-            <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-slate-700 overscroll-contain" data-lenis-prevent>
-              <div className="flex items-center gap-5 p-5 bg-slate-50 rounded-sm border border-slate-200/80">
-                {selectedUser.image_url ? (
-                  <img src={selectedUser.image_url} alt={selectedUser.name} className="w-16 h-16 rounded-full object-cover border-2 border-slate-200 shrink-0" />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xl shrink-0">
-                    {(selectedUser.name[0] || "U").toUpperCase()}
-                  </div>
-                )}
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-slate-900">{selectedUser.name}</h3>
-                    <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 font-extrabold text-[10px] uppercase rounded-sm">
-                      {selectedUser.role}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 font-mono text-xs">{selectedUser.email}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-sm space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block flex items-center gap-1">
-                    <Key className="w-3 h-3 text-slate-500" /> CLERK USER IDENTIFIER
-                  </span>
-                  <p className="font-mono text-slate-900 font-bold text-xs bg-white p-2.5 rounded-sm border border-slate-200 break-all">
-                    {selectedUser.clerk_user_id}
-                  </p>
-                </div>
-
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-sm space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block flex items-center gap-1">
-                    <Database className="w-3 h-3 text-slate-500" /> SUPABASE DATABASE RECORD ID
-                  </span>
-                  <p className="font-mono text-slate-900 font-bold text-xs bg-white p-2.5 rounded-sm border border-slate-200 break-all">
-                    {selectedUser.id || "synced-clerk-user"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-sm space-y-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-slate-500" /> SYSTEM PERMISSIONS &amp; ACCESS SCOPE
-                </span>
-                <p className="text-slate-700 leading-relaxed font-sans text-xs bg-white p-3 rounded-sm border border-slate-200">
-                  {selectedUser.role === "admin"
-                    ? "Full administrative privileges: Can create, update, and delete products, manage blog journal articles, moderate customer reviews, view commercial wholesale inquiries, and inspect order transaction hashes."
-                    : "Standard customer privileges: Can browse product catalog, place orders, submit reviews, and view order history."}
-                </p>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
-              <button
-                onClick={() => setSelectedUser(null)}
-                className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
-              >
-                Close Profile
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }

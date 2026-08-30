@@ -13,8 +13,20 @@ export default function AdminContactPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiry | null>(null);
+  const [stagedStatus, setStagedStatus] = useState<ContactInquiry["status"] | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const addToast = useUIStore((s) => s.addToast);
+
+  const handleOpenInquiry = (item: ContactInquiry) => {
+    setSelectedInquiry(item);
+    setStagedStatus(item.status);
+  };
+
+  const handleCloseInquiry = () => {
+    setSelectedInquiry(null);
+    setStagedStatus(null);
+  };
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -36,6 +48,11 @@ export default function AdminContactPage() {
   }, []);
 
   const handleUpdateStatus = async (id: string, status: ContactInquiry["status"]) => {
+    const current = inquiries.find((i) => i.id === id) || (selectedInquiry?.id === id ? selectedInquiry : null);
+    if (current && current.status === status) return;
+    if (updatingId) return;
+    setUpdatingId(id);
+
     try {
       const res = await fetch("/api/contact", {
         method: "PATCH",
@@ -46,13 +63,13 @@ export default function AdminContactPage() {
         setInquiries((prev) =>
           prev.map((item) => (item.id === id ? { ...item, status } : item))
         );
-        if (selectedInquiry?.id === id) {
-          setSelectedInquiry((prev) => (prev ? { ...prev, status } : null));
-        }
+        handleCloseInquiry();
         addToast(`Inquiry status updated to ${status}.`, "success");
       }
     } catch {
       addToast("Failed to update status", "error");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -164,7 +181,7 @@ export default function AdminContactPage() {
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         <button
-                          onClick={() => setSelectedInquiry(item)}
+                          onClick={() => handleOpenInquiry(item)}
                           className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
                         >
                           <Eye className="w-3 h-3 text-slate-500" /> View
@@ -195,7 +212,7 @@ export default function AdminContactPage() {
                 <span className="text-[10px] uppercase font-mono text-slate-400">Contact Inquiry</span>
                 <h3 className="text-base font-bold text-slate-900">{selectedInquiry.name}</h3>
               </div>
-              <button onClick={() => setSelectedInquiry(null)} className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer">
+              <button onClick={handleCloseInquiry} className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -226,28 +243,46 @@ export default function AdminContactPage() {
 
               <div>
                 <span className="text-[10px] font-bold text-slate-400 block mb-1.5">UPDATE STATUS</span>
-                <div className="flex gap-2">
-                  {(["pending", "replied", "resolved"] as const).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => handleUpdateStatus(selectedInquiry.id, st)}
-                      className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-colors cursor-pointer ${
-                        selectedInquiry.status === st
-                          ? "bg-slate-900 text-white"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
+                <div className="flex flex-wrap gap-2">
+                  {(["pending", "replied", "resolved"] as const).map((st) => {
+                    const isSelected = (stagedStatus || selectedInquiry.status) === st;
+                    const isUpdating = updatingId === selectedInquiry.id;
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => setStagedStatus(st)}
+                        className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-slate-900 text-white shadow-xs"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        } ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        {st}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex justify-end">
+            <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              {stagedStatus && stagedStatus !== selectedInquiry.status && (
+                <button
+                  type="button"
+                  disabled={updatingId === selectedInquiry.id}
+                  onClick={() => handleUpdateStatus(selectedInquiry.id, stagedStatus)}
+                  className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
+                >
+                  {updatingId === selectedInquiry.id ? "Saving..." : "Save Changes"}
+                </button>
+              )}
+
               <button
-                onClick={() => setSelectedInquiry(null)}
-                className="px-4 py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-sm hover:bg-slate-200 cursor-pointer"
+                type="button"
+                onClick={handleCloseInquiry}
+                className="px-4 py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-sm hover:bg-slate-200 cursor-pointer border border-slate-200"
               >
                 Close
               </button>

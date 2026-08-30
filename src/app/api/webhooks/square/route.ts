@@ -120,6 +120,7 @@ export async function POST(req: Request) {
       if (paymentStatus === "COMPLETED") {
         // Prevent stale webhooks from overwriting an already confirmed order needlessly
         if (orderRecord.payment_status !== "paid") {
+          const currentNotes = orderRecord.fulfillment_notes || orderRecord.shipping_address?.notes || "";
           await supabase
             .from("orders")
             .update({
@@ -128,7 +129,7 @@ export async function POST(req: Request) {
               square_payment_id: squarePaymentId,
               square_transaction_id: squarePaymentId,
               square_receipt_url: receiptUrl || orderRecord.square_receipt_url,
-              fulfillment_notes: "Paid & Confirmed via Authoritative Square Webhook",
+              fulfillment_notes: currentNotes || "Paid & Confirmed via Authoritative Square Webhook",
             })
             .eq("id", orderRecord.id);
 

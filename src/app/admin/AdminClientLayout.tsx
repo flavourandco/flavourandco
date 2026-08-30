@@ -41,8 +41,8 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
     { label: "Customers", href: "/admin/users", icon: Users },
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    { label: "Wholesale", href: "/admin/wholesale", icon: FileSpreadsheet },
-    { label: "Inquiries", href: "/admin/contact", icon: Mail },
+    { label: "Wholesale Inquiries", href: "/admin/wholesale", icon: FileSpreadsheet },
+    { label: "Contact Inquiries", href: "/admin/contact", icon: Mail },
     { label: "Reviews", href: "/admin/reviews", icon: Star },
     { label: "Blog", href: "/admin/blogs", icon: BookOpenText },
   ];

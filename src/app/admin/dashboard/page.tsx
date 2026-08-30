@@ -289,7 +289,7 @@ export default function AdminDashboardPage() {
           {/* Card 5: Wholesale Inquiries */}
           <div className="bg-white rounded-sm p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Wholesale</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Wholesale Inquiries</span>
               <div className="w-7 h-7 rounded-sm bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200/60">
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
@@ -307,17 +307,17 @@ export default function AdminDashboardPage() {
           {/* Card 6: Contact Inquiries */}
           <div className="bg-white rounded-sm p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Contact Messages</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Contact Inquiries</span>
               <div className="w-7 h-7 rounded-sm bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/60">
                 <Mail className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-                {stats ? stats.contactCount : 0} Messages
+                {stats ? stats.contactCount : 0} Inquiries
               </h3>
               <span className="text-[11px] font-medium text-slate-500 mt-1 block">
-                Customer Store Inquiries
+                Customer Messages
               </span>
             </div>
           </div>

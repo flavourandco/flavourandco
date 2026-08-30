@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Star, CheckCircle, XCircle, Trash2, Filter, Plus, X, Sparkles } from "lucide-react";
+import { Star, CheckCircle, XCircle, Trash2, Filter, Plus, X, Sparkles, Loader2 } from "lucide-react";
 import type { ReviewItem, Product } from "@/lib/types";
 import { useUIStore } from "@/store/ui.store";
 import { formatCustomerError } from "@/lib/error-formatter";
@@ -14,6 +14,7 @@ export default function AdminReviewsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
 
   // Manual Add Review Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -67,7 +68,14 @@ export default function AdminReviewsPage() {
     fetchProductsList();
   }, [statusFilter]);
 
+  const [updatingReviewId, setUpdatingReviewId] = useState<string | null>(null);
+
   const handleUpdateStatus = async (id: string, newStatus: "approved" | "rejected") => {
+    const current = reviews.find((r) => r.id === id);
+    if (current && current.status === newStatus) return;
+    if (updatingReviewId) return;
+    setUpdatingReviewId(id);
+
     try {
       const res = await fetch("/api/reviews", {
         method: "PUT",
@@ -88,11 +96,15 @@ export default function AdminReviewsPage() {
       }
     } catch (err) {
       addToast(formatCustomerError(err), "error");
+    } finally {
+      setUpdatingReviewId(null);
     }
   };
 
   const handleToggleFeatured = async (id: string, currentFeatured?: boolean) => {
+    if (togglingFeaturedId) return;
     const nextFeatured = !currentFeatured;
+    setTogglingFeaturedId(id);
     try {
       const res = await fetch("/api/reviews", {
         method: "PUT",
@@ -105,7 +117,7 @@ export default function AdminReviewsPage() {
           prev.map((r) => (r.id === id ? { ...r, isFeatured: nextFeatured } : r))
         );
         addToast(
-          nextFeatured ? "Review set as Featured on Homepage!" : "Review removed from Homepage featured.",
+          nextFeatured ? "Review featured on Home!" : "Review unfeatured from Home.",
           "success"
         );
       } else {
@@ -113,6 +125,8 @@ export default function AdminReviewsPage() {
       }
     } catch (err) {
       addToast(formatCustomerError(err), "error");
+    } finally {
+      setTogglingFeaturedId(null);
     }
   };
 
@@ -273,8 +287,7 @@ export default function AdminReviewsPage() {
                       ))}
                     </div>
                     {r.isFeatured && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded-sm">
-                        <Sparkles className="w-3 h-3 text-amber-600" />
+                      <span className="inline-flex items-center text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-sm">
                         Featured on Home
                       </span>
                     )}
@@ -282,12 +295,12 @@ export default function AdminReviewsPage() {
 
                   {/* Status Badge */}
                   <span
-                    className={`inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border self-start sm:self-auto ${
+                    className={`inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm self-start sm:self-auto ${
                       r.status === "approved"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                        ? "bg-emerald-50 text-emerald-700"
                         : r.status === "rejected"
-                        ? "bg-rose-50 text-rose-700 border-rose-200/60"
-                        : "bg-amber-50 text-amber-700 border-amber-200/60"
+                        ? "bg-rose-50 text-rose-700"
+                        : "bg-amber-50 text-amber-700"
                     }`}
                   >
                     {r.status || "approved"}
@@ -310,24 +323,42 @@ export default function AdminReviewsPage() {
                   </div>
 
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    {/* Toggle Featured Button */}
+                    {/* On/Off Toggle for Featured (No star icon, borderless) */}
                     <button
+                      type="button"
+                      disabled={togglingFeaturedId === r.id}
                       onClick={() => handleToggleFeatured(r.id, r.isFeatured)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-sm border transition-colors cursor-pointer ${
+                      className={`inline-flex items-center gap-2 px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer select-none ${
                         r.isFeatured
-                          ? "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
-                          : "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200"
-                      }`}
-                      title="Toggle show on Homepage testimonial slider"
+                          ? "bg-amber-100/90 text-amber-950 hover:bg-amber-200/90"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      } ${togglingFeaturedId === r.id ? "opacity-75 cursor-not-allowed" : ""}`}
+                      title={r.isFeatured ? "Featured on Homepage" : "Not Featured"}
                     >
-                      <Sparkles className={`w-3 h-3 ${r.isFeatured ? "text-amber-600 fill-amber-500" : "text-slate-400"}`} />
-                      <span>{r.isFeatured ? "Featured" : "Feature on Home"}</span>
+                      <span className="text-[11px]">Featured</span>
+                      
+                      {/* Interactive On/Off Pill Switch */}
+                      <div
+                        className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                          r.isFeatured ? "bg-amber-600" : "bg-slate-300"
+                        }`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
+                            r.isFeatured ? "translate-x-3" : "translate-x-0"
+                          }`}
+                        >
+                          {togglingFeaturedId === r.id && (
+                            <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
+                          )}
+                        </div>
+                      </div>
                     </button>
 
                     {r.status !== "approved" && (
                       <button
                         onClick={() => handleUpdateStatus(r.id, "approved")}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-sm border border-emerald-200/80 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-sm transition-colors cursor-pointer"
                       >
                         <CheckCircle className="w-3 h-3" /> Approve
                       </button>
@@ -336,7 +367,7 @@ export default function AdminReviewsPage() {
                     {r.status !== "rejected" && (
                       <button
                         onClick={() => handleUpdateStatus(r.id, "rejected")}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm border border-slate-200/80 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer"
                       >
                         <XCircle className="w-3 h-3" /> Reject
                       </button>
@@ -344,7 +375,7 @@ export default function AdminReviewsPage() {
 
                     <button
                       onClick={() => setDeletingId(r.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm border border-rose-200/80 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-sm transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3 h-3" /> Delete
                     </button>
@@ -487,7 +518,7 @@ export default function AdminReviewsPage() {
                     onChange={(e) => setAddForm({ ...addForm, isFeatured: e.target.checked })}
                     className="rounded text-slate-900 cursor-pointer"
                   />
-                  <span className="font-semibold text-slate-800 text-[11px]">Feature on Homepage Slider</span>
+                  <span className="font-semibold text-slate-800 text-[11px]">Feature on Homepage</span>
                 </label>
 
                 <label className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-sm cursor-pointer">

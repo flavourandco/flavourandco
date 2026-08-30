@@ -129,6 +129,7 @@ export async function POST(req: Request) {
     }
 
     // 6. Update Order Initial Payment Metadata
+    const currentNotes = order.fulfillment_notes || order.shipping_address?.notes || "";
     await supabase
       .from("orders")
       .update({
@@ -137,9 +138,9 @@ export async function POST(req: Request) {
         square_receipt_url: receiptUrl,
         payment_status: paymentStatus === "COMPLETED" ? "paid" : "pending",
         status: paymentStatus === "COMPLETED" ? "completed" : "processing",
-        fulfillment_notes: paymentStatus === "COMPLETED" 
+        fulfillment_notes: currentNotes || (paymentStatus === "COMPLETED" 
           ? "Paid & Confirmed via Square" 
-          : "Payment accepted, pending webhook confirmation",
+          : "Payment accepted, pending webhook confirmation"),
       })
       .eq("id", order.id);
 

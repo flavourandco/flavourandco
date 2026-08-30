@@ -69,10 +69,12 @@ export interface OrderItem {
 
 export interface ShippingAddress {
   street?: string;
+  unit?: string;
   city?: string;
   state?: string;
   postalCode?: string;
   country?: string;
+  notes?: string;
 }
 
 export interface Order {
