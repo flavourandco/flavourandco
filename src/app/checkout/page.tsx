@@ -380,7 +380,7 @@ export default function CheckoutPage() {
                           required
                           value={formData.fullName}
                           onChange={handleInputChange}
-                          placeholder="e.g. Simran Gulati"
+                          placeholder="Full name"
                           className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 pl-10 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all min-h-[44px]"
                         />
                         <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -399,7 +399,7 @@ export default function CheckoutPage() {
                           required
                           value={formData.email}
                           onChange={handleInputChange}
-                          placeholder="name@example.com"
+                          placeholder="Email address"
                           className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 pl-10 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all min-h-[44px]"
                         />
                         <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -437,7 +437,7 @@ export default function CheckoutPage() {
                           required
                           value={formData.address}
                           onChange={handleInputChange}
-                          placeholder="e.g. 100 George Street"
+                          placeholder="Street address"
                           className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 pl-10 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all min-h-[44px]"
                         />
                         <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -455,7 +455,7 @@ export default function CheckoutPage() {
                         required
                         value={formData.city}
                         onChange={handleInputChange}
-                        placeholder="e.g. Sydney, Parramatta, Melbourne"
+                        placeholder="Suburb or City"
                         className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all min-h-[44px]"
                       />
                     </div>
@@ -483,15 +483,15 @@ export default function CheckoutPage() {
                           maxLength={4}
                           value={formData.postcode}
                           onChange={handleInputChange}
-                          placeholder="e.g. 2000"
+                          placeholder="Postcode"
                           className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all font-mono min-h-[44px]"
                         />
                       </div>
                     </div>
 
                     {/* Dynamic Free Shipping Postcode Feedback Banner */}
-                    <div className="sm:col-span-2">
-                      {isPostcodeFilled && isEligibleForFreeShipping ? (
+                    {isPostcodeFilled && isEligibleForFreeShipping && (
+                      <div className="sm:col-span-2">
                         <div className="p-3 bg-emerald-50 rounded-md border border-emerald-200 text-[#07402b] flex items-center justify-between gap-2 animate-fadeIn">
                           <div className="flex items-center gap-2 text-xs font-semibold">
                             <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -503,15 +503,9 @@ export default function CheckoutPage() {
                             A$0.00 Delivery
                           </span>
                         </div>
-                      ) : (
-                        <div className="p-3 bg-stone-50 rounded-md border border-stone-200 text-stone-600 flex items-center gap-2 text-[11px]">
-                          <Truck className="w-4 h-4 text-[#07402b] shrink-0" />
-                          <span>
-                            Direct delivery across Australia. Temperature-controlled packaging ensures peak freshness.
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
+
 
                     {/* Special Delivery Notes */}
                     <div className="sm:col-span-2 space-y-2 pt-1">
@@ -538,7 +532,7 @@ export default function CheckoutPage() {
                         rows={2}
                         value={formData.notes}
                         onChange={handleInputChange}
-                        placeholder="e.g. Leave near front door inside gate, or call on arrival."
+                        placeholder="Leave at door, gate code, or delivery instructions..."
                         className="w-full rounded-md border border-stone-200/90 bg-stone-50/40 px-4 py-3 text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-[#6b1e30] focus:ring-2 focus:ring-[#6b1e30]/10 focus:outline-none transition-all"
                       />
                     </div>

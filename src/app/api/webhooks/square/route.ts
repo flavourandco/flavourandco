@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { verifySquareWebhookSignature } from "@/lib/square";
+import { sendOrderConfirmationNotifications } from "@/lib/email/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -99,7 +100,7 @@ export async function POST(req: Request) {
     if (referenceId) {
       const { data: byOrderNumber } = await supabase
         .from("orders")
-        .select("id, order_number, payment_status, status, customer_email, square_receipt_url")
+        .select("*")
         .or(`order_number.eq.${referenceId},id.eq.${referenceId}`)
         .single();
       orderRecord = byOrderNumber;
@@ -108,7 +109,7 @@ export async function POST(req: Request) {
     if (!orderRecord && squarePaymentId) {
       const { data: bySquareId } = await supabase
         .from("orders")
-        .select("id, order_number, payment_status, status, customer_email, square_receipt_url")
+        .select("*")
         .eq("square_payment_id", squarePaymentId)
         .single();
       orderRecord = bySquareId;
@@ -142,10 +143,22 @@ export async function POST(req: Request) {
             })
             .eq("order_id", orderRecord.id);
 
-          // Trigger Post-Payment Actions (Idempotent notification dispatch placeholder)
           console.log(
             `[AUTHORITATIVE PAYMENT CONFIRMED] Order #${orderRecord.order_number} marked PAID via Webhook ${eventId}.`
           );
+
+          // Trigger Post-Payment Notifications (Idempotent: deduplicated if checkout handler already sent)
+          const updatedSnapshot = {
+            ...orderRecord,
+            payment_status: "paid",
+            status: "completed",
+            square_payment_id: squarePaymentId,
+            square_receipt_url: receiptUrl || orderRecord.square_receipt_url,
+          };
+
+          sendOrderConfirmationNotifications(updatedSnapshot).catch((err) => {
+            console.error("[WEBHOOK EMAIL DISPATCH ERROR]", err);
+          });
         }
       } else if (paymentStatus === "FAILED" || paymentStatus === "CANCELED") {
         if (orderRecord.payment_status !== "paid") {

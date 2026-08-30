@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { createSquarePayment } from "@/lib/square";
+import { sendOrderConfirmationNotifications } from "@/lib/email/notifications";
 
 export async function POST(req: Request) {
   try {
@@ -141,6 +142,23 @@ export async function POST(req: Request) {
           : "Payment accepted, pending webhook confirmation",
       })
       .eq("id", order.id);
+
+    // 7. Safely Dispatch Order Confirmation Notifications (Customer & Admin)
+    if (paymentStatus === "COMPLETED") {
+      const updatedOrderSnapshot = {
+        ...order,
+        square_payment_id: paymentId,
+        square_receipt_url: receiptUrl,
+        payment_status: "paid",
+        status: "completed",
+      };
+
+      // Non-blocking background side effect
+      sendOrderConfirmationNotifications(updatedOrderSnapshot).catch((emailErr) => {
+        console.error("[CHECKOUT EMAIL TRIGGER ERROR]", emailErr);
+      });
+    }
+
 
     return NextResponse.json({
       success: true,

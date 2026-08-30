@@ -15,10 +15,13 @@ import {
   ExternalLink,
   PackageCheck,
   FileText,
+  Download,
+  Printer,
 } from "lucide-react";
 import type { Order } from "@/lib/types";
 import { useUIStore } from "@/store/ui.store";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
+import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -26,6 +29,7 @@ export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
   const addToast = useUIStore((s) => s.addToast);
 
   const fetchOrders = async () => {
@@ -431,7 +435,16 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setReceiptOrder(selectedOrder)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold text-xs rounded-sm transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5 text-[#6b1e30]" />
+                <span>Download Receipt</span>
+              </button>
+
               <button
                 onClick={() => setSelectedOrder(null)}
                 className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
@@ -443,6 +456,13 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       )}
+
+      {/* RECEIPT MODAL */}
+      <OrderReceiptModal
+        order={receiptOrder}
+        isOpen={Boolean(receiptOrder)}
+        onClose={() => setReceiptOrder(null)}
+      />
     </div>
   );
 }

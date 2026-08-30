@@ -17,11 +17,15 @@ import {
   MapPin,
   CreditCard,
   PackageCheck,
+  Download,
+  Printer,
+  FileText,
 } from "lucide-react";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/layout/Footer";
 import { useAuthStore } from "@/store/auth.store";
 import { BoneyardProfilePageSkeleton } from "@/components/ui/BoneyardSkeleton";
+import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 import type { Order } from "@/lib/types";
 
 function getOrderProductTitle(items?: any[]): string {
@@ -46,6 +50,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
 
   const isHydrating = !isLoaded || (isSignedIn && authLoading) || (!isInitialized && isSignedIn);
 
@@ -261,8 +266,20 @@ export default function ProfilePage() {
                             })}
                         </div>
 
-                        {/* View Order Details Popup Button */}
-                        <div className="pt-2 border-t border-stone-200/60 flex justify-end">
+                        {/* Order Actions: View Details & Download Receipt */}
+                        <div className="pt-2.5 border-t border-stone-200/60 flex flex-wrap items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReceiptOrder(ord);
+                            }}
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-[#07402b] bg-[#faf6f0] hover:bg-[#E3A72B] hover:text-[#07402b] border border-stone-300/80 rounded-sm transition-all cursor-pointer shadow-2xs"
+                            title="Download official receipt as PDF"
+                          >
+                            <Download className="w-3.5 h-3.5 text-[#6b1e30]" />
+                            <span>Download Receipt</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
@@ -480,7 +497,18 @@ export default function ProfilePage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-stone-50 border-t border-stone-200 flex justify-end">
+            <div className="p-4 bg-stone-50 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setReceiptOrder(selectedOrder);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#faf6f0] hover:bg-[#E3A72B] hover:text-[#07402b] text-[#07402b] border border-stone-300 font-bold text-xs uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5 text-[#6b1e30]" />
+                <span>Download Receipt</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
@@ -492,6 +520,13 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* POPUP MODAL: OFFICIAL RECEIPT & TAX INVOICE */}
+      <OrderReceiptModal
+        order={receiptOrder}
+        isOpen={Boolean(receiptOrder)}
+        onClose={() => setReceiptOrder(null)}
+      />
 
       <Footer />
     </>

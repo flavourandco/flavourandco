@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { sendStatusUpdateNotification } from "@/lib/email/notifications";
 
 export async function GET() {
   try {
@@ -61,19 +62,60 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const body = await req.json();
-    const { id, status, fulfillmentNotes } = body;
+    const {
+      id,
+      status,
+      fulfillmentNotes,
+      trackingNumber,
+      trackingUrl,
+      courierName,
+      estimatedDelivery,
+      refundAmount,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, error: "Order ID is required." }, { status: 400 });
     }
 
     const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
+    let updatedOrder: any = null;
+
     if (supabase) {
       const updatePayload: any = {};
       if (status) updatePayload.status = status;
       if (fulfillmentNotes !== undefined) updatePayload.fulfillment_notes = fulfillmentNotes;
+      if (trackingNumber !== undefined) updatePayload.tracking_number = trackingNumber;
+      if (trackingUrl !== undefined) updatePayload.tracking_url = trackingUrl;
+      if (courierName !== undefined) updatePayload.courier_name = courierName;
+      if (estimatedDelivery !== undefined) updatePayload.estimated_delivery = estimatedDelivery;
 
-      await supabase.from("orders").update(updatePayload).eq("id", id);
+      const { data: updData, error: updErr } = await supabase
+        .from("orders")
+        .update(updatePayload)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (!updErr && updData) {
+        updatedOrder = updData;
+      }
+    }
+
+    // Trigger Status Update Email Notification (Non-blocking safe side effect)
+    if (updatedOrder && status) {
+      sendStatusUpdateNotification(
+        {
+          ...updatedOrder,
+          trackingNumber: trackingNumber || updatedOrder.tracking_number,
+          trackingUrl: trackingUrl || updatedOrder.tracking_url,
+          courierName: courierName || updatedOrder.courier_name,
+          estimatedDelivery: estimatedDelivery || updatedOrder.estimated_delivery,
+          refundAmount: refundAmount || updatedOrder.refund_amount,
+        },
+        status
+      ).catch((notifyErr) => {
+        console.error("[STATUS UPDATE EMAIL ERROR]", notifyErr);
+      });
     }
 
     return NextResponse.json({ success: true });
@@ -81,3 +123,4 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+

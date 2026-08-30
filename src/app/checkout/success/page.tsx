@@ -13,8 +13,12 @@ import {
   RotateCw,
   Phone,
   User,
+  Download,
+  Printer,
 } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
+import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
+import type { Order } from "@/lib/types";
 
 interface OrderDetails {
   id: string;
@@ -55,6 +59,7 @@ function SuccessContent() {
   const [error, setError] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [pollCount, setPollCount] = useState(0);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
   const fetchOrderStatus = async () => {
     if (!orderId) {
@@ -241,19 +246,29 @@ function SuccessContent() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/profile"
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#07402b] hover:bg-[#6b1e30] text-white text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg shadow-2xs hover:shadow-xs transition-all text-center min-h-[44px]"
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => setIsReceiptOpen(true)}
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#E3A72B] hover:bg-[#d49924] text-[#07402b] text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg shadow-2xs hover:shadow-xs transition-all text-center min-h-[44px] cursor-pointer whitespace-nowrap"
             >
-              <User className="w-3.5 h-3.5" /> View Order in Profile
-            </Link>
-            <Link
-              href="/shop"
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-white border border-stone-300 hover:border-[#07402b] text-stone-700 hover:text-[#07402b] text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg transition-all text-center min-h-[44px]"
-            >
-              <ShoppingBag className="w-3.5 h-3.5" /> Continue Shopping
-            </Link>
+              <Download className="w-4 h-4" /> Download Receipt
+            </button>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/profile"
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-[#07402b] hover:bg-[#6b1e30] text-white text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg shadow-2xs hover:shadow-xs transition-all text-center min-h-[44px]"
+              >
+                <User className="w-3.5 h-3.5" /> View Order in Profile
+              </Link>
+              <Link
+                href="/shop"
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-white border border-stone-300 hover:border-[#07402b] text-stone-700 hover:text-[#07402b] text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg transition-all text-center min-h-[44px]"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" /> Continue Shopping
+              </Link>
+            </div>
           </div>
 
         </div>
@@ -362,7 +377,7 @@ function SuccessContent() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#07402b] hover:text-[#6b1e30] transition-colors"
                 >
-                  <span>View Official Digital Receipt</span>
+                  <span>View Square Digital Receipt</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -372,6 +387,41 @@ function SuccessContent() {
         </div>
 
       </div>
+
+      {/* RECEIPT MODAL */}
+      {order && (
+        <OrderReceiptModal
+          order={{
+            id: order.id,
+            orderNumber: order.orderNumber,
+            customerName: order.customer.fullName,
+            customerEmail: order.customer.email,
+            customerPhone: order.customer.phone,
+            shippingAddress: `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.postcode}`,
+            shippingMethod: "Sydney Fresh Express Delivery",
+            paymentMethod: "Square Online Payment",
+            paymentStatus: order.paymentStatus,
+            squarePaymentId: order.squarePaymentId,
+            squareReceiptUrl: order.squareReceiptUrl,
+            subtotal: order.subtotal,
+            shippingFee: order.shippingFee,
+            taxAmount: (order.totalAmount * 10) / 110,
+            totalAmount: order.totalAmount,
+            status: "completed",
+            itemsCount: order.items.length,
+            createdAt: order.createdAt,
+            items: order.items.map((it) => ({
+              name: it.name,
+              price: it.unitPrice,
+              quantity: it.quantity,
+              variant: it.variantName,
+              image: it.image,
+            })),
+          }}
+          isOpen={isReceiptOpen}
+          onClose={() => setIsReceiptOpen(false)}
+        />
+      )}
 
     </div>
   );

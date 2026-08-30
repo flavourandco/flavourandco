@@ -20,6 +20,9 @@ export { default as RelatedProducts } from "./products/RelatedProducts";
 // Story Components
 export { default as StoryTimeline } from "./story/StoryTimeline";
 
+// Order Components
+export { default as OrderReceiptModal } from "./orders/OrderReceiptModal";
+
 // Form Components & Page Clients
 export { default as ContactForm } from "./forms/ContactForm";
 export { default as WholesaleClient } from "./forms/WholesaleClient";

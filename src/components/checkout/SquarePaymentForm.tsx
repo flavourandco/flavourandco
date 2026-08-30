@@ -10,9 +10,9 @@ declare global {
         appId: string,
         locationId: string
       ) => Promise<{
-        card: (options?: { includePostalCode?: boolean }) => Promise<{
+        card: (options?: { postalCode?: string | boolean; includePostalCode?: boolean }) => Promise<{
           attach: (selector: string) => Promise<void>;
-          tokenize: (options?: { postalCode?: string }) => Promise<{
+          tokenize: () => Promise<{
             status: string;
             token?: string;
             errors?: Array<{ message: string }>;
@@ -136,11 +136,10 @@ export default function SquarePaymentForm({
         return;
       }
 
-      if (initializedRef.current) {
+      if (initializedRef.current && cardRef.current) {
         setSdkLoading(false);
         return;
       }
-      initializedRef.current = true;
 
       try {
         const payments = await window.Square.payments(appId, locationId);
@@ -149,14 +148,19 @@ export default function SquarePaymentForm({
         const cardElement = document.getElementById("square-card-element");
         if (cardElement) {
           cardElement.innerHTML = "";
-          const card = await payments.card();
+          const cardOptions = postcode && String(postcode).trim().length >= 4 
+            ? { postalCode: String(postcode).trim() } 
+            : undefined;
+          const card = await payments.card(cardOptions);
           await card.attach("#square-card-element");
           cardRef.current = card;
+          initializedRef.current = true;
           setSdkReady(true);
         }
       } catch (err: any) {
-        console.warn("Square Card attach notice:", err);
-        setSdkReady(true);
+        console.error("Square Card initialization error:", err);
+        initializedRef.current = false;
+        setCardError(err?.message || "Could not initialize credit card input.");
       } finally {
         setSdkLoading(false);
       }
@@ -223,18 +227,28 @@ export default function SquarePaymentForm({
     } else if (window.Square) {
       initSquare();
     }
+
+    return () => {
+      if (cardRef.current && typeof cardRef.current.destroy === "function") {
+        try {
+          cardRef.current.destroy();
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+      cardRef.current = null;
+      initializedRef.current = false;
+    };
   }, [appId, locationId, environment]);
 
   const handlePayClick = async (e: React.FormEvent) => {
     e.preventDefault();
     setCardError(null);
 
-    // If active Card element exists, tokenize details securely with postcode if provided
+    // If active Card element exists, tokenize details securely
     if (cardRef.current && sdkReady) {
       try {
-        const result = await cardRef.current.tokenize(
-          postcode ? { postalCode: postcode } : undefined
-        );
+        const result = await cardRef.current.tokenize();
         if (result.status === "OK" && result.token) {
           onSubmitPayment(result.token);
           return;
