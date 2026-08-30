@@ -1,5 +1,4 @@
 import type { Product, ProductVariant, WhyStandOutPoint, BlogPost, ReviewItem } from "./types";
-import { media } from "./media";
 
 export type { Product, ProductVariant, WhyStandOutPoint, BlogPost, ReviewItem };
 
@@ -49,11 +48,6 @@ export const wholesaleTestimonials = [
     company: "Luxury Hotel Group",
   },
 ];
-
-// Empty arrays — products, blog posts, and customer reviews are dynamically fetched from the Supabase database.
-export const products: Product[] = [];
-export const blogPosts: BlogPost[] = [];
-export const customerReviews: ReviewItem[] = [];
 
 export const footerLinks = {
   shop: [
