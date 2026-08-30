@@ -3,6 +3,7 @@ import { getAppBaseUrl, getAdminEmailAddress } from "./resend";
 import { sendTransactionalEmail } from "./send";
 import type { Order, OrderItem, ShippingAddress } from "@/lib/types";
 import type { EmailOrderData, FormattedAddress, OrderEmailEvent } from "./types";
+import { getTrackingUrl } from "@/lib/tracking";
 
 // Template Components
 import { CustomerOrderConfirmation } from "./templates/CustomerOrderConfirmation";
@@ -12,6 +13,8 @@ import { OrderShipped } from "./templates/OrderShipped";
 import { OrderDelivered } from "./templates/OrderDelivered";
 import { OrderCancelled } from "./templates/OrderCancelled";
 import { OrderRefunded } from "./templates/OrderRefunded";
+
+export { getTrackingUrl };
 
 /**
  * Normalizes shipping address from string or object to standard formatted object.
@@ -79,7 +82,6 @@ function normalizeOrderItems(rawItems: any[], appBaseUrl?: string): OrderItem[] 
 export function formatOrderForEmail(order: any): EmailOrderData {
   const appBaseUrl = getAppBaseUrl();
   const orderNumber = order.orderNumber || order.order_number || `FC-ORD-${order.id || Date.now()}`;
-  const orderId = order.id || orderNumber;
 
   const totalAmount = Number(order.totalAmount ?? order.total_amount ?? 0);
   const subtotal = Number(order.subtotal ?? (totalAmount - (order.shippingFee ?? order.shipping_fee ?? 0)));
@@ -92,6 +94,10 @@ export function formatOrderForEmail(order: any): EmailOrderData {
   // Deep links
   const viewOrderUrl = `${appBaseUrl}/profile`;
   const adminOrderUrl = `${appBaseUrl}/admin/orders`;
+
+  const trackingNumber = order.trackingNumber || order.tracking_number || undefined;
+  const courierName = order.courierName || order.courier_name || (trackingNumber ? "Australia Post Express" : undefined);
+  const trackingUrl = getTrackingUrl(trackingNumber, courierName, order.trackingUrl || order.tracking_url);
 
   return {
     orderNumber,
@@ -114,9 +120,9 @@ export function formatOrderForEmail(order: any): EmailOrderData {
     createdAt: order.createdAt || order.created_at || new Date().toISOString(),
     viewOrderUrl,
     adminOrderUrl,
-    trackingNumber: order.trackingNumber || order.tracking_number || undefined,
-    trackingUrl: order.trackingUrl || order.tracking_url || undefined,
-    courierName: order.courierName || order.courier_name || undefined,
+    trackingNumber,
+    trackingUrl,
+    courierName,
     estimatedDelivery: order.estimatedDelivery || order.estimated_delivery || undefined,
     refundAmount: order.refundAmount || order.refund_amount || undefined,
     refundReason: order.refundReason || order.refund_reason || undefined,

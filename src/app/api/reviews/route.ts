@@ -1,217 +1,194 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { ReviewSchema } from "@/lib/validations/review";
-import { requireAdminApi } from "@/lib/auth";
-import type { ReviewItem } from "@/lib/types";
 
-export async function GET(request: Request) {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId");
-    const status = searchParams.get("status") || "approved";
-    const featuredOnly = searchParams.get("featured") === "true";
+    const status = searchParams.get("status");
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabaseServerClient();
-      if (supabase) {
-        let query = supabase
-          .from("reviews")
-          .select("*, products(name)")
-          .order("created_at", { ascending: false });
-
-        if (productId) {
-          query = query.eq("product_id", productId);
-        }
-
-        if (featuredOnly) {
-          query = query.eq("is_featured", true);
-        }
-
-        if (status !== "all") {
-          query = query.eq("status", status);
-        }
-
-        const { data, error } = await query;
-
-        if (!error && data) {
-          const formattedReviews: ReviewItem[] = data.map((item) => ({
-            id: item.id,
-            productId: item.product_id || undefined,
-            productName: item.product_name || item.products?.name || "General Testimonial",
-            name: item.name,
-            rating: item.rating,
-            date: new Date(item.created_at).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }),
-            comment: item.comment,
-            isVerified: item.is_verified ?? true,
-            isFeatured: Boolean(item.is_featured),
-            status: item.status || "approved",
-          }));
-
-          return NextResponse.json({ success: true, data: formattedReviews });
-        }
-      }
+    const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
+    if (!supabase) {
+      return NextResponse.json(
+        { success: true, data: [] },
+        { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+      );
     }
 
-    return NextResponse.json({ success: true, data: [] });
-  } catch (err: unknown) {
-    const error = err as Error;
+    let query = supabase.from("reviews").select("*").order("created_at", { ascending: false });
+
+    if (productId) {
+      query = query.eq("product_id", productId);
+    }
+
+    if (status && status !== "all") {
+      query = query.eq("status", status);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("Error fetching reviews:", error.message);
+      return NextResponse.json(
+        { success: false, error: error.message, data: [] },
+        { status: 500, headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+      );
+    }
+
+    const formatted = (data || []).map((r: any) => ({
+      id: r.id,
+      productId: r.product_id || undefined,
+      productName: r.product_name || "Gourmet Pie",
+      name: r.author || r.name || "Customer",
+      rating: r.rating || 5,
+      date: r.date || (r.created_at ? new Date(r.created_at).toLocaleDateString("en-AU", { month: "short", day: "numeric", year: "numeric" }) : "Recently"),
+      comment: r.content || r.comment || "",
+      isVerified: r.is_verified ?? true,
+      isFeatured: r.is_featured ?? false,
+      status: r.status || "approved",
+    }));
+
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch reviews" },
-      { status: 500 }
+      { success: true, data: formatted },
+      { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+    );
+  } catch (err: any) {
+    console.error("Reviews GET Error:", err);
+    return NextResponse.json(
+      { success: false, error: err.message, data: [] },
+      { status: 500, headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
     );
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const validated = ReviewSchema.parse(body);
+    const body = await req.json();
+    const { productId, productName, name, rating, comment, isVerified, isFeatured, status } = body;
 
-    const record: Record<string, any> = {
-      product_id: validated.productId || null,
-      product_name: body.productName || null,
-      name: validated.name,
-      rating: validated.rating,
-      comment: validated.comment,
-      is_verified: validated.isVerified ?? true,
-      is_featured: validated.isFeatured ?? false,
-      status: validated.status || "approved",
+    if (!comment || !name) {
+      return NextResponse.json(
+        { success: false, error: "Name and comment are required." },
+        { status: 400 }
+      );
+    }
+
+    const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: "Database not configured." },
+        { status: 500 }
+      );
+    }
+
+    const row: any = {
+      product_id: productId || null,
+      product_name: productName || "Gourmet Pie",
+      name: name.trim(),
+      author: name.trim(),
+      rating: rating || 5,
+      comment: comment.trim(),
+      content: comment.trim(),
+      is_verified: isVerified ?? true,
+      is_featured: isFeatured ?? false,
+      status: status || "approved",
+      date: new Date().toLocaleDateString("en-AU", { month: "short", day: "numeric", year: "numeric" }),
     };
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabaseServerClient();
-      if (supabase) {
-        const { data, error } = await supabase
-          .from("reviews")
-          .insert([record])
-          .select()
-          .single();
+    let { data, error } = await supabase.from("reviews").insert([row]).select().maybeSingle();
 
-        if (error) {
-          // Fallback if product_name or is_featured column doesn't exist yet in DB schema
-          delete record.product_name;
-          delete record.is_featured;
-          const { data: retryData, error: retryError } = await supabase
-            .from("reviews")
-            .insert([record])
-            .select()
-            .single();
-
-          if (retryError) {
-            return NextResponse.json({ success: false, error: retryError.message }, { status: 400 });
-          }
-          return NextResponse.json({ success: true, data: retryData }, { status: 201 });
-        }
-
-        return NextResponse.json({ success: true, data }, { status: 201 });
+    if (error) {
+      console.warn("Reviews POST schema fallback retry:", error.message);
+      // Fallback with base columns only
+      const baseRow: any = {
+        product_id: productId || null,
+        name: name.trim(),
+        rating: rating || 5,
+        comment: comment.trim(),
+      };
+      const retry = await supabase.from("reviews").insert([baseRow]).select().maybeSingle();
+      if (retry.error) {
+        return NextResponse.json({ success: false, error: retry.error.message }, { status: 500 });
       }
+      data = retry.data;
     }
 
-    return NextResponse.json({ success: true, data: record }, { status: 201 });
-  } catch (err: unknown) {
-    const error = err as Error;
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to create review" },
-      { status: 400 }
+      { success: true, data },
+      { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
     );
+  } catch (err: any) {
+    console.error("Reviews POST Error:", err);
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request) {
-  const { error: authErr } = await requireAdminApi();
-  if (authErr) return authErr;
-
+export async function PUT(req: Request) {
   try {
-    const body = await request.json();
+    const body = await req.json();
     const { id, status, isFeatured } = body;
 
     if (!id) {
-      return NextResponse.json({ success: false, error: "Review ID required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Review ID is required." }, { status: 400 });
     }
 
-    const updates: Record<string, any> = {};
-    if (status && ["pending", "approved", "rejected"].includes(status)) {
-      updates.status = status;
-    }
-    if (typeof isFeatured === "boolean") {
-      updates.is_featured = isFeatured;
+    const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
+    if (!supabase) {
+      return NextResponse.json({ success: false, error: "Database not configured." }, { status: 500 });
     }
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabaseServerClient();
-      if (supabase) {
-        const { data, error } = await supabase
-          .from("reviews")
-          .update(updates)
-          .eq("id", id)
-          .select();
+    const updates: any = {};
+    if (status !== undefined) updates.status = status;
+    if (isFeatured !== undefined) updates.is_featured = isFeatured;
 
-        if (error) {
-          // If is_featured doesn't exist yet in DB schema, retry without it
-          delete updates.is_featured;
-          if (Object.keys(updates).length > 0) {
-            const { data: retryData, error: retryErr } = await supabase
-              .from("reviews")
-              .update(updates)
-              .eq("id", id)
-              .select();
-            if (retryErr) {
-              return NextResponse.json({ success: false, error: retryErr.message }, { status: 400 });
-            }
-            return NextResponse.json({ success: true, data: retryData });
-          }
-          if (error.message?.includes("is_featured") || error.message?.includes("schema cache")) {
-            return NextResponse.json(
-              {
-                success: false,
-                error: "The 'is_featured' column is missing in Supabase. Please run: ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;",
-              },
-              { status: 400 }
-            );
-          }
-          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
-        }
+    const { data, error } = await supabase
+      .from("reviews")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
 
-        return NextResponse.json({ success: true, data });
-      }
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: "Review updated" });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: true, data },
+      { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+    );
+  } catch (err: any) {
+    console.error("Reviews PUT Error:", err);
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request) {
-  const { error: authErr } = await requireAdminApi();
-  if (authErr) return authErr;
-
+export async function DELETE(req: Request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ success: false, error: "Review ID is required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Review ID is required." }, { status: 400 });
     }
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabaseServerClient();
-      if (supabase) {
-        const { error } = await supabase.from("reviews").delete().eq("id", id);
-        if (error) {
-          return NextResponse.json({ success: false, error: error.message }, { status: 400 });
-        }
-      }
+    const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
+    if (!supabase) {
+      return NextResponse.json({ success: false, error: "Database not configured." }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: `Review ${id} deleted` });
-  } catch (err: unknown) {
-    const error = err as Error;
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { success: true, message: "Review deleted successfully" },
+      { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+    );
+  } catch (err: any) {
+    console.error("Reviews DELETE Error:", err);
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

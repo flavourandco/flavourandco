@@ -22,6 +22,7 @@ import type { Order } from "@/lib/types";
 import { useUIStore } from "@/store/ui.store";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
+import { notifyContentUpdated, subscribeToRealtimeUpdates } from "@/lib/realtime";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -30,6 +31,9 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [stagedStatus, setStagedStatus] = useState<Order["status"] | null>(null);
+  const [courierName, setCourierName] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [estimatedDelivery, setEstimatedDelivery] = useState("");
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const addToast = useUIStore((s) => s.addToast);
@@ -37,17 +41,26 @@ export default function AdminOrdersPage() {
   const handleOpenOrder = (order: Order) => {
     setSelectedOrder(order);
     setStagedStatus(order.status);
+    setCourierName(order.courierName || "Australia Post Express");
+    setTrackingNumber(order.trackingNumber || "");
+    setEstimatedDelivery(order.estimatedDelivery || "");
   };
 
   const handleCloseOrder = () => {
     setSelectedOrder(null);
     setStagedStatus(null);
+    setCourierName("");
+    setTrackingNumber("");
+    setEstimatedDelivery("");
   };
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/orders");
+      const res = await fetch(`/api/orders?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setOrders(json.data);
@@ -61,16 +74,19 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+
+    const unsubscribe = subscribeToRealtimeUpdates((type) => {
+      if (type === "orders") {
+        fetchOrders();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: Order["status"]) => {
-    // 1. Prevent action if already in this status
-    const currentOrder = orders.find((o) => o.id === id) || (selectedOrder?.id === id ? selectedOrder : null);
-    if (currentOrder && currentOrder.status === newStatus) {
-      return;
-    }
-
-    // 2. Prevent concurrent clicks while updating
     if (updatingOrderId) return;
     setUpdatingOrderId(id);
 
@@ -78,19 +94,38 @@ export default function AdminOrdersPage() {
       const res = await fetch("/api/orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({
+          id,
+          status: newStatus,
+          courierName: courierName.trim() || undefined,
+          trackingNumber: trackingNumber.trim() || undefined,
+          estimatedDelivery: estimatedDelivery.trim() || undefined,
+        }),
       });
-      if (res.ok) {
+      const json = await res.json();
+      if (res.ok && json.success) {
         setOrders((prev) =>
-          prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o))
+          prev.map((o) =>
+            o.id === id
+              ? {
+                ...o,
+                status: newStatus,
+                courierName: courierName.trim() || o.courierName,
+                trackingNumber: trackingNumber.trim() || o.trackingNumber,
+                estimatedDelivery: estimatedDelivery.trim() || o.estimatedDelivery,
+              }
+              : o
+          )
         );
+        notifyContentUpdated("orders");
         handleCloseOrder();
         addToast(`Order status updated to ${newStatus}.`, "success");
       } else {
-        addToast("Failed to update order status.", "error");
+        const errorMsg = json.error || "Failed to update order status in database.";
+        addToast(errorMsg, "error");
       }
-    } catch {
-      addToast("Failed to update order status.", "error");
+    } catch (err: any) {
+      addToast(err?.message || "Failed to update order status.", "error");
     } finally {
       setUpdatingOrderId(null);
     }
@@ -170,9 +205,8 @@ export default function AdminOrdersPage() {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 rounded-sm text-[11px] font-semibold uppercase tracking-wider cursor-pointer transition-colors ${
-                statusFilter === st ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
+              className={`px-3 py-1 rounded-sm text-[11px] font-semibold uppercase tracking-wider cursor-pointer transition-colors ${statusFilter === st ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
             >
               {st}
             </button>
@@ -249,7 +283,7 @@ export default function AdminOrdersPage() {
       {selectedOrder && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
           <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
-            
+
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
               <div>
@@ -271,37 +305,74 @@ export default function AdminOrdersPage() {
 
             {/* Scrollable Modal Content */}
             <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 text-xs text-slate-700 overscroll-contain" data-lenis-prevent>
-              
-              {/* Status Controls (Positioned on Top) */}
-              <div className="p-3.5 bg-slate-100/80 border border-slate-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <span className="text-xs font-bold text-slate-900">UPDATE FULFILMENT STATUS</span>
-                <div className="flex flex-wrap gap-2">
-                  {(["processing", "shipped", "completed", "cancelled"] as const).map((st) => {
-                    const isSelected = (stagedStatus || selectedOrder.status) === st;
-                    const isUpdating = updatingOrderId === selectedOrder.id;
 
-                    return (
-                      <button
-                        key={st}
-                        type="button"
-                        disabled={isUpdating}
-                        onClick={() => setStagedStatus(st)}
-                        className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-slate-900 text-white shadow-xs"
-                            : "bg-white text-slate-700 hover:bg-slate-200 border border-slate-200"
-                        } ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
-                      >
-                        {st}
-                      </button>
-                    );
-                  })}
+              {/* Status Controls (Positioned on Top) */}
+              <div className="p-3.5 bg-slate-100/80 border border-slate-200 rounded-sm space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="text-xs font-bold text-slate-900">UPDATE FULFILMENT STATUS</span>
+                  <div className="flex flex-wrap gap-2">
+                    {(["processing", "shipped", "completed", "cancelled"] as const).map((st) => {
+                      const isSelected = (stagedStatus || selectedOrder.status) === st;
+                      const isUpdating = updatingOrderId === selectedOrder.id;
+
+                      return (
+                        <button
+                          key={st}
+                          type="button"
+                          disabled={isUpdating}
+                          onClick={() => setStagedStatus(st)}
+                          className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-all cursor-pointer ${isSelected
+                              ? "bg-slate-900 text-white shadow-xs"
+                              : "bg-white text-slate-700 hover:bg-slate-200 border border-slate-200"
+                            } ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
+                        >
+                          {st}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {/* Tracking & Courier Fields (Shown when Shipped or Editing Tracking) */}
+                {(stagedStatus === "shipped" || selectedOrder.status === "shipped" || trackingNumber) && (
+                  <div className="pt-2.5 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-white p-3 rounded-sm border border-slate-200">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">Carrier / Courier</label>
+                      <input
+                        type="text"
+                        value={courierName}
+                        onChange={(e) => setCourierName(e.target.value)}
+                        placeholder="e.g. Australia Post Express"
+                        className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-sm focus:outline-none focus:border-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">Tracking Number</label>
+                      <input
+                        type="text"
+                        value={trackingNumber}
+                        onChange={(e) => setTrackingNumber(e.target.value)}
+                        placeholder="e.g. AP-EXP-9928172AU"
+                        className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-sm font-mono focus:outline-none focus:border-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">Estimated Delivery</label>
+                      <input
+                        type="text"
+                        value={estimatedDelivery}
+                        onChange={(e) => setEstimatedDelivery(e.target.value)}
+                        placeholder="e.g. Tomorrow by 2 PM"
+                        className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-sm focus:outline-none focus:border-slate-800"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Top Row: Customer & Delivery Info + Square Payment Info Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
+
                 {/* Customer & Delivery Card */}
                 <div className="p-4 bg-slate-50 rounded-sm border border-slate-200/80 space-y-3">
                   <div className="flex items-center gap-1.5 text-slate-900 font-bold border-b border-slate-200/60 pb-2">
@@ -405,7 +476,7 @@ export default function AdminOrdersPage() {
               {/* Itemized Order Breakdown Table */}
               <div className="space-y-3">
                 <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">Order Items Breakdown</h4>
-                
+
                 <div className="border border-slate-200 rounded-sm overflow-hidden bg-white">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-[10px] uppercase tracking-wider">
@@ -536,3 +607,4 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
+

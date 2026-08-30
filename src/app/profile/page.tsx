@@ -23,6 +23,7 @@ import {
   Star,
   Clock,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/layout/Footer";
@@ -30,6 +31,8 @@ import { useAuthStore } from "@/store/auth.store";
 import { BoneyardProfilePageSkeleton } from "@/components/ui/BoneyardSkeleton";
 import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 import type { Order } from "@/lib/types";
+import { subscribeToRealtimeUpdates } from "@/lib/realtime";
+import { getTrackingUrl } from "@/lib/tracking";
 
 function getOrderProductTitle(items?: any[]): string {
   if (!Array.isArray(items) || items.length === 0) return "Gourmet Pie Order";
@@ -59,22 +62,60 @@ export default function ProfilePage() {
 
   const userEmail = userProfile?.email || user?.primaryEmailAddress?.emailAddress || "";
 
-  useEffect(() => {
-    if (userEmail) {
-      setLoadingOrders(true);
-      fetch("/api/orders")
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success && Array.isArray(json.data)) {
-            const userOrders = json.data.filter(
-              (o: Order) => o.customerEmail?.toLowerCase() === userEmail.toLowerCase()
-            );
-            setOrders(userOrders);
-          }
-        })
-        .catch((err) => console.error("Error loading user orders:", err))
-        .finally(() => setLoadingOrders(false));
+  const fetchUserOrders = async (showLoading = false) => {
+    if (!userEmail) return;
+    if (showLoading) setLoadingOrders(true);
+    try {
+      const res = await fetch(`/api/orders?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        const userOrders = json.data.filter(
+          (o: Order) => o.customerEmail?.toLowerCase() === userEmail.toLowerCase()
+        );
+        setOrders(userOrders);
+        setSelectedOrder((prev) => {
+          if (!prev) return null;
+          const updated = userOrders.find(
+            (o: Order) => o.id === prev.id || o.orderNumber === prev.orderNumber
+          );
+          return updated || prev;
+        });
+      }
+    } catch (err) {
+      console.error("Error loading user orders:", err);
+    } finally {
+      if (showLoading) setLoadingOrders(false);
     }
+  };
+
+  useEffect(() => {
+    if (!userEmail) return;
+    fetchUserOrders(true);
+
+    // 1. Live Realtime listener (cross-tab + Supabase websocket)
+    const unsubscribe = subscribeToRealtimeUpdates((type) => {
+      if (type === "orders") {
+        fetchUserOrders(false);
+      }
+    });
+
+    // 2. Window focus & visibility change revalidation
+    const handleFocus = () => fetchUserOrders(false);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") fetchUserOrders(false);
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [userEmail]);
 
   // Render Boneyard Skeleton during Clerk initialization & Supabase data fetching
@@ -591,6 +632,66 @@ export default function ProfilePage() {
                           </span>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Live Courier Tracking Callout Box if Shipped / Tracking available */}
+              {(() => {
+                const isShipped = selectedOrder.status === "shipped";
+                const trackingNumber = selectedOrder.trackingNumber;
+                const courierName = selectedOrder.courierName || (trackingNumber ? "Australia Post Express" : undefined);
+                const trackingUrl = getTrackingUrl(trackingNumber, courierName, selectedOrder.trackingUrl);
+
+                if (!isShipped && !trackingNumber && !trackingUrl) return null;
+
+                return (
+                  <div className="bg-blue-50/80 border border-blue-200 rounded-sm p-4 text-xs space-y-2">
+                    <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-blue-200/60">
+                      <div className="flex items-center gap-1.5 text-blue-900 font-bold">
+                        <Truck className="w-4 h-4 text-blue-600" />
+                        <span>Refrigerated Express Tracking</span>
+                      </div>
+                      {courierName && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-800 font-semibold text-[10px] rounded-sm uppercase tracking-wider">
+                          Carrier: {courierName}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      <div className="space-y-1">
+                        {trackingNumber ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-500 font-medium">Tracking Number:</span>
+                            <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-blue-200">
+                              {trackingNumber}
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-blue-900 font-medium">
+                            Your pies have dispatched in temperature-controlled packaging.
+                          </p>
+                        )}
+                        {selectedOrder.estimatedDelivery && (
+                          <p className="text-[11px] text-slate-600">
+                            Estimated Delivery: <strong className="text-slate-800">{selectedOrder.estimatedDelivery}</strong>
+                          </p>
+                        )}
+                      </div>
+
+                      {trackingUrl && (
+                        <a
+                          href={trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-sm transition-colors shadow-2xs self-start sm:self-auto shrink-0 cursor-pointer"
+                        >
+                          <span>Track Package Live</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 );

@@ -1,216 +1,137 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { verifySquareWebhookSignature } from "@/lib/square";
+import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { sendOrderConfirmationNotifications } from "@/lib/email/notifications";
+import { getAppBaseUrl } from "@/lib/email/resend";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    // 1. Read Raw Body text for signature verification
     const rawBody = await req.text();
-    const signatureHeader = req.headers.get("x-square-hmacsha256-signature");
+    const signature = req.headers.get("x-square-hmacsha256-signature");
+    const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
+    const notificationUrl = process.env.SQUARE_WEBHOOK_NOTIFICATION_URL || `${getAppBaseUrl()}/api/webhooks/square`;
 
-    const webhookSignatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
-    const notificationUrl =
-      process.env.SQUARE_WEBHOOK_NOTIFICATION_URL ||
-      req.url ||
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/webhooks/square`;
-
-    // 2. Cryptographically Verify Signature if key is configured
-    if (webhookSignatureKey && !webhookSignatureKey.includes("YOUR_WEBHOOK")) {
-      const isValidSignature = verifySquareWebhookSignature({
-        signatureHeader,
-        signatureKey: webhookSignatureKey,
+    // 1. Webhook Signature Verification
+    if (signatureKey && signature) {
+      const isValid = verifySquareWebhookSignature({
+        signatureHeader: signature,
+        signatureKey,
         notificationUrl,
         rawBody,
       });
-
-      if (!isValidSignature) {
-        console.warn("Square Webhook signature verification failed. Request rejected.");
-        return NextResponse.json(
-          { error: "Invalid webhook signature." },
-          { status: 401 }
-        );
+      if (!isValid) {
+        console.error("Square Webhook signature verification failed.");
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
       }
     } else {
-      console.warn("Square Webhook signature key not configured. Signature verification skipped in development.");
+      console.warn("Square Webhook signature key not configured. Processing without verification.");
     }
 
-    // 3. Parse JSON Event Payload
-    let payload: any;
-    try {
-      payload = JSON.parse(rawBody);
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
-    }
+    const event = JSON.parse(rawBody);
+    console.log(`[SQUARE WEBHOOK] Received event: ${event.type} (${event.event_id})`);
 
-    const eventId = payload.event_id || payload.id;
-    const eventType = payload.type;
+    const supabase = isSupabaseConfigured() ? getSupabaseServerClient() : null;
 
-    if (!eventId || !eventType) {
-      return NextResponse.json({ error: "Missing event metadata." }, { status: 400 });
-    }
+    // 2. Handle Payment Updated Event
+    if (event.type === "payment.updated" || event.type === "payment.created") {
+      const payment = event.data?.object?.payment;
+      if (!payment) {
+        return NextResponse.json({ success: true, message: "No payment object found." });
+      }
 
-    // We focus on payment events
-    if (eventType !== "payment.created" && eventType !== "payment.updated") {
-      return NextResponse.json({ received: true, ignored: true, message: `Event '${eventType}' ignored.` });
-    }
+      const paymentId = payment.id;
+      const orderId = payment.order_id;
+      const status = payment.status; // e.g., 'COMPLETED', 'APPROVED', 'FAILED'
+      const note = payment.note || "";
+      const receiptUrl = payment.receipt_url;
 
-    if (!isSupabaseConfigured()) {
-      console.error("Webhook processing failed: Supabase not configured.");
-      return NextResponse.json({ error: "Database not configured." }, { status: 500 });
-    }
+      console.log(`[SQUARE WEBHOOK] Payment ${paymentId} status: ${status}, Order ID: ${orderId}`);
 
-    const supabase = getSupabaseServerClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Database client unavailable." }, { status: 500 });
-    }
+      if (status === "COMPLETED" && supabase) {
+        // Find existing order in Supabase
+        let { data: order } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("square_payment_id", paymentId)
+          .maybeSingle();
 
-    // 4. Webhook Event Deduplication Check (Idempotency)
-    const { data: existingEvent } = await supabase
-      .from("webhook_events")
-      .select("id, status")
-      .eq("event_id", eventId)
-      .single();
+        if (!order && orderId) {
+          const { data: ordByOrderId } = await supabase
+            .from("orders")
+            .select("*")
+            .eq("square_transaction_id", orderId)
+            .maybeSingle();
+          if (ordByOrderId) order = ordByOrderId;
+        }
 
-    if (existingEvent) {
-      // Event already processed safely, return 200 immediately
-      return NextResponse.json({
-        received: true,
-        duplicate: true,
-        message: "Webhook event already processed.",
-      });
-    }
+        // Try extracting custom order number from note (e.g., "Order: ORD-1234")
+        if (!order && note) {
+          const match = note.match(/ORD-[A-Z0-9]+/i);
+          if (match) {
+            const { data: ordByNumber } = await supabase
+              .from("orders")
+              .select("*")
+              .eq("order_number", match[0])
+              .maybeSingle();
+            if (ordByNumber) order = ordByNumber;
+          }
+        }
 
-    // 5. Extract Payment Object
-    const payment = payload?.data?.object?.payment;
-    if (!payment) {
-      return NextResponse.json({ error: "Missing payment object in event data." }, { status: 400 });
-    }
-
-    const squarePaymentId = payment.id;
-    const referenceId = payment.reference_id; // Order Number or Order ID
-    const paymentStatus = (payment.status || "").toUpperCase(); // e.g., 'COMPLETED', 'FAILED', 'CANCELED'
-    const receiptUrl = payment.receipt_url;
-
-    // 6. Locate Corresponding Order in Database
-    let orderRecord = null;
-
-    if (referenceId) {
-      const { data: byOrderNumber } = await supabase
-        .from("orders")
-        .select("*")
-        .or(`order_number.eq.${referenceId},id.eq.${referenceId}`)
-        .single();
-      orderRecord = byOrderNumber;
-    }
-
-    if (!orderRecord && squarePaymentId) {
-      const { data: bySquareId } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("square_payment_id", squarePaymentId)
-        .single();
-      orderRecord = bySquareId;
-    }
-
-    // 7. Safe State Machine Transition & Database Updates
-    if (orderRecord) {
-      if (paymentStatus === "COMPLETED") {
-        // Prevent stale webhooks from overwriting an already confirmed order needlessly
-        if (orderRecord.payment_status !== "paid") {
-          const currentNotes = orderRecord.fulfillment_notes || orderRecord.shipping_address?.notes || "";
-          await supabase
+        if (order) {
+          // Update order payment status to paid
+          const { error: updateErr } = await supabase
             .from("orders")
             .update({
               payment_status: "paid",
-              status: "completed",
-              square_payment_id: squarePaymentId,
-              square_transaction_id: squarePaymentId,
-              square_receipt_url: receiptUrl || orderRecord.square_receipt_url,
-              fulfillment_notes: currentNotes || "Paid & Confirmed via Authoritative Square Webhook",
+              square_receipt_url: receiptUrl || order.square_receipt_url,
+              status: order.status === "pending" ? "processing" : order.status,
             })
-            .eq("id", orderRecord.id);
+            .eq("id", order.id);
 
-          // Update corresponding Payment Attempt
-          await supabase
-            .from("payment_attempts")
-            .update({
-              status: "completed",
-              square_payment_id: squarePaymentId,
-              raw_response: payment,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("order_id", orderRecord.id);
-
-          console.log(
-            `[AUTHORITATIVE PAYMENT CONFIRMED] Order #${orderRecord.order_number} marked PAID via Webhook ${eventId}.`
-          );
-
-          // Trigger Post-Payment Notifications (Idempotent: deduplicated if checkout handler already sent)
-          const updatedSnapshot = {
-            ...orderRecord,
-            payment_status: "paid",
-            status: "completed",
-            square_payment_id: squarePaymentId,
-            square_receipt_url: receiptUrl || orderRecord.square_receipt_url,
-          };
-
-          sendOrderConfirmationNotifications(updatedSnapshot).catch((err) => {
-            console.error("[WEBHOOK EMAIL DISPATCH ERROR]", err);
-          });
+          if (updateErr) {
+            console.error("Error updating order payment status in Supabase:", updateErr.message);
+          } else {
+            console.log(`[SQUARE WEBHOOK] Order #${order.order_number} marked as PAID.`);
+            // Trigger confirmation emails
+            await sendOrderConfirmationNotifications(order).catch((e) =>
+              console.error("Webhook email notification error:", e)
+            );
+          }
+        } else {
+          console.warn(`[SQUARE WEBHOOK] No matching local order found for payment ${paymentId}`);
         }
-      } else if (paymentStatus === "FAILED" || paymentStatus === "CANCELED") {
-        if (orderRecord.payment_status !== "paid") {
+      }
+    }
+
+    // 3. Handle Refund Updated Event
+    if (event.type === "refund.updated" || event.type === "refund.created") {
+      const refund = event.data?.object?.refund;
+      if (refund && refund.status === "COMPLETED" && supabase) {
+        const paymentId = refund.payment_id;
+        const { data: order } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("square_payment_id", paymentId)
+          .maybeSingle();
+
+        if (order) {
           await supabase
             .from("orders")
             .update({
-              payment_status: "failed",
-              status: "pending",
-              fulfillment_notes: `Square Payment ${paymentStatus.toLowerCase()}`,
+              payment_status: "refunded",
+              status: "refunded",
             })
-            .eq("id", orderRecord.id);
-
-          await supabase
-            .from("payment_attempts")
-            .update({
-              status: paymentStatus.toLowerCase(),
-              raw_response: payment,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("order_id", orderRecord.id);
+            .eq("id", order.id);
+          console.log(`[SQUARE WEBHOOK] Order #${order.order_number} marked as REFUNDED.`);
         }
       }
-    } else {
-      console.warn(
-        `Square Webhook received for payment ${squarePaymentId} / reference ${referenceId}, but no matching order was found.`
-      );
     }
 
-    // 8. Record Event ID in Database to guarantee event processing idempotency
-    try {
-      await supabase.from("webhook_events").insert({
-        event_id: eventId,
-        event_type: eventType,
-        status: "processed",
-        payload,
-      });
-    } catch (evtErr) {
-      console.warn("Webhook event logging skipped:", evtErr);
-    }
-
-    return NextResponse.json({
-      received: true,
-      processed: true,
-      eventId,
-      status: paymentStatus,
-    });
+    return NextResponse.json({ success: true, received: true });
   } catch (err: any) {
-    console.error("Square webhook processing error:", err);
-    return NextResponse.json(
-      { error: err?.message || "Webhook handling internal error" },
-      { status: 500 }
-    );
+    console.error("[SQUARE WEBHOOK ERROR]", err);
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

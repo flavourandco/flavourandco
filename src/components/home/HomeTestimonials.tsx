@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Star, Quote } from "lucide-react";
 import type { ReviewItem } from "@/lib/types";
+import { subscribeToRealtimeUpdates } from "@/lib/realtime";
 
 export default function HomeTestimonials() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -14,12 +15,14 @@ export default function HomeTestimonials() {
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    fetch("/api/reviews?status=approved")
+  const loadReviews = useCallback(() => {
+    fetch(`/api/reviews?status=approved&t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
         if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
-          // Priority: featured reviews first, or all approved reviews
           const featured = json.data.filter((r: ReviewItem) => r.isFeatured);
           setReviews(featured.length > 0 ? featured : json.data);
         } else {
@@ -29,6 +32,20 @@ export default function HomeTestimonials() {
       .catch(() => setReviews([]))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadReviews();
+
+    const unsubscribe = subscribeToRealtimeUpdates((type) => {
+      if (type === "reviews") {
+        loadReviews();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [loadReviews]);
 
   useGSAP(
     () => {
@@ -60,7 +77,8 @@ export default function HomeTestimonials() {
     return null;
   }
 
-  const marqueeItems = reviews.length < 4 ? [...reviews, ...reviews, ...reviews, ...reviews] : [...reviews, ...reviews];
+  const marqueeItems =
+    reviews.length < 4 ? [...reviews, ...reviews, ...reviews, ...reviews] : [...reviews, ...reviews];
 
   return (
     <section

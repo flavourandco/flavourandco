@@ -99,6 +99,10 @@ export interface Order {
   status: "completed" | "processing" | "shipped" | "pending" | "cancelled";
   itemsCount: number;
   fulfillmentNotes?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  courierName?: string;
+  estimatedDelivery?: string;
   createdAt: string;
 }
 
@@ -161,4 +165,3 @@ export interface UserProfile {
   imageUrl?: string;
   createdAt?: string;
 }
-

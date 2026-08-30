@@ -61,11 +61,21 @@ export function getAdminEmailAddress(): string {
 
 /**
  * Returns the public app URL for links in email templates.
+ * Directly reads configured URL from environment (e.g. NEXT_PUBLIC_APP_URL).
  */
 export function getAppBaseUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_APP_URL;
+  const configured =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+
   if (configured && configured.trim().length > 0) {
-    return configured.trim().replace(/\/$/, "");
+    let clean = configured.trim().replace(/\/$/, "");
+    if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
+      clean = `https://${clean}`;
+    }
+    return clean;
   }
-  return "http://localhost:3000";
+  return "https://flavourandco.vercel.app";
 }
