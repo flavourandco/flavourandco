@@ -253,7 +253,7 @@ export default function ProductDetailPage({
                   <Button
                     onClick={() => {
                       clearCart();
-                      addItem(product, quantity, activeVariant?.name, unitPrice);
+                      addItem(product, quantity, activeVariant?.name, unitPrice, { showToast: false });
                       router.push("/checkout");
                     }}
                     variant="secondary"

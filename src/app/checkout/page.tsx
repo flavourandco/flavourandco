@@ -25,6 +25,7 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
+  AlertTriangle,
   Gift,
   HelpCircle,
 } from "lucide-react";
@@ -34,6 +35,8 @@ import { useCartStore } from "@/store/cart.store";
 import { useUIStore } from "@/store/ui.store";
 import {
   isFreeDeliveryPostcode,
+  isSydney50KmPostcode,
+  getDeliveryQuote,
   calculateShippingFee,
   isValidAustralianPostcode,
   AUSTRALIAN_STATES,
@@ -164,10 +167,11 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getSubtotal();
-  const isEligibleForFreeShipping = isFreeDeliveryPostcode(formData.postcode) || subtotal >= freeDeliveryThreshold;
-  const shippingFee = calculateShippingFee(subtotal, formData.postcode, freeDeliveryThreshold);
-  const total = subtotal + shippingFee;
+  const deliveryQuote = getDeliveryQuote(subtotal, formData.postcode, freeDeliveryThreshold);
   const isPostcodeFilled = formData.postcode.trim().length === 4;
+  const isDeliverable = !isPostcodeFilled || deliveryQuote.isDeliverable;
+  const shippingFee = deliveryQuote.isDeliverable ? deliveryQuote.fee : 15;
+  const total = subtotal + shippingFee;
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -205,6 +209,13 @@ export default function CheckoutPage() {
     }
     if (!isValidAustralianPostcode(formData.postcode)) {
       addToast("Please enter a valid 4-digit Australian postcode.", "error");
+      return;
+    }
+    if (!isSydney50KmPostcode(formData.postcode)) {
+      addToast(
+        `Delivery is currently only available within Greater Sydney (up to 50km). Postcode ${formData.postcode} is outside our delivery zone.`,
+        "error"
+      );
       return;
     }
 
@@ -489,20 +500,50 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* Dynamic Free Shipping Postcode Feedback Banner */}
-                    {isPostcodeFilled && isEligibleForFreeShipping && (
+                    {/* Dynamic 3-Tier Delivery Feedback Banner */}
+                    {isPostcodeFilled && (
                       <div className="sm:col-span-2">
-                        <div className="p-3 bg-emerald-50 rounded-md border border-emerald-200 text-[#07402b] flex items-center justify-between gap-2 animate-fadeIn">
-                          <div className="flex items-center gap-2 text-xs font-semibold">
-                            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                            <span>
-                              <strong>Free Express Delivery applied!</strong> Eligible for postcode {formData.postcode.trim()}.
+                        {!deliveryQuote.isDeliverable ? (
+                          <div className="p-3.5 bg-amber-50 rounded-md border border-amber-300 text-amber-900 flex items-start gap-2.5 animate-fadeIn">
+                            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div className="space-y-0.5 text-xs">
+                              <p className="font-bold text-amber-950">
+                                Delivery Currently Not Available for {formData.postcode.trim()}
+                              </p>
+                              <p className="text-[11px] text-amber-800 leading-relaxed">
+                                We currently deliver fresh &amp; frozen gourmet orders across <strong>Greater Sydney (within ~50km)</strong>. Please contact us for bulk or special arrangements.
+                              </p>
+                            </div>
+                          </div>
+                        ) : deliveryQuote.isFree ? (
+                          <div className="p-3 bg-emerald-50 rounded-md border border-emerald-200 text-[#07402b] flex items-center justify-between gap-2 animate-fadeIn">
+                            <span className="text-xs font-bold">
+                              {deliveryQuote.tier === 1
+                                ? "Free Local Delivery applied!"
+                                : "Free Express Delivery applied!"}
+                            </span>
+                            <span className="text-[10px] font-bold uppercase bg-emerald-600 text-white px-2 py-0.5 rounded-md shrink-0">
+                              A$0.00 Delivery
                             </span>
                           </div>
-                          <span className="text-[10px] font-bold uppercase bg-emerald-600 text-white px-2 py-0.5 rounded-md shrink-0">
-                            A$0.00 Delivery
-                          </span>
-                        </div>
+                        ) : (
+                          <div className="p-3 bg-stone-50 rounded-md border border-stone-200 text-stone-700 flex items-center justify-between gap-2 animate-fadeIn">
+                            <div className="flex items-center gap-2 text-xs">
+                              <Truck className="w-4 h-4 text-[#07402b] shrink-0" />
+                              <span>
+                                <strong>Standard Sydney Delivery:</strong> A$15.00
+                                {freeDeliveryThreshold - subtotal > 0 && (
+                                  <span className="text-stone-500 ml-1">
+                                    (Add A${(freeDeliveryThreshold - subtotal).toFixed(2)} more for Free Delivery)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-bold uppercase bg-stone-200 text-stone-800 px-2 py-0.5 rounded-md shrink-0 font-mono">
+                              A$15.00
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
 

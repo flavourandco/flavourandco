@@ -1,5 +1,6 @@
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { calculateShippingFee, isValidAustralianPostcode } from "@/lib/shipping";
+import { calculateShippingFee, isValidAustralianPostcode, isSydney50KmPostcode } from "@/lib/shipping";
+import { getFreeDeliveryThresholdServer } from "@/lib/settings";
 
 export interface OrderItemInput {
   id: string;
@@ -72,6 +73,12 @@ export async function calculateAuthoritativeOrderTotals(
 
   if (!isValidAustralianPostcode(postcode)) {
     throw new Error("Please enter a valid 4-digit Australian postcode.");
+  }
+
+  if (!isSydney50KmPostcode(postcode)) {
+    throw new Error(
+      `Delivery is currently only available within Greater Sydney (up to 50km). We cannot deliver to postcode ${postcode} at this time.`
+    );
   }
 
   // Multi-index lookup map for DB products
@@ -203,8 +210,11 @@ export async function calculateAuthoritativeOrderTotals(
   // Round subtotal to 2 decimal places
   subtotal = Math.round(subtotal * 100) / 100;
 
+  // Fetch dynamic free delivery threshold from settings
+  const freeDeliveryThreshold = await getFreeDeliveryThresholdServer();
+
   // Calculate express shipping fee based on postcode & subtotal threshold
-  const shippingFee = calculateShippingFee(subtotal, postcode);
+  const shippingFee = calculateShippingFee(subtotal, postcode, freeDeliveryThreshold);
   const totalAmount = Math.round((subtotal + shippingFee) * 100) / 100;
   const totalAmountCents = Math.round(totalAmount * 100);
 

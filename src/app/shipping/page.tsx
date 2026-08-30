@@ -60,13 +60,21 @@ export default function ShippingPage() {
 
         {/* Section 1 */}
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Delivery Zones &amp; Rates</h2>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">1. Delivery Coverage &amp; Rates</h2>
           <p>
-            Flavour &amp; Co. delivers fresh and frozen handcrafted gourmet pies across Australia. Depending on what you choose on the shop page, your order is prepared fresh or frozen and packed securely for direct doorstep delivery.
+            Flavour &amp; Co. delivers fresh and frozen handcrafted gourmet pies across <strong>Greater Sydney (within ~50km radius)</strong>. Your order is prepared fresh or snap-frozen and packed with cold-chain insulation for direct doorstep delivery.
           </p>
-          <p>
-            Standard express courier delivery is $15 AUD, and orders over ${freeDeliveryThreshold} (or eligible local delivery postcodes) receive <strong>Free Delivery</strong>.
-          </p>
+          <ul className="list-disc pl-5 space-y-1.5 text-stone-700 text-sm">
+            <li>
+              <strong>Tier 1 (Selected Local Postcodes):</strong> 100% Free Delivery on all orders, with no minimum spend required.
+            </li>
+            <li>
+              <strong>Tier 2 (Greater Sydney up to 50km):</strong> Standard Express Delivery is $15 AUD, or <strong>FREE</strong> for all orders of ${freeDeliveryThreshold} or more.
+            </li>
+            <li>
+              <strong>Tier 3 (Regional &amp; Interstate):</strong> Direct delivery is currently paused to guarantee peak cold-chain freshness.
+            </li>
+          </ul>
         </section>
 
         {/* Section 2 */}

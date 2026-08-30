@@ -15,7 +15,13 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number, variantName?: string, unitPrice?: number) => void;
+  addItem: (
+    product: Product,
+    quantity?: number,
+    variantName?: string,
+    unitPrice?: number,
+    options?: { showToast?: boolean }
+  ) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -31,7 +37,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
 
-      addItem: (product, quantity = 1, variantName, unitPrice) => {
+      addItem: (product, quantity = 1, variantName, unitPrice, options = { showToast: true }) => {
         const itemUnitPrice = unitPrice ?? product.price;
         const itemId = variantName ? `${product.id}-${variantName}` : product.id;
 
@@ -63,10 +69,12 @@ export const useCartStore = create<CartState>()(
           set({ items: [...currentItems, newItem] });
         }
 
-        const toastMsg = variantName
-          ? `Added ${quantity}x ${product.name} (${variantName}) to cart!`
-          : `Added ${quantity}x ${product.name} to cart!`;
-        useUIStore.getState().addToast(toastMsg, "success");
+        if (options?.showToast !== false) {
+          const toastMsg = variantName
+            ? `Added ${quantity}x ${product.name} (${variantName}) to cart!`
+            : `Added ${quantity}x ${product.name} to cart!`;
+          useUIStore.getState().addToast(toastMsg, "success");
+        }
       },
 
       removeItem: (id) => {
