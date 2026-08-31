@@ -17,6 +17,7 @@ import {
   FileText,
   Download,
   Printer,
+  Loader2,
 } from "lucide-react";
 import type { Order } from "@/lib/types";
 import { useUIStore } from "@/store/ui.store";
@@ -47,6 +48,7 @@ export default function AdminOrdersPage() {
   };
 
   const handleCloseOrder = () => {
+    if (updatingOrderId) return;
     setSelectedOrder(null);
     setStagedStatus(null);
     setCourierName("");
@@ -177,6 +179,14 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const hasOrderFormChanges = Boolean(
+    selectedOrder &&
+    ((stagedStatus && stagedStatus !== selectedOrder.status) ||
+      courierName.trim() !== (selectedOrder.courierName || "Australia Post Express").trim() ||
+      trackingNumber.trim() !== (selectedOrder.trackingNumber || "").trim() ||
+      estimatedDelivery.trim() !== (selectedOrder.estimatedDelivery || "").trim())
+  );
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
@@ -282,7 +292,17 @@ export default function AdminOrdersPage() {
       {/* READ-ONLY ORDER DETAILS MODAL (FIXED BIGGER SHAPE & STABLE RECTANGLE) */}
       {selectedOrder && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn" data-lenis-prevent>
-          <div className="bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+          <div className="relative bg-white w-full max-w-4xl lg:max-w-5xl max-h-[88vh] sm:max-h-[85vh] rounded-sm border border-slate-200 shadow-2xl overflow-hidden flex flex-col my-auto shrink-0">
+
+            {/* MINIMAL IN-MODAL RECTANGULAR LOADER OVERLAY */}
+            {updatingOrderId && (
+              <div className="absolute inset-0 z-50 bg-white/75 backdrop-blur-[2px] flex items-center justify-center p-4 animate-fadeIn">
+                <div className="bg-white border border-slate-300 shadow-lg px-4 py-2.5 rounded-none flex items-center gap-2.5">
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-900 shrink-0" />
+                  <span className="text-xs font-semibold text-slate-800 tracking-tight">Updating fulfilment...</span>
+                </div>
+              </div>
+            )}
 
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
@@ -296,7 +316,7 @@ export default function AdminOrdersPage() {
                 <h2 className="text-base font-bold text-slate-900">{selectedOrder.orderNumber}</h2>
               </div>
               <button
-                onClick={() => setSelectedOrder(null)}
+                onClick={handleCloseOrder}
                 className="p-1 rounded-sm text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -573,14 +593,17 @@ export default function AdminOrdersPage() {
               </button>
 
               <div className="flex items-center gap-2">
-                {stagedStatus && stagedStatus !== selectedOrder.status && (
+                {hasOrderFormChanges && (
                   <button
                     type="button"
-                    disabled={updatingOrderId === selectedOrder.id}
-                    onClick={() => handleUpdateStatus(selectedOrder.id, stagedStatus)}
-                    className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
+                    disabled={Boolean(updatingOrderId)}
+                    onClick={() => handleUpdateStatus(selectedOrder.id, stagedStatus || selectedOrder.status)}
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {updatingOrderId === selectedOrder.id ? "Saving..." : "Save Changes"}
+                    {updatingOrderId === selectedOrder.id && (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                    )}
+                    <span>{updatingOrderId === selectedOrder.id ? "Saving..." : "Save Changes"}</span>
                   </button>
                 )}
 

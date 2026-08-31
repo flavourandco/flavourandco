@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, FileSpreadsheet, Trash2, Eye, X } from "lucide-react";
+import { Search, FileSpreadsheet, Trash2, Eye, X, Loader2 } from "lucide-react";
 import { WholesaleInquiry } from "@/lib/types";
 import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 import { useUIStore } from "@/store/ui.store";
@@ -207,8 +207,18 @@ export default function AdminWholesalePage() {
       {/* VIEW / UPDATE MODAL */}
       {selectedInquiry && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white max-w-xl w-full rounded-sm border border-slate-200 shadow-2xl p-6 space-y-4">
+          <div className="relative bg-white max-w-xl w-full rounded-none border border-slate-200 shadow-2xl p-6 space-y-4">
             
+            {/* MINIMAL IN-MODAL RECTANGULAR LOADER OVERLAY */}
+            {updatingId && (
+              <div className="absolute inset-0 z-50 bg-white/75 backdrop-blur-[2px] flex items-center justify-center p-4 animate-fadeIn">
+                <div className="bg-white border border-slate-300 shadow-lg px-4 py-2.5 rounded-none flex items-center gap-2.5">
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-900 shrink-0" />
+                  <span className="text-xs font-semibold text-slate-800 tracking-tight">Updating status...</span>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-mono text-slate-400 block uppercase">Wholesale Application</span>
@@ -216,14 +226,14 @@ export default function AdminWholesalePage() {
               </div>
               <button
                 onClick={handleCloseInquiry}
-                className="p-1 rounded-sm text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1 rounded-none text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-sm">
+              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-none">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 block">CONTACT PERSON</span>
                   <span className="font-semibold text-slate-900">{selectedInquiry.contactName}</span>
@@ -244,7 +254,7 @@ export default function AdminWholesalePage() {
 
               <div>
                 <span className="text-[10px] font-bold text-slate-400 block mb-1">MESSAGE / REQUEST</span>
-                <p className="bg-slate-50 p-3 rounded-sm text-slate-700 leading-relaxed font-sans border border-slate-200/60">
+                <p className="bg-slate-50 p-3 rounded-none text-slate-700 leading-relaxed font-sans border border-slate-200/60">
                   {selectedInquiry.message}
                 </p>
               </div>
@@ -261,7 +271,7 @@ export default function AdminWholesalePage() {
                         type="button"
                         disabled={isUpdating}
                         onClick={() => setStagedStatus(st)}
-                        className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase transition-colors cursor-pointer ${
+                        className={`px-3 py-1 rounded-none text-[10px] font-bold uppercase transition-colors cursor-pointer ${
                           isSelected
                             ? "bg-slate-900 text-white shadow-xs"
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -281,16 +291,17 @@ export default function AdminWholesalePage() {
                   type="button"
                   disabled={updatingId === selectedInquiry.id}
                   onClick={() => handleUpdateStatus(selectedInquiry.id, stagedStatus)}
-                  className="px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-sm transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold text-xs rounded-none transition-colors cursor-pointer disabled:opacity-60"
                 >
-                  {updatingId === selectedInquiry.id ? "Saving..." : "Save Changes"}
+                  {updatingId === selectedInquiry.id && <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />}
+                  <span>{updatingId === selectedInquiry.id ? "Saving..." : "Save Changes"}</span>
                 </button>
               )}
 
               <button
                 type="button"
                 onClick={handleCloseInquiry}
-                className="px-4 py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-sm hover:bg-slate-200 cursor-pointer border border-slate-200"
+                className="px-4 py-1.5 bg-slate-100 text-slate-700 font-semibold text-xs rounded-none hover:bg-slate-200 cursor-pointer border border-slate-200"
               >
                 Close
               </button>

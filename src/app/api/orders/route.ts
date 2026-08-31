@@ -43,9 +43,27 @@ export async function GET() {
         o.fulfillment_notes ||
         "";
 
-      const trackingNumber = o.tracking_number || undefined;
-      const courierName = o.courier_name || (trackingNumber ? "Australia Post Express" : undefined);
-      const trackingUrl = getTrackingUrl(trackingNumber, courierName, o.tracking_url);
+      const trackingNumber =
+        o.tracking_number ||
+        (typeof shippingAddr === "object" ? shippingAddr.tracking_number || shippingAddr.trackingNumber : undefined) ||
+        undefined;
+
+      const courierName =
+        o.courier_name ||
+        (typeof shippingAddr === "object" ? shippingAddr.courier_name || shippingAddr.courierName : undefined) ||
+        (trackingNumber ? "Australia Post Express" : undefined);
+
+      const trackingUrl =
+        getTrackingUrl(
+          trackingNumber,
+          courierName,
+          o.tracking_url || (typeof shippingAddr === "object" ? shippingAddr.tracking_url || shippingAddr.trackingUrl : undefined)
+        );
+
+      const estimatedDelivery =
+        o.estimated_delivery ||
+        (typeof shippingAddr === "object" ? shippingAddr.estimated_delivery || shippingAddr.estimatedDelivery : undefined) ||
+        undefined;
 
       return {
         id: o.id,
@@ -82,7 +100,7 @@ export async function GET() {
         trackingNumber,
         trackingUrl,
         courierName,
-        estimatedDelivery: o.estimated_delivery || undefined,
+        estimatedDelivery,
         createdAt: o.created_at,
       };
     });
@@ -132,87 +150,89 @@ export async function PATCH(req: Request) {
       );
     }
 
-    // Build update object
-    const updatePayload: Record<string, any> = {};
+    // 1. Fetch existing order by UUID or order_number to ensure accurate targeting
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id));
+    let targetOrder: any = null;
+
+    if (isUuid) {
+      const { data: byId } = await supabase.from("orders").select("*").eq("id", id).maybeSingle();
+      targetOrder = byId;
+    }
+    if (!targetOrder) {
+      const { data: byOrderNum } = await supabase.from("orders").select("*").eq("order_number", id).maybeSingle();
+      targetOrder = byOrderNum;
+    }
+
+    if (!targetOrder) {
+      return NextResponse.json(
+        { success: false, error: "Order record not found in database." },
+        { status: 404 }
+      );
+    }
+
+    // 2. Prepare safe JSONB shipping_address updates to ensure tracking data persists permanently
+    const currentShippingAddr =
+      typeof targetOrder.shipping_address === "object" && targetOrder.shipping_address
+        ? { ...targetOrder.shipping_address }
+        : {};
+
+    if (trackingNumber !== undefined) currentShippingAddr.tracking_number = trackingNumber;
+    if (courierName !== undefined) currentShippingAddr.courier_name = courierName;
+    if (trackingUrl !== undefined) currentShippingAddr.tracking_url = trackingUrl;
+    if (estimatedDelivery !== undefined) currentShippingAddr.estimated_delivery = estimatedDelivery;
+
+    // 3. Build update payload targeting first-class database columns
+    const updatePayload: Record<string, any> = {
+      shipping_address: currentShippingAddr,
+    };
     if (status) updatePayload.status = status;
     if (fulfillmentNotes !== undefined) updatePayload.fulfillment_notes = fulfillmentNotes;
     if (trackingNumber !== undefined) updatePayload.tracking_number = trackingNumber;
-    if (trackingUrl !== undefined) updatePayload.tracking_url = trackingUrl;
     if (courierName !== undefined) updatePayload.courier_name = courierName;
+    if (trackingUrl !== undefined) updatePayload.tracking_url = trackingUrl;
     if (estimatedDelivery !== undefined) updatePayload.estimated_delivery = estimatedDelivery;
+    if (refundAmount !== undefined) updatePayload.refund_amount = refundAmount;
 
-    // 1. Try updating with full payload
-    let res = await supabase
+    // 4. Update the order in database
+    let updatedOrder: any = null;
+
+    const { data: updatedData, error: updateErr } = await supabase
       .from("orders")
       .update(updatePayload)
-      .eq("id", id)
+      .eq("id", targetOrder.id)
       .select()
       .maybeSingle();
 
-    if (!res.data && !res.error) {
-      res = await supabase
-        .from("orders")
-        .update(updatePayload)
-        .eq("order_number", id)
-        .select()
-        .maybeSingle();
-    }
-
-    // 2. If column schema error occurs, fallback to core fields (status & fulfillment_notes)
-    if (res.error) {
-      console.warn("[ORDERS DB UPDATE RETRY] Full payload failed:", res.error.message);
-      const corePayload: Record<string, any> = {};
-      if (status) corePayload.status = status;
-      if (fulfillmentNotes !== undefined) corePayload.fulfillment_notes = fulfillmentNotes;
-
-      let retryRes = await supabase
-        .from("orders")
-        .update(corePayload)
-        .eq("id", id)
-        .select()
-        .maybeSingle();
-
-      if (!retryRes.data && !retryRes.error) {
-        retryRes = await supabase
-          .from("orders")
-          .update(corePayload)
-          .eq("order_number", id)
-          .select()
-          .maybeSingle();
-      }
-
-      if (!retryRes.error && retryRes.data) {
-        res = retryRes;
-      }
-    }
-
-    // 3. Strict validation: If database update failed, abort immediately and return clear error
-    if (res.error || !res.data) {
-      const errorMessage = res.error?.message || "Order not found in database or update was rejected.";
-      console.error("[ORDER PATCH DB ERROR]", errorMessage);
+    if (updateErr) {
+      console.error("[ORDER PATCH DB ERROR]", updateErr.message);
       return NextResponse.json(
-        { success: false, error: errorMessage },
+        { success: false, error: updateErr.message },
         { status: 400 }
       );
     }
 
-    const updatedOrder = res.data;
+    updatedOrder = updatedData || { ...targetOrder, ...updatePayload };
 
     // Invalidate caches
     revalidatePath("/api/orders");
     revalidatePath("/profile");
     revalidatePath("/admin/orders");
 
-    // 4. Trigger Status Update Email Notification ONLY AFTER database update was successful
-    if (updatedOrder && status) {
+    // 5. Trigger Status Update Email Notification ONLY AFTER database update was successful
+    if (status) {
       try {
+        const effectiveTrackingNumber = trackingNumber || updatedOrder.tracking_number || currentShippingAddr.tracking_number;
+        const effectiveCourierName = courierName || updatedOrder.courier_name || currentShippingAddr.courier_name || (effectiveTrackingNumber ? "Australia Post Express" : undefined);
+        const effectiveTrackingUrl = trackingUrl || updatedOrder.tracking_url || currentShippingAddr.tracking_url || getTrackingUrl(effectiveTrackingNumber, effectiveCourierName);
+        const effectiveEstimatedDelivery = estimatedDelivery || updatedOrder.estimated_delivery || currentShippingAddr.estimated_delivery;
+
         const emailRes = await sendStatusUpdateNotification(
           {
             ...updatedOrder,
-            trackingNumber: trackingNumber || updatedOrder.tracking_number,
-            trackingUrl: trackingUrl || updatedOrder.tracking_url,
-            courierName: courierName || updatedOrder.courier_name,
-            estimatedDelivery: estimatedDelivery || updatedOrder.estimated_delivery,
+            trackingNumber: effectiveTrackingNumber,
+            trackingUrl: effectiveTrackingUrl,
+            courierName: effectiveCourierName,
+            estimatedDelivery: effectiveEstimatedDelivery,
             refundAmount: refundAmount || updatedOrder.refund_amount,
           },
           status

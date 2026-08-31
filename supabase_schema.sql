@@ -64,6 +64,13 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS product_name TEXT;
 
+-- Orders tracking columns migration:
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS courier_name TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_number TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_url TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS estimated_delivery TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS refund_amount NUMERIC(10, 2);
+
 -- 4. WHOLESALE INQUIRIES TABLE
 CREATE TABLE IF NOT EXISTS public.wholesale_inquiries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
