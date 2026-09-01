@@ -92,7 +92,12 @@ export const faqItems: FaqItem[] = [
   {
     id: "faq-4",
     question: "Where do you deliver?",
-    answer: "We deliver fresh and frozen orders directly to your door across Australia. Customers can choose freshly baked or frozen packs directly when selecting their pies."
+    answer: "We currently deliver online orders in the Greater Sydney area. Please reach out to us for bulk & wholesale orders if you are located elsewhere."
+  },
+  {
+    id: "faq-order-next",
+    question: "I’ve placed my order — what’s next?",
+    answer: "Once your order is placed, you’ll receive a text message within 2 hours confirming your delivery date and estimated delivery time.\n\nDelivery is typically same-day, but depending on your location, it may take 1–3 business days. We’ll confirm your delivery details by text so you know exactly when to expect your order."
   },
   {
     id: "faq-5",

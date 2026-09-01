@@ -125,16 +125,33 @@ export default function HomeNavbar() {
               </button>
             </div>
 
-            {/* Center: Brand Logo */}
+            {/* Center: Brand Logo & Tagline */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1 px-3 block"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 z-10 py-1 px-2 text-center"
             >
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-[40px] sm:h-[46px] w-auto object-contain"
+                className="h-[30px] sm:h-[34px] w-auto object-contain"
               />
+              <div className="flex flex-col items-center w-fit mt-0.5">
+                <span className="text-[7.5px] sm:text-[8px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
+                  Familiar Flavours
+                </span>
+                <div className="w-full flex justify-between text-[5.5px] sm:text-[6px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
+                  <span>R</span>
+                  <span>E</span>
+                  <span>I</span>
+                  <span>M</span>
+                  <span>A</span>
+                  <span>G</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>E</span>
+                  <span>D</span>
+                </div>
+              </div>
             </Link>
 
             {/* Right: Cart & Hamburger Menu */}
@@ -163,13 +180,30 @@ export default function HomeNavbar() {
 
           {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
           <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-1 gap-6">
-            {/* Left: Brand Logo */}
-            <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105 py-1.5 px-3 block">
+            {/* Left: Brand Logo & Tagline */}
+            <Link href="/" className="shrink-0 flex flex-col items-center justify-center group transition-transform duration-300 hover:scale-105 py-1 px-2">
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-13 lg:h-15 xl:h-16 w-auto object-contain max-h-20"
+                className="h-10 lg:h-12 xl:h-13 w-auto object-contain"
               />
+              <div className="flex flex-col items-center w-fit mt-1">
+                <span className="text-[8.5px] lg:text-[9.5px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
+                  Familiar Flavours
+                </span>
+                <div className="w-full flex justify-between text-[6.5px] lg:text-[7.5px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
+                  <span>R</span>
+                  <span>E</span>
+                  <span>I</span>
+                  <span>M</span>
+                  <span>A</span>
+                  <span>G</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>E</span>
+                  <span>D</span>
+                </div>
+              </div>
             </Link>
 
             {/* Center: Navigation Links */}
@@ -279,12 +313,29 @@ export default function HomeNavbar() {
           <div>
             {/* Sidebar Header */}
             <div className="flex items-center justify-between pb-5 border-b border-secondary/15">
-              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="flex flex-col items-center gap-1">
                 <img
                   src={media.navbarLogo}
                   alt="Flavour & Co. Logo"
-                  className="h-14 w-auto object-contain"
+                  className="h-11 w-auto object-contain"
                 />
+                <div className="flex flex-col items-center w-fit">
+                  <span className="text-[8px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
+                    Familiar Flavours
+                  </span>
+                  <div className="w-full flex justify-between text-[6px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
+                    <span>R</span>
+                    <span>E</span>
+                    <span>I</span>
+                    <span>M</span>
+                    <span>A</span>
+                    <span>G</span>
+                    <span>I</span>
+                    <span>N</span>
+                    <span>E</span>
+                    <span>D</span>
+                  </div>
+                </div>
               </Link>
               <button
                 type="button"

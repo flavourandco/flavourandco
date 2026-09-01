@@ -1,8 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60" fill="none">
   <!-- Channel 7 Badge -->
-  <rect x="15" y="16" width="28" height="28" rx="6" fill="#6b1e30" />
-  <text x="29" y="36" font-family="Arial, sans-serif" font-size="17" font-weight="900" fill="#fdf8f3" text-anchor="middle">7</text>
+  <rect x="16" y="14" width="32" height="32" rx="6" fill="#6b1e30" />
+  <text x="32" y="37" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900" fill="#fdf8f3" text-anchor="middle">7</text>
   <!-- Text -->
-  <text x="52" y="27" font-family="Arial, sans-serif" font-size="12" font-weight="900" fill="#1c1410" letter-spacing="2">CHANNEL SEVEN</text>
-  <text x="52" y="41" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#c69c40" letter-spacing="3">PLATE OF ORIGIN</text>
+  <text x="58" y="35" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="900" fill="#1c1410" letter-spacing="2">CHANNEL SEVEN</text>
 </svg>

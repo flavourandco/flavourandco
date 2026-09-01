@@ -7,11 +7,15 @@ export const PARTNER_LOGOS = [
   { name: "Hyatt Regency Sydney", src: "/partners/hyatt-regency.svg" },
   { name: "Sheraton Grand Sydney Hyde Park", src: "/partners/sheraton-grand.avif" },
   { name: "Amora Hotel Jamison Sydney", src: "/partners/amora-hotel.webp" },
-  { name: "Novotel Sydney Darling Harbour", src: "/partners/novotel.webp" },
+  {
+    name: "Novotel Sydney Darling Harbour",
+    src: "/partners/novotel-sydney-darling-harbour-logo-blue-rgb-resized.webp",
+    innerClassName: "w-[72%] h-[72%]",
+  },
   { name: "PARKROYAL Parramatta", src: "/partners/parkroyal.svg" },
   { name: "Cruzing Catering & Events Management", src: "/partners/cruzing.png" },
-  { name: "Channel 7 Plate of Origin", src: "/partners/channel-7.svg" },
-  { name: "Corporate Catering Partners", src: "/partners/corporate-catering.avif" },
+  { name: "Channel 7", src: "/partners/channel-7.svg" },
+  { name: "Scenic World", src: "/partners/scenic-world.avif" },
 ];
 
 interface PartnerLogosStripProps {
@@ -45,14 +49,16 @@ export default function PartnerLogosStrip({
               className="bg-white/80 hover:bg-white border border-[#ebe3d8] rounded-xl p-6 w-full h-28 sm:h-32 flex items-center justify-center shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer"
               title={logo.name}
             >
-              <div className="relative w-full h-full">
-                <Image
-                  src={logo.src}
-                  alt={logo.name}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  className="object-contain transition-transform duration-300 group-hover:scale-105"
-                />
+              <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                <div className={`relative ${logo.innerClassName || "w-full h-full"}`}>
+                  <Image
+                    src={logo.src}
+                    alt={logo.name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    className="object-contain"
+                  />
+                </div>
               </div>
             </div>
           ))}

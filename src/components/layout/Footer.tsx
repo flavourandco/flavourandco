@@ -75,11 +75,30 @@ export default function Footer() {
         <div className="hidden md:grid md:grid-cols-5 gap-8">
           {/* Column 1 & 2: Brand Logo & Overview */}
           <div className="md:col-span-2 md:pr-8">
-            <img
-              src={media.footerLogo}
-              alt="Flavour & Co. Logo"
-              className="h-32 lg:h-36 w-auto object-contain mb-4"
-            />
+            <div className="flex flex-col items-center w-fit mb-5">
+              <img
+                src={media.footerLogo}
+                alt="Flavour & Co. Logo"
+                className="h-28 lg:h-32 w-auto object-contain"
+              />
+              <div className="flex flex-col items-center w-fit mt-2.5">
+                <span className="text-xs lg:text-sm font-extrabold tracking-[0.1em] uppercase text-brand-gold whitespace-nowrap leading-tight">
+                  Familiar Flavours
+                </span>
+                <div className="w-full flex justify-between text-[9px] lg:text-[10.5px] font-extrabold uppercase text-brand-gold leading-none mt-1 select-none">
+                  <span>R</span>
+                  <span>E</span>
+                  <span>I</span>
+                  <span>M</span>
+                  <span>A</span>
+                  <span>G</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>E</span>
+                  <span>D</span>
+                </div>
+              </div>
+            </div>
             <p className="text-sm leading-relaxed opacity-80">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
             </p>
@@ -188,11 +207,30 @@ export default function Footer() {
           
           {/* Section 1: Brand Logo & Overview */}
           <div className="space-y-4 text-left">
-            <img
-              src={media.footerLogo}
-              alt="Flavour & Co. Logo"
-              className="h-24 w-auto object-contain mb-3"
-            />
+            <div className="flex flex-col items-center w-fit">
+              <img
+                src={media.footerLogo}
+                alt="Flavour & Co. Logo"
+                className="h-22 w-auto object-contain"
+              />
+              <div className="flex flex-col items-center w-fit mt-2">
+                <span className="text-xs font-extrabold tracking-[0.1em] uppercase text-brand-gold whitespace-nowrap leading-tight">
+                  Familiar Flavours
+                </span>
+                <div className="w-full flex justify-between text-[9px] font-extrabold uppercase text-brand-gold leading-none mt-1 select-none">
+                  <span>R</span>
+                  <span>E</span>
+                  <span>I</span>
+                  <span>M</span>
+                  <span>A</span>
+                  <span>G</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>E</span>
+                  <span>D</span>
+                </div>
+              </div>
+            </div>
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
             </p>

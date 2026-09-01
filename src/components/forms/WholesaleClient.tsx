@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
-import { wholesaleBrands, wholesaleTestimonials } from "@/lib/data";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { useUIStore } from "@/store/ui.store";
 import { formatCustomerError } from "@/lib/error-formatter";
