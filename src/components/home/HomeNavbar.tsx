@@ -133,25 +133,11 @@ export default function HomeNavbar() {
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-[30px] sm:h-[34px] w-auto object-contain"
+                className="h-[38px] sm:h-[44px] w-auto object-contain"
               />
-              <div className="flex flex-col items-center w-fit mt-0.5">
-                <span className="text-[7.5px] sm:text-[8px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
-                  Familiar Flavours
-                </span>
-                <div className="w-full flex justify-between text-[5.5px] sm:text-[6px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
-                  <span>R</span>
-                  <span>E</span>
-                  <span>I</span>
-                  <span>M</span>
-                  <span>A</span>
-                  <span>G</span>
-                  <span>I</span>
-                  <span>N</span>
-                  <span>E</span>
-                  <span>D</span>
-                </div>
-              </div>
+              <span className="w-full text-center font-cormorant font-bold text-[6.5px] sm:text-[7.5px] tracking-[0.16em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight mt-0.5 select-none">
+                Familiar Flavours Reimagined
+              </span>
             </Link>
 
             {/* Right: Cart & Hamburger Menu */}
@@ -179,41 +165,27 @@ export default function HomeNavbar() {
           </div>
 
           {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
-          <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-1 gap-6">
+          <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-1.5 gap-6">
             {/* Left: Brand Logo & Tagline */}
             <Link href="/" className="shrink-0 flex flex-col items-center justify-center group transition-transform duration-300 hover:scale-105 py-1 px-2">
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-10 lg:h-12 xl:h-13 w-auto object-contain"
+                className="h-14 lg:h-16 xl:h-[72px] w-auto object-contain"
               />
-              <div className="flex flex-col items-center w-fit mt-1">
-                <span className="text-[8.5px] lg:text-[9.5px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
-                  Familiar Flavours
-                </span>
-                <div className="w-full flex justify-between text-[6.5px] lg:text-[7.5px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
-                  <span>R</span>
-                  <span>E</span>
-                  <span>I</span>
-                  <span>M</span>
-                  <span>A</span>
-                  <span>G</span>
-                  <span>I</span>
-                  <span>N</span>
-                  <span>E</span>
-                  <span>D</span>
-                </div>
-              </div>
+              <span className="w-full text-center font-cormorant font-bold text-[8.5px] lg:text-[9.5px] xl:text-[10px] tracking-[0.2em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight mt-0.5 select-none">
+                Familiar Flavours Reimagined
+              </span>
             </Link>
 
             {/* Center: Navigation Links */}
             <nav className="flex items-center gap-6 lg:gap-8">
-              <ul className="flex items-center gap-6 lg:gap-8 text-sm lg:text-base font-extrabold uppercase tracking-wider">
+              <ul className="flex items-center gap-6 lg:gap-8 text-sm lg:text-base font-black uppercase tracking-wider">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`transition-colors pb-1 ${pathname === link.href ? "text-primary font-black border-b-2 border-primary" : "text-primary/80 hover:text-primary font-extrabold"
+                      className={`transition-colors pb-1 font-black ${pathname === link.href ? "text-primary font-black border-b-2 border-primary" : "text-primary/90 hover:text-secondary font-black"
                         }`}
                     >
                       {link.label}
@@ -240,7 +212,7 @@ export default function HomeNavbar() {
                 aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-0.5 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-gold text-[9px] font-extrabold text-brand-green shadow-xs">
+                <span className="absolute -top-0.5 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-gold text-[9px] font-black text-brand-green shadow-xs">
                   {totalCartCount}
                 </span>
               </Link>
@@ -261,26 +233,26 @@ export default function HomeNavbar() {
                       className="h-8 w-8 rounded-full object-cover shadow-xs"
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs shadow-xs">
+                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-black text-xs shadow-xs">
                       {userInitial}
                     </div>
                   )}
                   <div className="hidden lg:flex flex-col text-left leading-none text-stone-800">
-                    <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Hey,</span>
-                    <span className="text-xs font-extrabold tracking-tight">{firstName}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider mb-0.5">Hey,</span>
+                    <span className="text-xs font-black tracking-tight">{firstName}</span>
                   </div>
                 </Link>
               ) : (
                 <div className="flex items-center gap-3 ml-2">
                   <Link
                     href="/sign-in"
-                    className="text-xs font-extrabold uppercase tracking-wider text-stone-700 hover:text-brand-green transition-colors cursor-pointer"
+                    className="text-xs font-black uppercase tracking-wider text-stone-800 hover:text-brand-green transition-colors cursor-pointer"
                   >
                     Log In
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="text-xs font-extrabold uppercase tracking-wider px-4 py-2 rounded-full bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green transition-all shadow-xs cursor-pointer inline-block"
+                    className="text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green transition-all shadow-xs cursor-pointer inline-block"
                   >
                     Sign Up
                   </Link>
@@ -313,29 +285,12 @@ export default function HomeNavbar() {
           <div>
             {/* Sidebar Header */}
             <div className="flex items-center justify-between pb-5 border-b border-secondary/15">
-              <Link href="/" onClick={() => setMobileOpen(false)} className="flex flex-col items-center gap-1">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="flex flex-col items-center">
                 <img
                   src={media.navbarLogo}
                   alt="Flavour & Co. Logo"
-                  className="h-11 w-auto object-contain"
+                  className="h-14 w-auto object-contain"
                 />
-                <div className="flex flex-col items-center w-fit">
-                  <span className="text-[8px] font-extrabold tracking-[0.08em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight">
-                    Familiar Flavours
-                  </span>
-                  <div className="w-full flex justify-between text-[6px] font-extrabold uppercase text-[#6b1e30] leading-none mt-0.5 select-none">
-                    <span>R</span>
-                    <span>E</span>
-                    <span>I</span>
-                    <span>M</span>
-                    <span>A</span>
-                    <span>G</span>
-                    <span>I</span>
-                    <span>N</span>
-                    <span>E</span>
-                    <span>D</span>
-                  </div>
-                </div>
               </Link>
               <button
                 type="button"
@@ -349,7 +304,7 @@ export default function HomeNavbar() {
 
             {/* Navigation Links */}
             <nav className="mt-6">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50 block mb-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 block mb-2">
                 Menu & Exploration
               </span>
               <ul className="flex flex-col space-y-1">
@@ -360,7 +315,7 @@ export default function HomeNavbar() {
                       <Link
                         href={link.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`flex items-center justify-between py-3 px-3 rounded-none text-sm font-bold uppercase tracking-wider transition-all ${isActive
+                        className={`flex items-center justify-between py-3 px-3 rounded-none text-sm font-black uppercase tracking-wider transition-all ${isActive
                           ? "bg-secondary/15 text-secondary border-l-4 border-secondary pl-4"
                           : "text-primary hover:bg-base-200 hover:text-secondary hover:pl-4"
                           }`}
@@ -396,13 +351,13 @@ export default function HomeNavbar() {
                   {user?.imageUrl ? (
                     <img src={user.imageUrl} alt={firstName} className="h-8 w-8 rounded-full object-cover shadow-xs" />
                   ) : (
-                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-bold text-xs">
+                    <div className="h-8 w-8 rounded-full bg-brand-green text-brand-gold flex items-center justify-center font-black text-xs">
                       {userInitial}
                     </div>
                   )}
                   <div className="text-left flex flex-col leading-none text-brand-green">
-                    <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Hey,</span>
-                    <span className="text-xs font-extrabold tracking-tight">{firstName}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider mb-0.5">Hey,</span>
+                    <span className="text-xs font-black tracking-tight">{firstName}</span>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-brand-green" />
@@ -412,7 +367,7 @@ export default function HomeNavbar() {
                 <Link
                   href="/sign-in"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 py-2.5 px-3 border border-brand-green bg-white text-xs font-bold uppercase tracking-wider text-brand-green hover:bg-brand-green/10 transition-all rounded-md cursor-pointer text-center"
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 border border-brand-green bg-white text-xs font-black uppercase tracking-wider text-brand-green hover:bg-brand-green/10 transition-all rounded-md cursor-pointer text-center"
                 >
                   <LogIn className="h-4 w-4" />
                   Log In
@@ -420,7 +375,7 @@ export default function HomeNavbar() {
                 <Link
                   href="/sign-up"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-brand-green text-white text-xs font-bold uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm cursor-pointer text-center"
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-brand-green text-white text-xs font-black uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm cursor-pointer text-center"
                 >
                   <UserPlus className="h-4 w-4" />
                   Sign Up
@@ -434,7 +389,7 @@ export default function HomeNavbar() {
               <Link
                 href="/contact"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 py-2 px-3 border border-secondary/20 bg-base-200 text-xs font-bold uppercase tracking-wider text-primary hover:border-secondary transition-all rounded-md"
+                className="flex items-center justify-center gap-2 py-2 px-3 border border-secondary/20 bg-base-200 text-xs font-black uppercase tracking-wider text-primary hover:border-secondary transition-all rounded-md"
               >
                 <HelpCircle className="h-4 w-4 text-secondary" />
                 Help & FAQ

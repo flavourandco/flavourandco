@@ -22,6 +22,7 @@
 
   --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
   --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-cormorant: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-geist: "Geist", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Geist", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }

@@ -81,23 +81,6 @@ export default function Footer() {
                 alt="Flavour & Co. Logo"
                 className="h-28 lg:h-32 w-auto object-contain"
               />
-              <div className="flex flex-col items-center w-fit mt-2.5">
-                <span className="text-xs lg:text-sm font-extrabold tracking-[0.1em] uppercase text-brand-gold whitespace-nowrap leading-tight">
-                  Familiar Flavours
-                </span>
-                <div className="w-full flex justify-between text-[9px] lg:text-[10.5px] font-extrabold uppercase text-brand-gold leading-none mt-1 select-none">
-                  <span>R</span>
-                  <span>E</span>
-                  <span>I</span>
-                  <span>M</span>
-                  <span>A</span>
-                  <span>G</span>
-                  <span>I</span>
-                  <span>N</span>
-                  <span>E</span>
-                  <span>D</span>
-                </div>
-              </div>
             </div>
             <p className="text-sm leading-relaxed opacity-80">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
@@ -213,23 +196,6 @@ export default function Footer() {
                 alt="Flavour & Co. Logo"
                 className="h-22 w-auto object-contain"
               />
-              <div className="flex flex-col items-center w-fit mt-2">
-                <span className="text-xs font-extrabold tracking-[0.1em] uppercase text-brand-gold whitespace-nowrap leading-tight">
-                  Familiar Flavours
-                </span>
-                <div className="w-full flex justify-between text-[9px] font-extrabold uppercase text-brand-gold leading-none mt-1 select-none">
-                  <span>R</span>
-                  <span>E</span>
-                  <span>I</span>
-                  <span>M</span>
-                  <span>A</span>
-                  <span>G</span>
-                  <span>I</span>
-                  <span>N</span>
-                  <span>E</span>
-                  <span>D</span>
-                </div>
-              </div>
             </div>
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
               Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.

@@ -20,14 +20,14 @@ export default function AnnouncementBar() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#E3A72B]/40 to-transparent z-20" />
 
       {/* Desktop View: Static Highlighted Text with Uniform Gold Color */}
-      <div className="hidden md:flex relative z-20 w-full items-center justify-center gap-2.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-[#E3A72B] drop-shadow-[0_0_14px_rgba(227,167,43,0.35)] px-4">
+      <div className="hidden md:flex relative z-20 w-full items-center justify-center gap-2.5 text-[11px] font-black uppercase tracking-[0.25em] text-[#E3A72B] drop-shadow-[0_0_14px_rgba(227,167,43,0.35)] px-4">
         <span>EXPRESS DELIVERY SYDNEY WIDE</span>
         <span className="opacity-60">•</span>
         <span>HANDCRAFTED GOURMET PIES</span>
       </div>
 
       {/* Mobile View: High-Visibility Rollover Loop */}
-      <div className="md:hidden relative z-20 overflow-hidden w-full text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#E3A72B] drop-shadow-[0_0_10px_rgba(227,167,43,0.3)]">
+      <div className="md:hidden relative z-20 overflow-hidden w-full text-[10px] font-black uppercase tracking-[0.2em] text-[#E3A72B] drop-shadow-[0_0_10px_rgba(227,167,43,0.3)]">
         <div className="animate-ticker flex whitespace-nowrap items-center">
           {[1, 2, 3].map((key) => (
             <span key={key} className="inline-flex items-center gap-2 px-4">
