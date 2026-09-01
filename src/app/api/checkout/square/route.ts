@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { createSquarePayment } from "@/lib/square";
 import { sendOrderConfirmationNotifications } from "@/lib/email/notifications";
+import { markSubscriberDiscountUsed } from "@/lib/subscribers";
 
 export async function POST(req: Request) {
   try {
@@ -144,7 +145,7 @@ export async function POST(req: Request) {
       })
       .eq("id", order.id);
 
-    // 7. Safely Dispatch Order Confirmation Notifications (Customer & Admin)
+    // 7. Safely Dispatch Order Confirmation Notifications & Mark Subscriber Discount Redeemed
     if (paymentStatus === "COMPLETED") {
       const updatedOrderSnapshot = {
         ...order,
@@ -154,10 +155,17 @@ export async function POST(req: Request) {
         status: "completed",
       };
 
-      // Non-blocking background side effect
+      // Non-blocking background side effect: emails
       sendOrderConfirmationNotifications(updatedOrderSnapshot).catch((emailErr) => {
         console.error("[CHECKOUT EMAIL TRIGGER ERROR]", emailErr);
       });
+
+      // Mark subscriber discount as redeemed for first order
+      if (order.customer_email) {
+        markSubscriberDiscountUsed(order.customer_email, order.order_number).catch((subErr) => {
+          console.warn("[SUBSCRIBER DISCOUNT MARK ERROR]", subErr);
+        });
+      }
     }
 
 

@@ -31,6 +31,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import ProductReviews from "@/components/products/ProductReviews";
 import RelatedProducts from "@/components/products/RelatedProducts";
+import { BoneyardProductDetailSkeleton } from "@/components/ui/BoneyardSkeleton";
 import { useEffect } from "react";
 
 export default function ProductDetailPage({
@@ -129,6 +130,16 @@ export default function ProductDetailPage({
   };
 
   if (!product) {
+    if (storeProducts.length === 0) {
+      return (
+        <PageLayout title="Loading..." subtitle="" fullWidth hideHeader={true}>
+          <div className="bg-cream min-h-screen pt-4 sm:pt-6">
+            <BoneyardProductDetailSkeleton />
+          </div>
+        </PageLayout>
+      );
+    }
+
     return (
       <PageLayout
         title="Product Not Found"
@@ -155,6 +166,23 @@ export default function ProductDetailPage({
     <PageLayout title={product.name} subtitle="" fullWidth hideHeader={true}>
       <div className="bg-cream text-stone-800 min-h-screen pt-4 sm:pt-6 md:pt-8 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
+          {/* Breadcrumb Navigation Bar */}
+          <div className="mb-5 sm:mb-7 flex items-center gap-2 text-xs font-semibold text-stone-500">
+            <Link
+              href="/shop"
+              className="hover:text-brand-green transition-colors inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Shop</span>
+            </Link>
+            <span className="text-stone-300">/</span>
+            <span className="capitalize">{product.category || "Gourmet Pies"}</span>
+            <span className="text-stone-300">/</span>
+            <span className="text-stone-900 font-bold truncate max-w-[180px] sm:max-w-none">
+              {product.name}
+            </span>
+          </div>
+
           {/* Main Grid: STABLE Left Column (Image & Side-by-Side CTAs) vs SCROLLABLE Right Column (Details) */}
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-12 items-start">
 

@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   Gift,
   HelpCircle,
+  Tag,
 } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import SquarePaymentForm from "@/components/checkout/SquarePaymentForm";
@@ -113,6 +114,8 @@ function StateSelector({
   );
 }
 
+import { BoneyardCartSkeleton } from "@/components/ui/BoneyardSkeleton";
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useUser();
@@ -139,8 +142,26 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  // Discount & Promo Code State
+  const [promoInput, setPromoInput] = useState("PIECLUB10");
+  const [isCheckingDiscount, setIsCheckingDiscount] = useState(false);
+  const [discountInfo, setDiscountInfo] = useState<{
+    eligible: boolean;
+    discountPercent: number;
+    discountCode: string;
+    reason?: string;
+  } | null>(null);
+
   useEffect(() => {
     setMounted(true);
+    try {
+      const savedEmail = localStorage.getItem("flavour_subscriber_email");
+      const savedCode = localStorage.getItem("flavour_applied_discount_code");
+      if (savedCode) setPromoInput(savedCode);
+      if (savedEmail) {
+        setFormData((prev) => ({ ...prev, email: prev.email || savedEmail }));
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -153,25 +174,69 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
+  // Auto-verify discount whenever email or promo code changes
+  const checkDiscount = async (emailToCheck: string, codeToCheck: string) => {
+    if (!emailToCheck || !emailToCheck.includes("@") || !codeToCheck.trim()) {
+      setDiscountInfo(null);
+      return;
+    }
+
+    setIsCheckingDiscount(true);
+    try {
+      const res = await fetch("/api/subscribers/check-discount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailToCheck.trim(), code: codeToCheck.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setDiscountInfo(data);
+      } else {
+        setDiscountInfo({
+          eligible: false,
+          discountPercent: 0,
+          discountCode: codeToCheck,
+          reason: data.error || "Discount could not be verified.",
+        });
+      }
+    } catch {
+      setDiscountInfo(null);
+    } finally {
+      setIsCheckingDiscount(false);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.email && formData.email.includes("@") && promoInput) {
+      const debounce = setTimeout(() => {
+        checkDiscount(formData.email, promoInput);
+      }, 500);
+      return () => clearTimeout(debounce);
+    }
+  }, [formData.email, promoInput]);
+
   if (!mounted) {
     return (
       <PageLayout title="Checkout" hideHeader fullWidth>
-        <div className="bg-[#fcfaf7] min-h-[75vh] flex flex-col items-center justify-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#6b1e30] border-t-transparent" />
-          <span className="text-xs font-serif font-semibold text-stone-500 uppercase tracking-widest">
-            Preparing your secure checkout...
-          </span>
+        <div className="bg-[#fdfbf7] min-h-[75vh] pt-4 sm:pt-6">
+          <BoneyardCartSkeleton />
         </div>
       </PageLayout>
     );
   }
 
   const subtotal = getSubtotal();
+  const isDiscountApplied = Boolean(discountInfo?.eligible && discountInfo.discountPercent > 0);
+  const discountAmount = isDiscountApplied
+    ? Math.round(subtotal * ((discountInfo?.discountPercent || 10) / 100) * 100) / 100
+    : 0;
+
   const deliveryQuote = getDeliveryQuote(subtotal, formData.postcode, freeDeliveryThreshold);
   const isPostcodeFilled = formData.postcode.trim().length === 4;
   const isDeliverable = !isPostcodeFilled || deliveryQuote.isDeliverable;
   const shippingFee = deliveryQuote.isDeliverable ? deliveryQuote.fee : 15;
-  const total = subtotal + shippingFee;
+  const netSubtotal = Math.max(0, subtotal - discountAmount);
+  const total = Math.round((netSubtotal + shippingFee) * 100) / 100;
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -229,6 +294,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items,
           customer: formData,
+          discountCode: isDiscountApplied ? promoInput : undefined,
         }),
       });
 
@@ -351,9 +417,15 @@ export default function CheckoutPage() {
                     </div>
                     <div className="text-xs space-y-1 text-stone-600 pt-1 border-t border-stone-100">
                       <div className="flex justify-between">
-                        <span>Subtotal</span>
+                        <span>Items Subtotal</span>
                         <span className="font-mono">A${subtotal.toFixed(2)}</span>
                       </div>
+                      {isDiscountApplied && (
+                        <div className="flex justify-between text-emerald-700 font-semibold">
+                          <span>Offer Applied</span>
+                          <span className="font-mono">-A${discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span>Delivery</span>
                         <span className="font-mono">{shippingFee === 0 ? "FREE" : `A$${shippingFee.toFixed(2)}`}</span>
@@ -670,12 +742,65 @@ export default function CheckoutPage() {
                     ))}
                   </div>
 
+                  {/* Promo Code Input Box */}
+                  <div className="pt-2 border-t border-stone-100 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-stone-700">
+                        Discount Code
+                      </span>
+                      {isDiscountApplied && (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          Offer Applied
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                        placeholder="e.g. PIECLUB10"
+                        className="flex-1 px-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-md font-mono uppercase font-bold text-stone-800 focus:bg-white focus:outline-none focus:border-[#6b1e30]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => checkDiscount(formData.email, promoInput)}
+                        disabled={isCheckingDiscount || !promoInput.trim()}
+                        className={`px-3.5 py-2 text-xs font-bold rounded-md transition-colors cursor-pointer disabled:opacity-50 ${
+                          isDiscountApplied
+                            ? "bg-emerald-700 hover:bg-emerald-800 text-white"
+                            : "bg-stone-900 hover:bg-stone-800 text-white"
+                        }`}
+                      >
+                        {isCheckingDiscount ? "Checking..." : isDiscountApplied ? "Applied" : "Apply"}
+                      </button>
+                    </div>
+                    {discountInfo && (
+                      <div
+                        className={`text-[11px] p-2 rounded-md font-medium ${
+                          discountInfo.eligible
+                            ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            : "bg-amber-50 text-amber-900 border border-amber-200"
+                        }`}
+                      >
+                        {discountInfo.eligible ? "Applied" : (discountInfo.reason || "Coupon not applicable")}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Financial Totals Breakdown */}
                   <div className="space-y-2.5 pt-3 border-t border-stone-100 text-xs text-stone-700">
                     <div className="flex justify-between">
                       <span className="text-stone-500">Items Subtotal</span>
                       <span className="font-bold font-mono text-stone-900">A${subtotal.toFixed(2)}</span>
                     </div>
+
+                    {isDiscountApplied && (
+                      <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50/80 px-2 py-1 rounded">
+                        <span>Offer Applied</span>
+                        <span className="font-mono">-A${discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
 
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1.5">
@@ -692,8 +817,8 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="flex justify-between text-[10px] text-stone-400">
-                      <span>GST (10% Included)</span>
-                      <span className="font-mono">A${((total * 10) / 110).toFixed(2)}</span>
+                      <span>Taxes</span>
+                      <span className="font-medium">Included</span>
                     </div>
 
                     {/* Total Highlight */}

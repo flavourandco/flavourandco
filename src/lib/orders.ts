@@ -1,6 +1,7 @@
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { calculateShippingFee, isValidAustralianPostcode, isSydney50KmPostcode } from "@/lib/shipping";
 import { getFreeDeliveryThresholdServer } from "@/lib/settings";
+import { checkFirstOrderDiscountEligibility } from "@/lib/subscribers";
 
 export interface OrderItemInput {
   id: string;
@@ -30,6 +31,9 @@ export interface ValidatedOrderItem {
 export interface AuthoritativeOrderTotals {
   validatedItems: ValidatedOrderItem[];
   subtotal: number;
+  discountAmount: number;
+  discountCode?: string;
+  discountReason?: string;
   shippingFee: number;
   taxAmount: number;
   totalAmount: number;
@@ -65,7 +69,9 @@ function normalizeKey(val?: string | null): string {
  */
 export async function calculateAuthoritativeOrderTotals(
   rawItems: OrderItemInput[],
-  postcode: string
+  postcode: string,
+  customerEmail?: string,
+  discountCode?: string
 ): Promise<AuthoritativeOrderTotals> {
   if (!rawItems || rawItems.length === 0) {
     throw new Error("Cart is empty.");
@@ -210,12 +216,31 @@ export async function calculateAuthoritativeOrderTotals(
   // Round subtotal to 2 decimal places
   subtotal = Math.round(subtotal * 100) / 100;
 
+  // Calculate first-order subscriber discount if applicable
+  let discountAmount = 0;
+  let appliedCode: string | undefined = undefined;
+  let discountReason: string | undefined = undefined;
+
+  if (customerEmail && discountCode) {
+    try {
+      const discountCheck = await checkFirstOrderDiscountEligibility(customerEmail, discountCode);
+      if (discountCheck.eligible && discountCheck.discountPercent > 0) {
+        discountAmount = Math.round(subtotal * (discountCheck.discountPercent / 100) * 100) / 100;
+        appliedCode = discountCheck.discountCode;
+        discountReason = discountCheck.reason;
+      }
+    } catch (e) {
+      console.warn("Discount calculation warning:", e);
+    }
+  }
+
   // Fetch dynamic free delivery threshold from settings
   const freeDeliveryThreshold = await getFreeDeliveryThresholdServer();
 
   // Calculate express shipping fee based on postcode & subtotal threshold
   const shippingFee = calculateShippingFee(subtotal, postcode, freeDeliveryThreshold);
-  const totalAmount = Math.round((subtotal + shippingFee) * 100) / 100;
+  const netSubtotal = Math.max(0, subtotal - discountAmount);
+  const totalAmount = Math.round((netSubtotal + shippingFee) * 100) / 100;
   const totalAmountCents = Math.round(totalAmount * 100);
 
   // 10% GST included in AUD total
@@ -224,6 +249,9 @@ export async function calculateAuthoritativeOrderTotals(
   return {
     validatedItems,
     subtotal,
+    discountAmount,
+    discountCode: appliedCode,
+    discountReason,
     shippingFee,
     taxAmount,
     totalAmount,

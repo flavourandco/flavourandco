@@ -23,7 +23,7 @@ export default function PageLayout({
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-cream pt-[88px] sm:pt-[96px] md:pt-[104px]">
+      <main className="min-h-screen bg-cream pt-[104px] sm:pt-[116px] md:pt-[128px] lg:pt-[136px]">
         {!hideHeader && (
           <PageHeader title={title} subtitle={subtitle} eyebrow={eyebrow} />
         )}

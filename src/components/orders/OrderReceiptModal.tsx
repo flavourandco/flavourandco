@@ -347,8 +347,8 @@ export default function OrderReceiptModal({
               </div>
 
               <div className="flex items-center justify-between text-stone-500 text-[11px] pt-1 border-t border-stone-200 whitespace-nowrap">
-                <span>Includes GST (10% Tax)</span>
-                <span className="font-mono">A${gstAmount.toFixed(2)}</span>
+                <span>Taxes</span>
+                <span className="font-medium">Included</span>
               </div>
 
               <div className="flex items-center justify-between pt-2.5 border-t-2 border-[#07402b] whitespace-nowrap">

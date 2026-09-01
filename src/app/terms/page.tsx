@@ -56,7 +56,7 @@ export default function TermsPage() {
         <section className="bg-white p-6 sm:p-8 rounded-xl border border-secondary/15 shadow-sm space-y-3">
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary">2. Orders, Pricing &amp; Availability</h2>
           <p>
-            All prices are listed in Australian Dollars ($AUD) and include GST unless stated otherwise. Products are subject to availability. Flavour &amp; Co. reserves the right to decline or adjust orders in the event of stock limitations or pricing errors.
+            All prices are listed in Australian Dollars ($AUD) and include applicable taxes unless stated otherwise. Products are subject to availability. Flavour &amp; Co. reserves the right to decline or adjust orders in the event of stock limitations or pricing errors.
           </p>
         </section>
 

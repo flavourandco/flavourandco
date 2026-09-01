@@ -183,9 +183,9 @@ export const AdminNewOrder: React.FC<{ order: EmailOrderData }> = ({ order }) =>
               </td>
             </tr>
             <tr>
-              <td style={{ padding: "4px 0", fontSize: "11px", color: "#78716c" }}>GST Included:</td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "11px", fontFamily: "monospace", color: "#78716c" }}>
-                ${order.taxAmount.toFixed(2)} AUD
+              <td style={{ padding: "4px 0", fontSize: "11px", color: "#78716c" }}>Taxes:</td>
+              <td align="right" style={{ padding: "4px 0", fontSize: "11px", color: "#78716c" }}>
+                Included in total
               </td>
             </tr>
             <tr>

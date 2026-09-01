@@ -357,8 +357,8 @@ function SuccessContent() {
             </div>
 
             <div className="flex justify-between text-[10px] text-stone-400">
-              <span>GST (10% Included)</span>
-              <span className="font-mono">A${((order.totalAmount * 10) / 110).toFixed(2)}</span>
+              <span>Taxes</span>
+              <span className="font-medium">Included</span>
             </div>
 
             {/* Total Highlight */}

@@ -125,19 +125,16 @@ export default function HomeNavbar() {
               </button>
             </div>
 
-            {/* Center: Brand Logo & Tagline */}
+            {/* Center: Brand Logo */}
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 z-10 py-1 px-2 text-center"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 transition-transform duration-300 hover:scale-105 z-10 py-1 px-3 block"
             >
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-[38px] sm:h-[44px] w-auto object-contain"
+                className="h-[44px] sm:h-[50px] w-auto object-contain"
               />
-              <span className="w-full text-center font-cormorant font-bold text-[6.5px] sm:text-[7.5px] tracking-[0.16em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight mt-0.5 select-none">
-                Familiar Flavours Reimagined
-              </span>
             </Link>
 
             {/* Right: Cart & Hamburger Menu */}
@@ -166,16 +163,13 @@ export default function HomeNavbar() {
 
           {/* DESKTOP VIEW NAVBAR (hidden md:flex) */}
           <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-1.5 gap-6">
-            {/* Left: Brand Logo & Tagline */}
-            <Link href="/" className="shrink-0 flex flex-col items-center justify-center group transition-transform duration-300 hover:scale-105 py-1 px-2">
+            {/* Left: Brand Logo */}
+            <Link href="/" className="shrink-0 transition-transform duration-300 hover:scale-105 py-1.5 px-3 block">
               <img
                 src={media.navbarLogo}
                 alt="Flavour & Co. Logo"
-                className="h-14 lg:h-16 xl:h-[72px] w-auto object-contain"
+                className="h-14 lg:h-16 xl:h-[72px] w-auto object-contain max-h-20"
               />
-              <span className="w-full text-center font-cormorant font-bold text-[8.5px] lg:text-[9.5px] xl:text-[10px] tracking-[0.2em] uppercase text-[#6b1e30] whitespace-nowrap leading-tight mt-0.5 select-none">
-                Familiar Flavours Reimagined
-              </span>
             </Link>
 
             {/* Center: Navigation Links */}

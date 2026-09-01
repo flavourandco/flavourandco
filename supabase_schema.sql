@@ -217,3 +217,26 @@ CREATE POLICY "Public Users Select" ON public.users FOR SELECT USING (true);
 CREATE POLICY "Public Users Insert" ON public.users FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Users Update" ON public.users FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Public Users Delete" ON public.users FOR DELETE USING (true);
+
+-- 7. SUBSCRIBERS TABLE
+CREATE TABLE IF NOT EXISTS public.subscribers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    discount_code TEXT DEFAULT 'PIECLUB10',
+    discount_used BOOLEAN DEFAULT FALSE,
+    first_order_id TEXT,
+    source TEXT DEFAULT 'offer_modal',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_email ON public.subscribers (LOWER(email));
+CREATE INDEX IF NOT EXISTS idx_subscribers_discount_used ON public.subscribers (discount_used);
+
+ALTER TABLE public.subscribers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Subscribers Insert" ON public.subscribers;
+CREATE POLICY "Public Subscribers Insert" ON public.subscribers FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Subscribers Select" ON public.subscribers;
+CREATE POLICY "Public Subscribers Select" ON public.subscribers FOR SELECT USING (true);
+CREATE POLICY "Admin Subscribers All" ON public.subscribers FOR ALL USING (true);
+

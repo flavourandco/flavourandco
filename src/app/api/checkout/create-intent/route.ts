@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { userId } = await auth();
 
     const body = await req.json();
-    const { items, customer } = body;
+    const { items, customer, discountCode } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty." }, { status: 400 });
@@ -29,8 +29,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Calculate Authoritative Total using DB prices (ignoring client unitPrices)
-    const totals = await calculateAuthoritativeOrderTotals(items, customer.postcode);
+    // 2. Calculate Authoritative Total using DB prices (ignoring client unitPrices) with discount validation
+    const totals = await calculateAuthoritativeOrderTotals(
+      items,
+      customer.postcode,
+      customer.email,
+      discountCode
+    );
 
     // 3. Generate Unique Order ID and Idempotency Key
     const orderNumber = `FC-ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -78,6 +83,8 @@ export async function POST(req: Request) {
         variantName: it.variantName,
       })),
       subtotal: totals.subtotal,
+      discount_amount: totals.discountAmount || 0,
+      discount_code: totals.discountCode || null,
       shipping_fee: totals.shippingFee,
       tax_amount: totals.taxAmount,
       total_amount: totals.totalAmount,
@@ -104,7 +111,7 @@ export async function POST(req: Request) {
     if (!e1 && d1) {
       orderData = d1;
     } else {
-      // Fallback: If remote DB schema cache is missing idempotency_key or user_id column (PGRST204)
+      // Fallback: If remote DB schema cache is missing extended columns (PGRST204)
       console.warn("Retrying order insert without extended columns:", e1?.message);
       const { data: d2, error: e2 } = await supabase
         .from("orders")
@@ -142,6 +149,11 @@ export async function POST(req: Request) {
       orderId: orderData.id,
       orderNumber,
       idempotencyKey,
+      subtotal: totals.subtotal,
+      discountAmount: totals.discountAmount,
+      discountCode: totals.discountCode,
+      discountReason: totals.discountReason,
+      shippingFee: totals.shippingFee,
       totalAmount: totals.totalAmount,
       totalAmountCents: totals.totalAmountCents,
       currency: "AUD",

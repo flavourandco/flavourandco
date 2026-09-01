@@ -12,6 +12,7 @@ import {
   Users,
   FileSpreadsheet,
   Mail,
+  MailCheck,
   Star,
   BookOpenText,
   Menu,
@@ -39,6 +40,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
   const navItems = [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Customers", href: "/admin/users", icon: Users },
+    { label: "Subscribers", href: "/admin/subscribers", icon: MailCheck },
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
     { label: "Wholesale Inquiries", href: "/admin/wholesale", icon: FileSpreadsheet },

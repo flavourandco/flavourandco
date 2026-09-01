@@ -19,15 +19,25 @@ import {
   ChevronRight,
   Clock,
   Heart,
+  Tag,
 } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import Button from "@/components/ui/Button";
 import { useCartStore } from "@/store/cart.store";
 import { getValidProductImages } from "@/lib/media";
+import { BoneyardCartSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function CartPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [promoCode, setPromoCode] = useState("PIECLUB10");
+  const [subscriberEmail, setSubscriberEmail] = useState("");
+  const [isCheckingPromo, setIsCheckingPromo] = useState(false);
+  const [discountInfo, setDiscountInfo] = useState<{
+    eligible: boolean;
+    discountPercent: number;
+    reason?: string;
+  } | null>(null);
 
   const items = useCartStore((s) => s.items);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
@@ -41,7 +51,45 @@ export default function CartPage() {
 
   useEffect(() => {
     setMounted(true);
+    try {
+      const savedEmail = localStorage.getItem("flavour_subscriber_email");
+      const savedCode = localStorage.getItem("flavour_applied_discount_code");
+      if (savedCode) setPromoCode(savedCode);
+      if (savedEmail) setSubscriberEmail(savedEmail);
+    } catch {}
   }, []);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setIsCheckingPromo(true);
+    try {
+      const res = await fetch("/api/subscribers/check-discount", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: subscriberEmail || "guest@check.com", code: promoCode.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setDiscountInfo(data);
+      } else {
+        setDiscountInfo({
+          eligible: false,
+          discountPercent: 0,
+          reason: data.error || "Promo code not applicable.",
+        });
+      }
+    } catch {
+      setDiscountInfo(null);
+    } finally {
+      setIsCheckingPromo(false);
+    }
+  };
+
+  useEffect(() => {
+    if (subscriberEmail && promoCode) {
+      handleApplyPromo();
+    }
+  }, [subscriberEmail]);
 
   if (!mounted) {
     return (
@@ -51,19 +99,21 @@ export default function CartPage() {
         fullWidth
         hideHeader
       >
-        <div className="bg-[#fdfbf7] min-h-[75vh] flex flex-col items-center justify-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#6b1e30] border-t-transparent" />
-          <span className="text-xs font-serif font-semibold text-stone-500 uppercase tracking-widest">
-            Loading your cart...
-          </span>
+        <div className="bg-[#fdfbf7] min-h-[75vh] pt-4 sm:pt-6">
+          <BoneyardCartSkeleton />
         </div>
       </PageLayout>
     );
   }
 
   const subtotal = getSubtotal();
+  const isDiscountApplied = Boolean(discountInfo?.eligible && discountInfo.discountPercent > 0);
+  const discountAmount = isDiscountApplied
+    ? Math.round(subtotal * ((discountInfo?.discountPercent || 10) / 100) * 100) / 100
+    : 0;
+  const netSubtotal = Math.max(0, subtotal - discountAmount);
   const shippingFee = getShippingFee();
-  const total = getTotal();
+  const total = netSubtotal;
   const progressToFreeShipping = Math.min(100, (subtotal / freeShippingThreshold) * 100);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const totalItemsCount = items.reduce((acc, i) => acc + i.quantity, 0);
@@ -336,11 +386,64 @@ export default function CartPage() {
                     </span>
                   </div>
 
+                  {/* Promo Code Input Box */}
+                  <div className="pt-2 border-t border-stone-100 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-stone-700">
+                        <span>Have a discount code?</span>
+                      </span>
+                      {isDiscountApplied && (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          Offer Applied
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        placeholder="e.g. PIECLUB10"
+                        className="flex-1 px-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-md font-mono uppercase font-bold text-stone-800 focus:bg-white focus:outline-none focus:border-[#6b1e30]"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromo}
+                        disabled={isCheckingPromo || !promoCode.trim()}
+                        className={`px-3.5 py-2 text-xs font-bold rounded-md transition-colors cursor-pointer disabled:opacity-50 ${
+                          isDiscountApplied
+                            ? "bg-emerald-700 hover:bg-emerald-800 text-white"
+                            : "bg-stone-900 hover:bg-stone-800 text-white"
+                        }`}
+                      >
+                        {isCheckingPromo ? "Checking..." : isDiscountApplied ? "Applied" : "Apply"}
+                      </button>
+                    </div>
+                    {discountInfo && (
+                      <div
+                        className={`text-[11px] p-2 rounded-md font-medium ${
+                          discountInfo.eligible
+                            ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            : "bg-amber-50 text-amber-900 border border-amber-200"
+                        }`}
+                      >
+                        {discountInfo.eligible ? "Applied" : (discountInfo.reason || "Coupon not applicable")}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-3.5 text-xs text-stone-700">
                     <div className="flex items-center justify-between">
                       <span className="text-stone-500">Items Subtotal</span>
                       <span className="font-bold font-mono text-stone-900 text-sm">A${subtotal.toFixed(2)}</span>
                     </div>
+
+                    {isDiscountApplied && (
+                      <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50/80 px-2.5 py-1.5 rounded-md border border-emerald-200">
+                        <span>Offer Applied</span>
+                        <span className="font-mono text-sm">-A${discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
@@ -357,8 +460,8 @@ export default function CartPage() {
                     </div>
 
                     <div className="flex justify-between text-[11px] text-stone-400">
-                      <span>GST (10% Included)</span>
-                      <span className="font-mono">A${((total * 10) / 110).toFixed(2)}</span>
+                      <span>Taxes</span>
+                      <span className="font-medium">Included in price</span>
                     </div>
 
                     {/* Total Highlight */}
@@ -368,7 +471,7 @@ export default function CartPage() {
                         <span className="text-xs text-stone-400 font-medium">Delivery fee calculated next</span>
                       </div>
                       <span className="font-mono text-2xl sm:text-3xl font-black text-[#6b1e30]">
-                        A${subtotal.toFixed(2)} <span className="text-xs font-sans font-bold text-stone-600">AUD</span>
+                        A${total.toFixed(2)} <span className="text-xs font-sans font-bold text-stone-600">AUD</span>
                       </span>
                     </div>
                   </div>

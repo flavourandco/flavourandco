@@ -165,3 +165,15 @@ export interface UserProfile {
   imageUrl?: string;
   createdAt?: string;
 }
+
+export interface Subscriber {
+  id: string;
+  email: string;
+  discountCode: string;
+  discountUsed: boolean;
+  firstOrderId?: string | null;
+  source: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+

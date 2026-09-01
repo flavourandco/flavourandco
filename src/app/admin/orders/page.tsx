@@ -569,8 +569,8 @@ export default function AdminOrdersPage() {
                     <span className="font-mono">${(selectedOrder.shippingFee || 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
-                    <span>GST (Includes 10%):</span>
-                    <span className="font-mono">${(selectedOrder.taxAmount || 0).toFixed(2)}</span>
+                    <span>Taxes:</span>
+                    <span className="font-medium">Included</span>
                   </div>
                   <div className="flex justify-between text-slate-900 font-extrabold pt-1.5 border-t border-slate-200 text-sm">
                     <span>Total Paid:</span>
