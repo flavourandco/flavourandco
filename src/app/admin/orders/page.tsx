@@ -24,6 +24,7 @@ import { useUIStore } from "@/store/ui.store";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 import { notifyContentUpdated, subscribeToRealtimeUpdates } from "@/lib/realtime";
+import { exportOrdersToCSV } from "@/lib/csv-export";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -187,14 +188,48 @@ export default function AdminOrdersPage() {
       estimatedDelivery.trim() !== (selectedOrder.estimatedDelivery || "").trim())
   );
 
+  const handleExportCSV = () => {
+    const listToExport = filteredOrders.length > 0 ? filteredOrders : orders;
+    if (listToExport.length === 0) {
+      addToast("No orders available to export.", "error");
+      return;
+    }
+    exportOrdersToCSV(listToExport);
+    addToast(`Exported ${listToExport.length} order(s) to formatted CSV.`, "success");
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="pb-4 border-b border-slate-200/80">
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Order Fulfilment &amp; Transactions</h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          View customer purchases, Square payment details, delivery addresses, and status updates.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Order Fulfilment &amp; Transactions</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            View customer purchases, Square payment details, delivery addresses, and status updates.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={fetchOrders}
+            disabled={loading}
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-sm shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+            title="Refresh orders"
+          >
+            <Clock className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-sm shadow-2xs transition-all cursor-pointer"
+            title="Download orders list as Excel-compatible CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter & Search Toolbar */}

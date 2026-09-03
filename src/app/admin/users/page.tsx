@@ -13,10 +13,15 @@ import {
   Mail,
   Calendar,
   Database,
+  Download,
+  Phone,
+  ShoppingBag,
 } from "lucide-react";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { useUIStore } from "@/store/ui.store";
+import { exportCustomersToCSV, ExportCustomerItem } from "@/lib/csv-export";
 
-interface AdminUser {
+export interface AdminUser extends ExportCustomerItem {
   id?: string;
   clerk_user_id: string;
   email: string;
@@ -25,6 +30,10 @@ interface AdminUser {
   image_url?: string;
   created_at: string;
   updated_at?: string;
+  orders_count?: number;
+  total_spent?: number;
+  phone?: string;
+  last_order_date?: string;
 }
 
 export default function AdminUsersPage() {
@@ -42,6 +51,8 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  const addToast = useUIStore((s) => s.addToast);
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -53,13 +64,13 @@ export default function AdminUsersPage() {
       } else {
         setFeedback({
           type: "error",
-          message: data.error || "Failed to load users from database.",
+          message: data.error || "Failed to load customers from database.",
         });
       }
     } catch (err: any) {
       setFeedback({
         type: "error",
-        message: err.message || "Network error fetching users.",
+        message: err.message || "Network error fetching customers.",
       });
     } finally {
       setLoading(false);
@@ -81,18 +92,21 @@ export default function AdminUsersPage() {
           type: "success",
           message: data.message || `Synced ${data.syncedCount || 0} user(s) into database successfully!`,
         });
+        addToast("Customers synced with Clerk successfully.", "success");
         await fetchUsers();
       } else {
         setFeedback({
           type: "error",
           message: data.error || "Failed to sync users with Clerk.",
         });
+        addToast(data.error || "Failed to sync customers.", "error");
       }
     } catch (err: any) {
       setFeedback({
         type: "error",
         message: err.message || "Error triggering user sync.",
       });
+      addToast("Network error syncing customers.", "error");
     } finally {
       setSyncing(false);
     }
@@ -111,7 +125,8 @@ export default function AdminUsersPage() {
         !query ||
         u.name.toLowerCase().includes(query) ||
         u.email.toLowerCase().includes(query) ||
-        u.clerk_user_id.toLowerCase().includes(query);
+        u.clerk_user_id.toLowerCase().includes(query) ||
+        (u.phone && u.phone.toLowerCase().includes(query));
 
       const matchesRole = roleFilter === "all" ? true : userRole === roleFilter;
       return matchesSearch && matchesRole;
@@ -141,6 +156,17 @@ export default function AdminUsersPage() {
     };
   }, [users]);
 
+  const handleExportCSV = () => {
+    const listToExport = sortedUsers.length > 0 ? sortedUsers : users;
+    if (listToExport.length === 0) {
+      addToast("No customers available to export.", "error");
+      return;
+    }
+
+    exportCustomersToCSV(listToExport);
+    addToast(`Exported ${listToExport.length} customer(s) to formatted CSV.`, "success");
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Page Title & Actions Header */}
@@ -154,19 +180,45 @@ export default function AdminUsersPage() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5 font-medium">
-            Manage customer accounts fetched strictly from your Supabase database.
+            Manage customer accounts, view order history, and export data directly to Excel-formatted CSV.
           </p>
         </div>
 
-        {/* Sync Button */}
-        <button
-          onClick={handleSyncWithClerk}
-          disabled={syncing}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-all shadow-2xs disabled:opacity-50 cursor-pointer border border-slate-800 shrink-0"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-          <span>{syncing ? "Syncing..." : "Sync with Clerk"}</span>
-        </button>
+        {/* Action Buttons Toolbar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Refresh Button */}
+          <button
+            type="button"
+            onClick={fetchUsers}
+            disabled={loading}
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-sm shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+            title="Refresh list"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          </button>
+
+          {/* Export CSV Button */}
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-sm shadow-2xs transition-all cursor-pointer"
+            title="Download customer list as Excel-compatible CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export CSV</span>
+          </button>
+
+          {/* Sync Button */}
+          <button
+            type="button"
+            onClick={handleSyncWithClerk}
+            disabled={syncing}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-all shadow-2xs disabled:opacity-50 cursor-pointer border border-slate-800 shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            <span>{syncing ? "Syncing..." : "Sync with Clerk"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Alert / Feedback Notification */}
@@ -187,8 +239,9 @@ export default function AdminUsersPage() {
             <span>{feedback.message}</span>
           </div>
           <button
+            type="button"
             onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-700 text-xs font-bold"
+            className="text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
           >
             ✕
           </button>
@@ -257,7 +310,7 @@ export default function AdminUsersPage() {
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
-              placeholder="Search customers by name, email, or Clerk ID..."
+              placeholder="Search customers by name, email, phone, or Clerk ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-sm py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 transition-all"
@@ -272,9 +325,9 @@ export default function AdminUsersPage() {
               onChange={(e) => setRoleFilter(e.target.value as any)}
               className="bg-slate-50 border border-slate-200 rounded-sm py-1.5 px-3 text-xs text-slate-900 font-medium focus:outline-none"
             >
-              <option value="all">All Roles</option>
-              <option value="user">Customers (user)</option>
-              <option value="admin">Admins (admin)</option>
+              <option value="all">All Roles ({totalUsersCount})</option>
+              <option value="user">Customers ({customerUsersCount})</option>
+              <option value="admin">Admins ({adminUsersCount})</option>
             </select>
           </div>
         </div>
@@ -286,6 +339,9 @@ export default function AdminUsersPage() {
           <div className="py-12 text-center text-slate-400 space-y-2">
             <Users className="w-8 h-8 mx-auto text-slate-300" />
             <p className="text-xs font-semibold text-slate-600">No customers found</p>
+            <p className="text-[11px] text-slate-400">
+              {searchQuery ? `No results match "${searchQuery}".` : "No registered customers found in database."}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -293,7 +349,8 @@ export default function AdminUsersPage() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Customer Profile</th>
-                  <th className="py-3 px-4">Email Address</th>
+                  <th className="py-3 px-4">Contact Details</th>
+                  <th className="py-3 px-4">Orders &amp; Spend</th>
                   <th className="py-3 px-4">Role</th>
                   <th className="py-3 px-4">Clerk User ID</th>
                   <th className="py-3 px-4 text-right">Joined Date</th>
@@ -307,16 +364,19 @@ export default function AdminUsersPage() {
                     (currentEmail && u.email.toLowerCase() === currentEmail);
 
                   const dateStr = u.created_at
-                    ? new Date(u.created_at).toLocaleDateString("en-US", {
+                    ? new Date(u.created_at).toLocaleDateString("en-AU", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                       })
                     : "Recently";
 
+                  const orderCount = typeof u.orders_count === "number" ? u.orders_count : 0;
+                  const totalSpent = typeof u.total_spent === "number" ? u.total_spent : 0;
+
                   return (
                     <tr
-                      key={u.clerk_user_id}
+                      key={u.clerk_user_id || u.email}
                       className={
                         isYou
                           ? "bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors"
@@ -339,7 +399,7 @@ export default function AdminUsersPage() {
                           )}
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-slate-900 block text-xs">{u.name}</span>
+                              <span className="font-bold text-slate-900 block text-xs">{u.name || "Customer"}</span>
                               {isYou && (
                                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded-sm border border-emerald-200 shrink-0">
                                   (You)
@@ -351,11 +411,34 @@ export default function AdminUsersPage() {
                         </div>
                       </td>
 
-                      {/* Email */}
+                      {/* Email & Phone */}
                       <td className="py-3 px-4 font-mono text-[11px] text-slate-800">
-                        <div className="flex items-center gap-1.5">
-                          <Mail className="w-3 h-3 text-slate-400 shrink-0" />
-                          <span>{u.email}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="select-all">{u.email}</span>
+                          </div>
+                          {u.phone && (
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                              <Phone className="w-3 h-3 text-slate-400 shrink-0" />
+                              <span>{u.phone}</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Orders & Spend */}
+                      <td className="py-3 px-4">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <ShoppingBag className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="font-bold text-slate-900 text-xs">
+                              {orderCount} {orderCount === 1 ? "Order" : "Orders"}
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-semibold text-emerald-700">
+                            ${totalSpent.toFixed(2)} AUD
+                          </span>
                         </div>
                       </td>
 
@@ -381,7 +464,7 @@ export default function AdminUsersPage() {
 
                       {/* Clerk ID */}
                       <td className="py-3 px-4 font-mono text-[10px] text-slate-500">
-                        <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-slate-600 font-medium">
+                        <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-slate-600 font-medium select-all">
                           {u.clerk_user_id}
                         </span>
                       </td>

@@ -19,6 +19,7 @@ import { Subscriber } from "@/lib/types";
 import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 import { useUIStore } from "@/store/ui.store";
 import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { exportSubscribersToCSV } from "@/lib/csv-export";
 
 export default function AdminSubscribersPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -150,30 +151,14 @@ export default function AdminSubscribersPage() {
   };
 
   const handleExportCSV = () => {
-    if (subscribers.length === 0) {
+    const listToExport = filteredSubscribers.length > 0 ? filteredSubscribers : subscribers;
+    if (listToExport.length === 0) {
       addToast("No subscribers to export.", "error");
       return;
     }
 
-    const headers = ["Email", "Discount Code", "First Order Discount Used", "First Order ID", "Source", "Subscribed At"];
-    const rows = filteredSubscribers.map((s) => [
-      `"${s.email}"`,
-      `"${s.discountCode || "PIECLUB10"}"`,
-      s.discountUsed ? "Yes" : "No",
-      `"${s.firstOrderId || ""}"`,
-      `"${s.source || "offer_modal"}"`,
-      `"${new Date(s.createdAt).toLocaleString()}"`,
-    ]);
-
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `flavour-co-subscribers-${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    addToast("Exported subscribers to CSV.", "success");
+    exportSubscribersToCSV(listToExport);
+    addToast(`Exported ${listToExport.length} subscriber(s) to formatted CSV.`, "success");
   };
 
   const totalCount = subscribers.length;
