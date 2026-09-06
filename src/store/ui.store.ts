@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { toast } from "react-hot-toast";
+import { formatCustomerError } from "@/lib/error-formatter";
 
 interface ToastNotification {
   id: string;
@@ -38,13 +39,14 @@ export const useUIStore = create<UIState>((set) => ({
 
   addToast: (message, type = "info") => {
     if (!message) return;
-    const toastId = `${type}:${message.trim()}`;
+    const finalMessage = type === "error" ? formatCustomerError(message) : message;
+    const toastId = `${type}:${finalMessage.trim()}`;
     if (type === "success") {
-      toast.success(message, { id: toastId });
+      toast.success(finalMessage, { id: toastId });
     } else if (type === "error") {
-      toast.error(message, { id: toastId });
+      toast.error(finalMessage, { id: toastId });
     } else {
-      toast(message, { id: toastId });
+      toast(finalMessage, { id: toastId });
     }
   },
 

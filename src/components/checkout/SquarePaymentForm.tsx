@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { CreditCard, Lock, CheckCircle2, AlertCircle, Info, MapPin } from "lucide-react";
+import { humanizePaymentError } from "@/lib/square";
 
 declare global {
   interface Window {
@@ -51,6 +52,7 @@ interface SquarePaymentFormProps {
   totalAmount: number;
   postcode?: string;
   addressSummary?: string;
+  externalError?: string | null;
 }
 
 // Payment Brand Badges
@@ -106,6 +108,7 @@ export default function SquarePaymentForm({
   totalAmount,
   postcode,
   addressSummary,
+  externalError,
 }: SquarePaymentFormProps) {
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkLoading, setSdkLoading] = useState(true);
@@ -121,6 +124,11 @@ export default function SquarePaymentForm({
   const appId = process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID || "";
   const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || "";
   const environment = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT || "sandbox";
+
+  // Active error to display directly below card input (humanized & simplified)
+  const activeError = (cardError || externalError)
+    ? humanizePaymentError(cardError || externalError)
+    : null;
 
   useEffect(() => {
     if (initializedRef.current && cardRef.current) {
@@ -253,12 +261,16 @@ export default function SquarePaymentForm({
           onSubmitPayment(result.token);
           return;
         } else if (result.errors && result.errors.length > 0) {
-          setCardError(result.errors[0].message || "Please check your card details.");
+          const errorMsg = result.errors
+            .map((err: any) => err.message)
+            .filter(Boolean)
+            .join(". ");
+          setCardError(errorMsg || "Please check your card details.");
           return;
         }
       } catch (err: any) {
         console.error("Card tokenization error:", err);
-        setCardError("Please double check your card number.");
+        setCardError("Please double check your card number, expiration date, and CVV.");
         return;
       }
     }
@@ -323,7 +335,7 @@ export default function SquarePaymentForm({
         )}
 
         {/* Square SDK Container: Embedded Card Input Fields */}
-        <div className="bg-white p-2 sm:p-3 rounded-sm border border-stone-200 min-h-[90px] w-full relative flex flex-col justify-center overflow-hidden">
+        <div className={`bg-white p-2 sm:p-3 rounded-sm border transition-colors min-h-[90px] w-full relative flex flex-col justify-center overflow-hidden ${activeError ? "border-red-400" : "border-stone-200"}`}>
           <div id="square-card-element" className="w-full min-w-full min-h-[80px]" />
           {sdkLoading && (
             <div className="absolute inset-0 bg-white/95 flex items-center justify-center gap-2 text-stone-500 text-xs pointer-events-none">
@@ -333,12 +345,11 @@ export default function SquarePaymentForm({
           )}
         </div>
 
-
-
-        {cardError && (
-          <div className="p-3 bg-red-50 rounded-sm border border-red-200 text-red-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{cardError}</span>
+        {/* Clean & Simple Inline Card Error */}
+        {activeError && (
+          <div className="flex items-center gap-1.5 px-0.5 pt-0.5 text-red-600 text-xs font-medium animate-in fade-in duration-200">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500" />
+            <span className="leading-snug">{activeError}</span>
           </div>
         )}
       </div>

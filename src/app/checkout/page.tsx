@@ -42,6 +42,7 @@ import {
   isValidAustralianPostcode,
   AUSTRALIAN_STATES,
 } from "@/lib/shipping";
+import { formatCustomerError } from "@/lib/error-formatter";
 
 const QUICK_DELIVERY_PREFERENCES = [
   "Leave at front door",
@@ -145,6 +146,7 @@ export default function CheckoutPage() {
   // Discount & Promo Code State
   const [promoInput, setPromoInput] = useState("PIECLUB10");
   const [isCheckingDiscount, setIsCheckingDiscount] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [discountInfo, setDiscountInfo] = useState<{
     eligible: boolean;
     discountPercent: number;
@@ -285,6 +287,7 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setPaymentError(null);
 
     try {
       // Phase 1: Create Server-Authoritative Pending Order Intent
@@ -324,7 +327,9 @@ export default function CheckoutPage() {
       addToast("Order placed successfully! Thank you for ordering with Flavour & Co.", "success");
       router.push(`/checkout/success?orderId=${encodeURIComponent(payData.orderId)}`);
     } catch (err: any) {
-      addToast(err.message || "Checkout failed. Please try again.", "error");
+      const errMsg = formatCustomerError(err);
+      setPaymentError(errMsg);
+      addToast(errMsg, "error");
     } finally {
       setIsProcessing(false);
     }
@@ -668,6 +673,7 @@ export default function CheckoutPage() {
                     isProcessing={isProcessing}
                     totalAmount={total}
                     postcode={formData.postcode}
+                    externalError={paymentError}
                     addressSummary={
                       formData.address
                         ? `${formData.address}${formData.city ? `, ${formData.city}` : ""} ${formData.state} ${formData.postcode}`.trim()

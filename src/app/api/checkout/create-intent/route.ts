@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     }
 
     // 4. Create Pending Order in Supabase with automatic schema compatibility fallback
-    const baseOrderPayload = {
+    const baseOrderPayload: Record<string, any> = {
       order_number: orderNumber,
       customer_name: customer.fullName,
       customer_email: customer.email,
@@ -70,6 +70,9 @@ export async function POST(req: Request) {
         postalCode: customer.postcode || "2000",
         country: "Australia",
         notes: customer.notes || "",
+        ...(totals.discountCode
+          ? { discountCode: totals.discountCode, discountAmount: totals.discountAmount }
+          : {}),
       },
       shipping_method: "Standard Express Delivery",
       payment_method: "Square Credit Card",
@@ -83,25 +86,33 @@ export async function POST(req: Request) {
         variantName: it.variantName,
       })),
       subtotal: totals.subtotal,
-      discount_amount: totals.discountAmount || 0,
-      discount_code: totals.discountCode || null,
       shipping_fee: totals.shippingFee,
       tax_amount: totals.taxAmount,
       total_amount: totals.totalAmount,
       status: "pending",
-      items_count: totals.itemsCount,
-      fulfillment_notes: customer.notes || "Order pending payment",
+      fulfillment_notes: totals.discountCode
+        ? `${customer.notes ? customer.notes + " | " : ""}Coupon applied: ${totals.discountCode} (-$${totals.discountAmount})`
+        : customer.notes || "Order pending payment",
     };
 
-    let orderData = null;
-
-    // Try full insert with user_id and idempotency_key
-    const fullPayload = {
+    // Construct full payload including optional/extended fields if present
+    const fullPayload: Record<string, any> = {
       ...baseOrderPayload,
+      items_count: totals.itemsCount,
       user_id: userId || null,
       idempotency_key: idempotencyKey,
     };
 
+    if (totals.discountAmount && totals.discountAmount > 0) {
+      fullPayload.discount_amount = totals.discountAmount;
+    }
+    if (totals.discountCode) {
+      fullPayload.discount_code = totals.discountCode;
+    }
+
+    let orderData = null;
+
+    // Step 1: Attempt full payload insert
     const { data: d1, error: e1 } = await supabase
       .from("orders")
       .insert(fullPayload)
@@ -111,22 +122,40 @@ export async function POST(req: Request) {
     if (!e1 && d1) {
       orderData = d1;
     } else {
-      // Fallback: If remote DB schema cache is missing extended columns (PGRST204)
-      console.warn("Retrying order insert without extended columns:", e1?.message);
+      console.warn("Retrying order insert without optional extended columns:", e1?.message);
+      
+      // Step 2: Attempt insert without discount columns
+      const withoutDiscounts = { ...fullPayload };
+      delete withoutDiscounts.discount_amount;
+      delete withoutDiscounts.discount_code;
+
       const { data: d2, error: e2 } = await supabase
         .from("orders")
-        .insert(baseOrderPayload)
+        .insert(withoutDiscounts)
         .select()
         .single();
 
-      if (e2 || !d2) {
-        console.error("Order creation database error:", e2);
-        return NextResponse.json(
-          { error: "Failed to create order intent record." },
-          { status: 500 }
-        );
+      if (!e2 && d2) {
+        orderData = d2;
+      } else {
+        console.warn("Retrying order insert with minimum required core columns:", e2?.message);
+        
+        // Step 3: Attempt minimal base payload insert
+        const { data: d3, error: e3 } = await supabase
+          .from("orders")
+          .insert(baseOrderPayload)
+          .select()
+          .single();
+
+        if (e3 || !d3) {
+          console.error("Order creation database error:", e3);
+          return NextResponse.json(
+            { error: e3?.message || "Failed to create order intent record." },
+            { status: 500 }
+          );
+        }
+        orderData = d3;
       }
-      orderData = d2;
     }
 
     // 5. Create Payment Attempt Record (if payment_attempts table exists)

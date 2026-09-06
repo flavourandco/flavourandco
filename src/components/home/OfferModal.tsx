@@ -5,6 +5,7 @@ import { X, ArrowRight, Check, Copy, Sparkles, Loader2 } from "lucide-react";
 import { Fraunces } from "next/font/google";
 import { media } from "@/lib/media";
 import { setWithTTL, hasExpired } from "@/lib/storage";
+import { formatCustomerError } from "@/lib/error-formatter";
 
 const POPUP_KEY = "offer-popup-dismissed";
 const POPUP_TTL = 10 * 60 * 1000; // 10 minutes
@@ -71,7 +72,7 @@ export default function OfferModal() {
         localStorage.setItem("flavour_applied_discount_code", data.discountCode || "PIECLUB10");
       } catch {}
     } catch (err: any) {
-      setErrorMessage(err.message || "Something went wrong. Please try again.");
+      setErrorMessage(formatCustomerError(err));
     } finally {
       setIsLoading(false);
     }

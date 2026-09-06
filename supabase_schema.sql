@@ -70,6 +70,8 @@ ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_number TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_url TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS estimated_delivery TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS refund_amount NUMERIC(10, 2);
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC(10, 2) DEFAULT 0.00;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS discount_code TEXT;
 
 -- 4. WHOLESALE INQUIRIES TABLE
 CREATE TABLE IF NOT EXISTS public.wholesale_inquiries (

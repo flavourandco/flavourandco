@@ -21,6 +21,63 @@ export interface SquarePaymentResponse {
 }
 
 /**
+ * Formats technical or raw Square error strings into human-friendly, simplified messages.
+ * Removes underscores, authorization prefixes, and tech jargon.
+ */
+export function humanizePaymentError(raw?: string | null): string {
+  if (!raw || typeof raw !== "string") {
+    return "Payment failed. Please check your card details and try again.";
+  }
+
+  const upper = raw.toUpperCase();
+
+  if (upper.includes("CARD_NOT_SUPPORTED") || upper.includes("CARD NOT SUPPORTED")) {
+    return "Card not supported. Please try a different card.";
+  }
+  if (upper.includes("INSUFFICIENT_FUNDS")) {
+    return "Insufficient funds. Please try another card or account.";
+  }
+  if (upper.includes("CARD_EXPIRED") || upper.includes("INVALID_EXPIRATION") || upper.includes("EXPIRATION")) {
+    return "Card has expired. Please check your card expiration date.";
+  }
+  if (upper.includes("CVV_FAILURE") || upper.includes("VERIFY_CVV") || upper.includes("INVALID_FEES")) {
+    return "Incorrect CVV security code. Please check the 3 digits on the back of your card.";
+  }
+  if (upper.includes("ADDRESS_VERIFICATION_FAILURE") || upper.includes("POSTAL_CODE") || upper.includes("POSTCODE")) {
+    return "Postcode does not match the billing address for this card.";
+  }
+  if (upper.includes("GENERIC_DECLINE") || upper.includes("CARD_DECLINED") || upper.includes("DECLINED")) {
+    return "Card declined. Please contact your bank or try a different card.";
+  }
+  if (upper.includes("INVALID_CARD") || upper.includes("PAN_FAILURE") || upper.includes("INVALID_ACCOUNT")) {
+    return "Invalid card number. Please verify the digits.";
+  }
+  if (upper.includes("ALLOWABLE_PIN_TRIES_EXCEEDED") || upper.includes("CARD_TOKEN_EXPIRED")) {
+    return "Payment session expired. Please re-enter your card details.";
+  }
+
+  // Fallback cleanup: strip authorization prefixes, quotes, and underscores
+  let cleaned = raw
+    .replace(/^authorization\s*error:\s*/i, "")
+    .replace(/^payment\s*error:\s*/i, "")
+    .replace(/^square\s*error:\s*/i, "")
+    .replace(/['"`]/g, "")
+    .replace(/_/g, " ")
+    .trim();
+
+  if (!cleaned) return "Payment could not be processed. Please try again.";
+
+  // Normalize case (e.g. "CARD NOT PROCESSED" -> "Card not processed")
+  if (cleaned === cleaned.toUpperCase() && cleaned.length > 3) {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+  } else {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+
+  return cleaned;
+}
+
+/**
  * Executes a payment call directly to Square Payments API (v2/payments).
  * Server-only execution.
  */
@@ -67,10 +124,10 @@ export async function createSquarePayment(
     const data = await res.json();
 
     if (!res.ok) {
-      const detail = data?.errors?.[0]?.detail || "Square payment processing failed.";
+      const detail = data?.errors?.[0]?.detail || data?.errors?.[0]?.code || "Square payment processing failed.";
       return {
         success: false,
-        error: detail,
+        error: humanizePaymentError(detail),
         raw: data,
       };
     }
@@ -87,7 +144,7 @@ export async function createSquarePayment(
     const errorMsg = err instanceof Error ? err.message : "Failed to reach Square Payments API";
     return {
       success: false,
-      error: errorMsg,
+      error: humanizePaymentError(errorMsg),
     };
   }
 }
