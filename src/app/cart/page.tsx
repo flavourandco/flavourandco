@@ -30,7 +30,7 @@ import { BoneyardCartSkeleton } from "@/components/ui/BoneyardSkeleton";
 export default function CartPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [promoCode, setPromoCode] = useState("PIECLUB10");
+  const [promoCode, setPromoCode] = useState("");
   const [subscriberEmail, setSubscriberEmail] = useState("");
   const [isCheckingPromo, setIsCheckingPromo] = useState(false);
   const [discountInfo, setDiscountInfo] = useState<{

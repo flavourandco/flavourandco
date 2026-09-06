@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { CreditCard, Lock, CheckCircle2, AlertCircle, Info, MapPin } from "lucide-react";
+import { CreditCard, Lock, CheckCircle2, AlertCircle } from "lucide-react";
 import { humanizePaymentError } from "@/lib/square";
 
 declare global {
@@ -11,13 +11,14 @@ declare global {
         appId: string,
         locationId: string
       ) => Promise<{
-        card: (options?: { postalCode?: string | boolean; includePostalCode?: boolean }) => Promise<{
+        card: (options?: any) => Promise<{
           attach: (selector: string) => Promise<void>;
           tokenize: () => Promise<{
             status: string;
             token?: string;
             errors?: Array<{ message: string }>;
           }>;
+          destroy?: () => Promise<void>;
         }>;
         paymentRequest: (options: {
           countryCode: string;
@@ -31,6 +32,7 @@ declare global {
             token?: string;
             errors?: Array<{ message: string }>;
           }>;
+          destroy?: () => Promise<void>;
         }>;
         googlePay: (paymentRequest: any) => Promise<{
           attach: (selector: string) => Promise<void>;
@@ -39,6 +41,7 @@ declare global {
             token?: string;
             errors?: Array<{ message: string }>;
           }>;
+          destroy?: () => Promise<void>;
         }>;
       }>;
     };
@@ -106,8 +109,6 @@ export default function SquarePaymentForm({
   onCancel,
   isProcessing,
   totalAmount,
-  postcode,
-  addressSummary,
   externalError,
 }: SquarePaymentFormProps) {
   const [sdkReady, setSdkReady] = useState(false);
@@ -120,6 +121,7 @@ export default function SquarePaymentForm({
   const applePayRef = useRef<any>(null);
   const googlePayRef = useRef<any>(null);
   const initializedRef = useRef(false);
+  const isInitializingRef = useRef(false);
 
   const appId = process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID || "";
   const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || "";
@@ -131,6 +133,7 @@ export default function SquarePaymentForm({
     : null;
 
   useEffect(() => {
+    // If already active and attached, no need to re-initialize
     if (initializedRef.current && cardRef.current) {
       setSdkLoading(false);
       setSdkReady(true);
@@ -138,38 +141,59 @@ export default function SquarePaymentForm({
     }
 
     const initSquare = async () => {
+      // Prevent multiple concurrent initializations (which caused double card input rendering)
+      if (isInitializingRef.current || initializedRef.current) {
+        return;
+      }
+
       if (!window.Square || !appId || appId.includes("EXAMPLE") || appId.includes("YOUR_SQUARE")) {
         setSdkLoading(false);
         setCardError("Payment gateway configuration missing.");
         return;
       }
 
-      if (initializedRef.current && cardRef.current) {
-        setSdkLoading(false);
-        return;
-      }
+      isInitializingRef.current = true;
 
       try {
         const payments = await window.Square.payments(appId, locationId);
 
-        // 1. Initialize & Attach Card Element
+        // 1. Initialize & Attach Card Element with standard native validation
         const cardElement = document.getElementById("square-card-element");
         if (cardElement) {
+          // Clear any leftover child nodes completely
           cardElement.innerHTML = "";
-          const cardOptions = postcode && String(postcode).trim().length >= 4 
-            ? { postalCode: String(postcode).trim() } 
-            : undefined;
-          const card = await payments.card(cardOptions);
-          await card.attach("#square-card-element");
-          cardRef.current = card;
-          initializedRef.current = true;
-          setSdkReady(true);
+
+          // Clean up old instance before creating a new one
+          if (cardRef.current && typeof cardRef.current.destroy === "function") {
+            try {
+              await cardRef.current.destroy();
+            } catch {}
+            cardRef.current = null;
+          }
+
+          // Use default card options (Square natively manages ZIP/postal code per card country)
+          const card = await payments.card();
+          
+          // Re-verify container is ready and not already populated
+          if (cardElement && cardElement.children.length === 0) {
+            await card.attach("#square-card-element");
+            cardRef.current = card;
+            initializedRef.current = true;
+            setSdkReady(true);
+          } else {
+            try {
+              if (typeof card?.destroy === "function") {
+                await card.destroy();
+              }
+            } catch {}
+          }
         }
       } catch (err: any) {
         console.error("Square Card initialization error:", err);
         initializedRef.current = false;
         setCardError(err?.message || "Could not initialize credit card input.");
       } finally {
+        isInitializingRef.current = false;
         setSdkLoading(false);
       }
 
@@ -188,7 +212,7 @@ export default function SquarePaymentForm({
         try {
           const applePay = await payments.applePay(req);
           const el = document.getElementById("square-apple-pay-element");
-          if (el) {
+          if (el && el.children.length === 0) {
             await applePay.attach("#square-apple-pay-element");
             applePayRef.current = applePay;
             setApplePayReady(true);
@@ -200,7 +224,7 @@ export default function SquarePaymentForm({
         try {
           const googlePay = await payments.googlePay(req);
           const el = document.getElementById("square-google-pay-element");
-          if (el) {
+          if (el && el.children.length === 0) {
             await googlePay.attach("#square-google-pay-element");
             googlePayRef.current = googlePay;
             setGooglePayReady(true);
@@ -237,15 +261,18 @@ export default function SquarePaymentForm({
     }
 
     return () => {
+      isInitializingRef.current = false;
+      initializedRef.current = false;
       if (cardRef.current && typeof cardRef.current.destroy === "function") {
         try {
           cardRef.current.destroy();
-        } catch {
-          // ignore cleanup errors
-        }
+        } catch {}
       }
       cardRef.current = null;
-      initializedRef.current = false;
+      const cardElement = document.getElementById("square-card-element");
+      if (cardElement) {
+        cardElement.innerHTML = "";
+      }
     };
   }, [appId, locationId, environment]);
 
@@ -318,21 +345,6 @@ export default function SquarePaymentForm({
             <Lock className="w-3.5 h-3.5 text-[#07402b]" /> Secure Checkout
           </span>
         </div>
-
-        {/* Address & Postcode Auto-Sync Badge */}
-        {addressSummary && (
-          <div className="p-2.5 bg-[#07402b]/5 rounded-sm border border-[#07402b]/15 text-stone-700 text-xs flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <MapPin className="w-3.5 h-3.5 text-[#07402b] shrink-0" />
-              <span className="truncate text-[11px] font-medium">
-                <strong className="text-[#07402b]">Address &amp; Postcode for Payment:</strong> {addressSummary}
-              </span>
-            </div>
-            <span className="text-[10px] text-[#07402b] font-bold shrink-0 bg-[#07402b]/10 px-1.5 py-0.5 rounded border border-[#07402b]/20">
-              Active
-            </span>
-          </div>
-        )}
 
         {/* Square SDK Container: Embedded Card Input Fields */}
         <div className={`bg-white p-2 sm:p-3 rounded-sm border transition-colors min-h-[90px] w-full relative flex flex-col justify-center overflow-hidden ${activeError ? "border-red-400" : "border-stone-200"}`}>

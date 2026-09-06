@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import SquarePaymentForm from "@/components/checkout/SquarePaymentForm";
+import PaymentProcessingModal, { PaymentModalStage } from "@/components/checkout/PaymentProcessingModal";
 import { useCartStore } from "@/store/cart.store";
 import { useUIStore } from "@/store/ui.store";
 import {
@@ -122,6 +123,7 @@ export default function CheckoutPage() {
   const { user } = useUser();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentModalStage, setPaymentModalStage] = useState<PaymentModalStage | null>(null);
   const [showMobileSummary, setShowMobileSummary] = useState(false);
 
   const items = useCartStore((s) => s.items);
@@ -144,7 +146,7 @@ export default function CheckoutPage() {
   });
 
   // Discount & Promo Code State
-  const [promoInput, setPromoInput] = useState("PIECLUB10");
+  const [promoInput, setPromoInput] = useState("");
   const [isCheckingDiscount, setIsCheckingDiscount] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [discountInfo, setDiscountInfo] = useState<{
@@ -209,9 +211,13 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    if (formData.email && formData.email.includes("@") && promoInput) {
+    if (!promoInput.trim()) {
+      setDiscountInfo(null);
+      return;
+    }
+    if (formData.email && formData.email.includes("@") && promoInput.trim()) {
       const debounce = setTimeout(() => {
-        checkDiscount(formData.email, promoInput);
+        checkDiscount(formData.email, promoInput.trim());
       }, 500);
       return () => clearTimeout(debounce);
     }
@@ -287,6 +293,7 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setPaymentModalStage("transferring");
     setPaymentError(null);
 
     try {
@@ -322,14 +329,24 @@ export default function CheckoutPage() {
         throw new Error(payData.error || "Payment processing failed. Please check card details.");
       }
 
-      // Clear local shopping cart and navigate to authoritative success page
+      // Payment confirmed stage
+      setPaymentModalStage("confirmed");
       clearCart();
       addToast("Order placed successfully! Thank you for ordering with Flavour & Co.", "success");
+
+      // Show payment confirmed animation for 1.2 seconds before redirecting
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       router.push(`/checkout/success?orderId=${encodeURIComponent(payData.orderId)}`);
     } catch (err: any) {
+      // Payment cancelled/failed stage
+      setPaymentModalStage("cancelled");
       const errMsg = formatCustomerError(err);
       setPaymentError(errMsg);
       addToast(errMsg, "error");
+
+      // Show payment cancelled animation for 1.4 seconds before closing modal back to checkout
+      await new Promise((resolve) => setTimeout(resolve, 1400));
+      setPaymentModalStage(null);
     } finally {
       setIsProcessing(false);
     }
@@ -672,13 +689,7 @@ export default function CheckoutPage() {
                     onCancel={() => router.push("/cart")}
                     isProcessing={isProcessing}
                     totalAmount={total}
-                    postcode={formData.postcode}
                     externalError={paymentError}
-                    addressSummary={
-                      formData.address
-                        ? `${formData.address}${formData.city ? `, ${formData.city}` : ""} ${formData.state} ${formData.postcode}`.trim()
-                        : undefined
-                    }
                   />
                 </div>
 
@@ -848,6 +859,15 @@ export default function CheckoutPage() {
 
         </div>
       </div>
+
+      {/* Payment Processing Minimal Animation Modal */}
+      <PaymentProcessingModal
+        isOpen={paymentModalStage !== null}
+        stage={paymentModalStage || undefined}
+        autoTransition={false}
+        totalAmount={total > 0 ? total : 65.0}
+        customerName={formData.fullName || "You"}
+      />
     </PageLayout>
   );
 }
