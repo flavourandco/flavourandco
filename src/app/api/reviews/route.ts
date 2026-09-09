@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     const formatted = (data || []).map((r: any) => ({
       id: r.id,
       productId: r.product_id || undefined,
-      productName: r.product_name || "Gourmet Pie",
+      productName: r.product_name || undefined,
       name: r.author || r.name || "Customer",
       rating: r.rating || 5,
       date: r.date || (r.created_at ? new Date(r.created_at).toLocaleDateString("en-AU", { month: "short", day: "numeric", year: "numeric" }) : "Recently"),
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
     const row: any = {
       product_id: productId || null,
-      product_name: productName || "Gourmet Pie",
+      product_name: productName || null,
       name: name.trim(),
       author: name.trim(),
       rating: rating || 5,
@@ -128,7 +128,24 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { id, status, isFeatured } = body;
+    const {
+      id,
+      name,
+      author,
+      rating,
+      comment,
+      content,
+      productId,
+      product_id,
+      productName,
+      product_name,
+      isVerified,
+      is_verified,
+      isFeatured,
+      is_featured,
+      status,
+      date,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, error: "Review ID is required." }, { status: 400 });
@@ -142,8 +159,35 @@ export async function PUT(req: Request) {
     const updates: any = {};
     if (status !== undefined) updates.status = status;
     if (isFeatured !== undefined) updates.is_featured = isFeatured;
+    if (is_featured !== undefined) updates.is_featured = is_featured;
+    if (isVerified !== undefined) updates.is_verified = isVerified;
+    if (is_verified !== undefined) updates.is_verified = is_verified;
+    if (rating !== undefined) updates.rating = Number(rating);
+    if (date !== undefined) updates.date = date;
 
-    const { data, error } = await supabase
+    const resolvedName = name ?? author;
+    if (resolvedName !== undefined) {
+      updates.name = resolvedName;
+      updates.author = resolvedName;
+    }
+
+    const resolvedComment = comment ?? content;
+    if (resolvedComment !== undefined) {
+      updates.comment = resolvedComment;
+      updates.content = resolvedComment;
+    }
+
+    const resolvedProductId = productId !== undefined ? productId : product_id;
+    if (resolvedProductId !== undefined) {
+      updates.product_id = resolvedProductId || null;
+    }
+
+    const resolvedProductName = productName !== undefined ? productName : product_name;
+    if (resolvedProductName !== undefined) {
+      updates.product_name = resolvedProductName || null;
+    }
+
+    let { data, error } = await supabase
       .from("reviews")
       .update(updates)
       .eq("id", id)
@@ -151,7 +195,27 @@ export async function PUT(req: Request) {
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      console.warn("Reviews PUT fallback retry:", error.message);
+      // Fallback with base columns only
+      const baseUpdates: any = {};
+      if (updates.status !== undefined) baseUpdates.status = updates.status;
+      if (updates.is_featured !== undefined) baseUpdates.is_featured = updates.is_featured;
+      if (updates.rating !== undefined) baseUpdates.rating = updates.rating;
+      if (updates.name !== undefined) baseUpdates.name = updates.name;
+      if (updates.comment !== undefined) baseUpdates.comment = updates.comment;
+      if (updates.product_id !== undefined) baseUpdates.product_id = updates.product_id;
+
+      const retry = await supabase
+        .from("reviews")
+        .update(baseUpdates)
+        .eq("id", id)
+        .select()
+        .maybeSingle();
+
+      if (retry.error) {
+        return NextResponse.json({ success: false, error: retry.error.message }, { status: 500 });
+      }
+      data = retry.data;
     }
 
     return NextResponse.json(

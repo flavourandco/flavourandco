@@ -173,7 +173,7 @@ export default function Footer() {
             <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
               Food Safety
             </h4>
-            <div className="mt-5 bg-white p-3.5 rounded-xl inline-block shadow-lg w-full max-w-[240px]">
+            <div className="mt-4 bg-white p-2 rounded-lg inline-block shadow-md w-full max-w-[130px]">
               <img
                 src="/haccp-aust-cert-black.jpg"
                 alt="HACCP Certified Food Safety Logo"
@@ -261,10 +261,10 @@ export default function Footer() {
 
           {/* Section 3: Food Safety Logo */}
           <div className="pt-2 border-t border-secondary/20 text-left">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary mb-3">
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary mb-2.5">
               Food Safety &amp; Quality
             </h4>
-            <div className="bg-white p-3 rounded-lg inline-block shadow-md max-w-[200px]">
+            <div className="bg-white p-2 rounded-lg inline-block shadow-md max-w-[110px]">
               <img
                 src="/haccp-aust-cert-black.jpg"
                 alt="HACCP Certified Food Safety Logo"
