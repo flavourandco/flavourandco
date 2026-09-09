@@ -83,7 +83,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm leading-relaxed opacity-80">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
+              Founded by Simran. Flavour &amp; Co. bakes her heritage into every pie. Indo-Australian flavours, made to share.
             </p>
             
             {/* Desktop Social Links */}
@@ -198,7 +198,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-xs leading-relaxed opacity-80 max-w-sm">
-              Flavour &amp; Co. is founded by Simran. We bake our roots into every pie, delivering delicious Indo-Australian pies and more.
+              Founded by Simran. Flavour &amp; Co. bakes her heritage into every pie. Indo-Australian flavours, made to share.
             </p>
           </div>
 
@@ -300,7 +300,7 @@ export default function Footer() {
             </div>
 
             <p className="text-[11px] opacity-60">
-              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved. Delivering fresh &amp; frozen Sydney-wide.
+              &copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved.
             </p>
           </div>
 
@@ -309,7 +309,7 @@ export default function Footer() {
         {/* Desktop Copyright Bar */}
         <div className="hidden md:flex mt-12 items-center justify-between border-t border-secondary/20 pt-6 text-xs opacity-60">
           <p>&copy; {new Date().getFullYear()} Flavour &amp; Co. All rights reserved.</p>
-          <p>Handcrafted by Simran • Fresh &amp; Frozen Sydney Delivery</p>
+          <p>Handcrafted by Simran</p>
         </div>
 
       </div>
