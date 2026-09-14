@@ -82,6 +82,7 @@ export async function PUT(
           is_featured: Boolean(body.isFeatured),
           is_best_seller: Boolean(body.isBestSeller),
           is_new_arrival: Boolean(body.isNewArrival),
+          is_draft: Boolean(body.isDraft),
           updated_at: new Date().toISOString(),
         };
 
@@ -89,13 +90,27 @@ export async function PUT(
           updatePayload.id = newId;
         }
 
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from("products")
           .update(updatePayload)
           .eq("id", id)
           .select();
 
+        // Graceful fallback if is_draft column has not been migrated yet in Supabase
+        if (error && (error.code === "42703" || error.message?.includes("is_draft"))) {
+          console.warn("[Products API] 'is_draft' column not found in database, retrying without is_draft...");
+          delete updatePayload.is_draft;
+          const retryRes = await supabase
+            .from("products")
+            .update(updatePayload)
+            .eq("id", id)
+            .select();
+          data = retryRes.data;
+          error = retryRes.error;
+        }
+
         if (error) {
+          console.error("[Products API] Error updating product in Supabase:", error);
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
@@ -114,6 +129,7 @@ export async function PUT(
     return NextResponse.json({ success: true, message: "Product updated (mock)" });
   } catch (err: unknown) {
     const error = err as Error;
+    console.error("[Products API] Unexpected error in PUT:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
@@ -144,14 +160,31 @@ export async function PATCH(
         if (typeof body.isNewArrival === "boolean") {
           updatePayload.is_new_arrival = body.isNewArrival;
         }
+        if (typeof body.isDraft === "boolean") {
+          updatePayload.is_draft = body.isDraft;
+        }
 
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from("products")
           .update(updatePayload)
           .eq("id", id)
           .select();
 
+        // Graceful fallback if is_draft column has not been migrated yet in Supabase
+        if (error && (error.code === "42703" || error.message?.includes("is_draft"))) {
+          console.warn("[Products API] 'is_draft' column not found in database, retrying PATCH without is_draft...");
+          delete updatePayload.is_draft;
+          const retryRes = await supabase
+            .from("products")
+            .update(updatePayload)
+            .eq("id", id)
+            .select();
+          data = retryRes.data;
+          error = retryRes.error;
+        }
+
         if (error) {
+          console.error("[Products API] Error in PATCH product:", error);
           return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
@@ -167,6 +200,7 @@ export async function PATCH(
     return NextResponse.json({ success: true, message: "Product flags updated (mock)" });
   } catch (err: unknown) {
     const error = err as Error;
+    console.error("[Products API] Unexpected error in PATCH:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

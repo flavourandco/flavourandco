@@ -23,6 +23,7 @@ export default function AdminProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [togglingFeaturedProductId, setTogglingFeaturedProductId] = useState<string | null>(null);
+  const [togglingDraftProductId, setTogglingDraftProductId] = useState<string | null>(null);
 
   const stagedMedia = useStagedMedia({ multiple: true, maxFiles: 10 });
 
@@ -60,6 +61,7 @@ export default function AdminProductsPage() {
     isFeatured: true,
     isBestSeller: false,
     isNewArrival: false,
+    isDraft: false,
   });
 
   // Array input helpers
@@ -162,6 +164,38 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleToggleDraftProduct = async (product: Product) => {
+    if (togglingDraftProductId) return;
+    const nextDraft = !product.isDraft;
+    setTogglingDraftProductId(product.id);
+
+    try {
+      const res = await fetch(`/api/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isDraft: nextDraft }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === product.id ? { ...p, isDraft: nextDraft } : p))
+        );
+        useProductStore.getState().fetchProducts(true);
+        notifyContentUpdated("products");
+        addToast(
+          nextDraft ? `"${product.name}" moved to Draft (hidden from store).` : `"${product.name}" published (visible in store).`,
+          "success"
+        );
+      } else {
+        addToast(formatCustomerError(json.error), "error");
+      }
+    } catch (err) {
+      addToast(formatCustomerError(err), "error");
+    } finally {
+      setTogglingDraftProductId(null);
+    }
+  };
+
   const handleOpenCreate = () => {
     setEditingProduct(null);
     setViewingProduct(null);
@@ -186,6 +220,7 @@ export default function AdminProductsPage() {
       isFeatured: true,
       isBestSeller: false,
       isNewArrival: false,
+      isDraft: false,
     });
     setIsEditModalOpen(true);
   };
@@ -219,6 +254,7 @@ export default function AdminProductsPage() {
       isFeatured: product.isFeatured,
       isBestSeller: product.isBestSeller,
       isNewArrival: product.isNewArrival,
+      isDraft: Boolean(product.isDraft),
     });
     setIsEditModalOpen(true);
   };
@@ -573,7 +609,7 @@ export default function AdminProductsPage() {
       {/* Data Table */}
       <div className="bg-white rounded-sm border border-slate-200/80 shadow-2xs overflow-hidden">
         {loading ? (
-          <BoneyardTableSkeleton rows={5} columns={7} />
+          <BoneyardTableSkeleton rows={5} columns={6} />
         ) : filteredProducts.length === 0 ? (
           <div className="p-12 text-center text-xs text-slate-400 font-medium">No products found.</div>
         ) : (
@@ -585,7 +621,6 @@ export default function AdminProductsPage() {
                   <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Price ($ AUD)</th>
                   <th className="py-3 px-4">Pack Info</th>
-                  <th className="py-3 px-4">Badge</th>
                   <th className="py-3 px-4">Flags</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
@@ -608,18 +643,14 @@ export default function AdminProductsPage() {
                     <td className="py-3 px-4 font-bold text-slate-900">${p.price.toFixed(2)}</td>
                     <td className="py-3 px-4 text-slate-600">{p.packInfo}</td>
                     <td className="py-3 px-4">
-                      {p.badge ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 border border-amber-200/60 text-[10px] font-semibold">
-                          <Tag className="w-2.5 h-2.5" /> {p.badge}
-                        </span>
-                      ) : (
-                        <span className="text-slate-300">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
                       <div className="flex flex-wrap gap-1">
+                        {p.isDraft && (
+                          <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 text-[9px] font-bold rounded-sm border border-amber-300">
+                            Draft
+                          </span>
+                        )}
                         {p.isFeatured && (
-                          <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-sm border border-emerald-200/60">
+                          <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 text-[9px] font-bold rounded-sm border border-purple-200/60">
                             Featured
                           </span>
                         )}
@@ -664,7 +695,15 @@ export default function AdminProductsPage() {
                           </div>
                         </button>
 
-                        {/* VIEW BUTTON (Row primary action) */}
+                        {/* EDIT BUTTON (Direct action in row) */}
+                        <button
+                          onClick={() => handleOpenEdit(p)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer border border-slate-300/60"
+                        >
+                          <Edit2 className="w-3 h-3 text-slate-600" /> Edit
+                        </button>
+
+                        {/* VIEW BUTTON */}
                         <button
                           onClick={() => setViewingProduct(p)}
                           className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer"
@@ -701,6 +740,39 @@ export default function AdminProductsPage() {
               </div>
               
               <div className="flex items-center gap-2">
+                {/* Featured Toggle in View Modal */}
+                <button
+                  type="button"
+                  disabled={togglingFeaturedProductId === viewingProduct.id}
+                  onClick={() => {
+                    handleToggleFeaturedProduct(viewingProduct);
+                    setViewingProduct({ ...viewingProduct, isFeatured: !viewingProduct.isFeatured });
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-sm transition-all cursor-pointer select-none ${
+                    viewingProduct.isFeatured
+                      ? "bg-amber-100/90 text-amber-950 hover:bg-amber-200/90 border border-amber-300/80"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
+                  } ${togglingFeaturedProductId === viewingProduct.id ? "opacity-75 cursor-not-allowed" : ""}`}
+                  title={viewingProduct.isFeatured ? "Featured on Homepage" : "Not Featured"}
+                >
+                  <span className="text-[11px]">Featured</span>
+                  <div
+                    className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                      viewingProduct.isFeatured ? "bg-amber-600" : "bg-slate-300"
+                    }`}
+                  >
+                    <div
+                      className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
+                        viewingProduct.isFeatured ? "translate-x-3" : "translate-x-0"
+                      }`}
+                    >
+                      {togglingFeaturedProductId === viewingProduct.id && (
+                        <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
+                      )}
+                    </div>
+                  </div>
+                </button>
+
                 <button
                   onClick={() => handleOpenEditFromView(viewingProduct)}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-colors cursor-pointer shadow-xs"
@@ -1326,6 +1398,24 @@ export default function AdminProductsPage() {
 
                 {activeTab === "flags" && (
                   <div className="space-y-4">
+                    {/* Draft Mode Toggle */}
+                    <div className="flex items-center justify-between p-3.5 bg-amber-50/60 border border-amber-200/80 rounded-sm">
+                      <div>
+                        <span className="text-xs font-bold text-amber-950 block">
+                          Draft
+                        </span>
+                        <span className="text-[11px] text-amber-800/80 block mt-0.5">
+                          When enabled, this product is saved as a draft and hidden from customers on the public website.
+                        </span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={formData.isDraft}
+                        onChange={(e) => setFormData({ ...formData, isDraft: e.target.checked })}
+                        className="w-4 h-4 rounded border-amber-300 text-amber-900 cursor-pointer"
+                      />
+                    </div>
+
                     <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-sm space-y-2">
                       <label className="text-xs font-bold text-slate-900 block">Custom Product Ribbon Tag</label>
                       <input
@@ -1358,29 +1448,61 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0">
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+                {/* Draft / Published Toggle Pill (Fixed size to prevent layout shifts) */}
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, isDraft: !prev.isDraft }))}
+                  className={`inline-flex items-center justify-center gap-2 w-[120px] h-9 rounded-full text-xs font-semibold cursor-pointer transition-all select-none shrink-0 ${
+                    formData.isDraft
+                      ? "bg-amber-100 text-amber-950 hover:bg-amber-200"
+                      : "bg-emerald-100 text-emerald-950 hover:bg-emerald-200"
+                  }`}
+                  title={formData.isDraft ? "Click to set as Published" : "Click to set as Draft"}
+                >
+                  <div
+                    className={`w-6 h-3.5 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                      formData.isDraft ? "bg-amber-600" : "bg-emerald-600"
+                    }`}
+                  >
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full bg-white shadow-xs transition-transform ${
+                        formData.isDraft ? "translate-x-2.5" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                  <span className="text-center">
+                    {formData.isDraft ? "Draft" : "Published"}
+                  </span>
+                </button>
+
+                {/* Cancel Button */}
                 <button
                   type="button"
                   disabled={isSubmitting || stagedMedia.isUploading}
                   onClick={handleAttemptCloseEdit}
-                  className="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-9 min-w-[76px] px-4 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center shrink-0"
                 >
                   Cancel
                 </button>
+
+                {/* Submit Button (Fixed min-width to avoid jitter between button states) */}
                 <button
                   type="submit"
                   disabled={isSubmitting || stagedMedia.isUploading}
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs disabled:opacity-75 transition-all"
+                  className="h-9 min-w-[130px] inline-flex items-center justify-center gap-2 px-5 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs disabled:opacity-75 transition-all shrink-0"
                 >
                   {isSubmitting || stagedMedia.isUploading ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
-                      <span>{stagedMedia.isUploading ? "Uploading Media..." : "Saving Product..."}</span>
+                      <span>{stagedMedia.isUploading ? "Uploading..." : formData.isDraft ? "Saving..." : editingProduct ? "Saving..." : "Adding..."}</span>
                     </>
+                  ) : formData.isDraft ? (
+                    "Save Draft"
                   ) : editingProduct ? (
                     "Save Changes"
                   ) : (
-                    "Create Product"
+                    "Add Product"
                   )}
                 </button>
               </div>

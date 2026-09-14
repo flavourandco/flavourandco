@@ -27,6 +27,7 @@ export interface Product {
   isFeatured: boolean;
   isBestSeller: boolean;
   isNewArrival: boolean;
+  isDraft?: boolean;
   option1Name?: string;
   option1Choices?: ProductVariant[];
   option2Name?: string;

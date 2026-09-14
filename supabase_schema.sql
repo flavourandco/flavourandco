@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     is_featured BOOLEAN DEFAULT FALSE,
     is_best_seller BOOLEAN DEFAULT FALSE,
     is_new_arrival BOOLEAN DEFAULT FALSE,
+    is_draft BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 );
 
 -- Migration commands for existing database deployments:
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_draft BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS product_name TEXT;
 

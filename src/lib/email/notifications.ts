@@ -1,5 +1,5 @@
 import React from "react";
-import { getAppBaseUrl, getAdminEmailAddress } from "./resend";
+import { getAppBaseUrl, getAdminEmailAddress, getAdminBackupEmailAddress, getAdminEmailRecipients } from "./resend";
 import { sendTransactionalEmail } from "./send";
 import type { Order, OrderItem, ShippingAddress } from "@/lib/types";
 import type { EmailOrderData, FormattedAddress, OrderEmailEvent } from "./types";
@@ -168,29 +168,54 @@ export async function sendOrderConfirmationNotifications(orderInput: any): Promi
     customerResult = { success: false, error: err?.message || "Customer email failed." };
   }
 
-  // 2. Send Admin New Order Notification Email
+  // 2. Send Admin New Order Notification Email (to both primary and backup admin concurrently)
   let adminResult: { success: boolean; error?: string; skipped?: boolean } = {
     success: false,
     error: "Not attempted",
   };
 
   try {
-    const adminEmail = getAdminEmailAddress();
-    if (adminEmail) {
-      adminResult = await sendTransactionalEmail({
-        to: adminEmail,
-        subject: `🛒 New Order #${order.orderNumber} Received`,
-        react: React.createElement(AdminNewOrder, { order }),
-        replyTo: order.customerEmail || undefined,
-        orderId,
-        orderNumber: order.orderNumber,
-        event: "order_confirmed_admin",
-        templateName: "AdminNewOrder",
-        idempotencyKey: `idem_admin_conf_${order.orderNumber}`,
-      });
+    const adminRecipients = getAdminEmailRecipients();
+    const backupEmail = getAdminBackupEmailAddress();
+
+    console.log(`[ADMIN NOTIFICATIONS] Dispatching new order #${order.orderNumber} alert to ${adminRecipients.length} admin recipient(s):`, adminRecipients);
+
+    const adminDispatches = adminRecipients.map(async (adminEmail) => {
+      const isBackup = Boolean(backupEmail && adminEmail.toLowerCase() === backupEmail.toLowerCase());
+      try {
+        const res = await sendTransactionalEmail({
+          to: adminEmail,
+          subject: isBackup
+            ? `[BACKUP ADMIN] 🛒 New Order #${order.orderNumber} Received`
+            : `🛒 New Order #${order.orderNumber} Received`,
+          react: React.createElement(AdminNewOrder, { order }),
+          replyTo: order.customerEmail || undefined,
+          orderId,
+          orderNumber: order.orderNumber,
+          event: isBackup ? ("order_confirmed_admin_backup" as any) : "order_confirmed_admin",
+          templateName: "AdminNewOrder",
+          idempotencyKey: `idem_admin_conf_${isBackup ? "backup_" : ""}${order.orderNumber}`,
+        });
+        console.log(`[ADMIN EMAIL SUCCESS] Sent order #${order.orderNumber} alert to ${adminEmail} (isBackup=${isBackup})`);
+        return { adminEmail, isBackup, res, success: res.success };
+      } catch (sendErr: any) {
+        console.error(`[ADMIN EMAIL ERROR] Failed to send order #${order.orderNumber} alert to ${adminEmail}:`, sendErr?.message || sendErr);
+        return { adminEmail, isBackup, res: { success: false, error: sendErr?.message }, success: false };
+      }
+    });
+
+    const settledResults = await Promise.allSettled(adminDispatches);
+    const anySuccess = settledResults.some(
+      (r) => r.status === "fulfilled" && r.value.success
+    );
+
+    if (anySuccess) {
+      adminResult = { success: true };
+    } else {
+      adminResult = { success: false, error: "All admin email dispatches failed." };
     }
   } catch (err: any) {
-    console.error(`[ADMIN EMAIL ERROR] #${order.orderNumber}:`, err?.message || err);
+    console.error(`[ADMIN EMAIL OVERALL ERROR] #${order.orderNumber}:`, err?.message || err);
     adminResult = { success: false, error: err?.message || "Admin email failed." };
   }
 

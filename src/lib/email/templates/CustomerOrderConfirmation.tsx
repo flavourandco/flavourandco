@@ -259,21 +259,6 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
             View Your Order Details &rarr;
           </a>
         </div>
-
-        {/* Storage & Reheating Instructions Note */}
-        <div
-          style={{
-            backgroundColor: "#f7efe6",
-            borderLeft: "4px solid #E3A72B",
-            padding: "12px 16px",
-            borderRadius: "0 6px 6px 0",
-            fontSize: "12px",
-            color: "#57534e",
-            lineHeight: "1.5",
-          }}
-        >
-          <strong style={{ color: "#1c1410" }}>Storage &amp; Reheating Tip:</strong> Keep your gourmet pies chilled upon arrival. Preheat oven to 180&deg;C and heat for 20&ndash;25 minutes until golden and piping hot for the ultimate flaky bakery experience!
-        </div>
       </div>
     </BaseLayout>
   );

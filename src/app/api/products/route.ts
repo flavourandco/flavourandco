@@ -39,6 +39,7 @@ export async function GET() {
             isFeatured: Boolean(item.is_featured),
             isBestSeller: Boolean(item.is_best_seller),
             isNewArrival: Boolean(item.is_new_arrival),
+            isDraft: Boolean(item.is_draft),
           }));
 
           return NextResponse.json(
@@ -142,35 +143,45 @@ export async function POST(request: Request) {
       isFeatured: Boolean(isFeatured),
       isBestSeller: Boolean(isBestSeller),
       isNewArrival: Boolean(isNewArrival),
+      isDraft: Boolean(body.isDraft),
     };
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
       if (supabase) {
-        const { error: dbError } = await supabase.from("products").insert([
-          {
-            id: newProduct.id,
-            name: newProduct.name,
-            tagline: newProduct.tagline,
-            short_description: newProduct.shortDescription,
-            description: newProduct.description,
-            why_stand_out: newProduct.whyStandOut,
-            product_details: newProduct.productDetails,
-            pack_info: newProduct.packInfo,
-            price: newProduct.price,
-            image: newProduct.image,
-            images: newProduct.images,
-            badge: newProduct.badge,
-            category: newProduct.category,
-            variants: newProduct.variants,
-            preparation_options: newProduct.preparationOptions,
-            is_featured: newProduct.isFeatured,
-            is_best_seller: newProduct.isBestSeller,
-            is_new_arrival: newProduct.isNewArrival,
-          },
-        ]);
+        const insertPayload: Record<string, any> = {
+          id: newProduct.id,
+          name: newProduct.name,
+          tagline: newProduct.tagline,
+          short_description: newProduct.shortDescription,
+          description: newProduct.description,
+          why_stand_out: newProduct.whyStandOut,
+          product_details: newProduct.productDetails,
+          pack_info: newProduct.packInfo,
+          price: newProduct.price,
+          image: newProduct.image,
+          images: newProduct.images,
+          badge: newProduct.badge,
+          category: newProduct.category,
+          variants: newProduct.variants,
+          preparation_options: newProduct.preparationOptions,
+          is_featured: newProduct.isFeatured,
+          is_best_seller: newProduct.isBestSeller,
+          is_new_arrival: newProduct.isNewArrival,
+          is_draft: newProduct.isDraft,
+        };
+
+        let { error: dbError } = await supabase.from("products").insert([insertPayload]);
+
+        if (dbError && (dbError.code === "42703" || dbError.message?.includes("is_draft"))) {
+          console.warn("[Products API] 'is_draft' column not found in database, retrying insert without is_draft...");
+          delete insertPayload.is_draft;
+          const retryRes = await supabase.from("products").insert([insertPayload]);
+          dbError = retryRes.error;
+        }
 
         if (dbError) {
+          console.error("[Products API] Error creating product in Supabase:", dbError);
           return NextResponse.json({ success: false, error: dbError.message }, { status: 400 });
         }
 
@@ -183,6 +194,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data: newProduct }, { status: 201 });
   } catch (err: unknown) {
     const error = err as Error;
+    console.error("[Products API] Unexpected error in POST:", error);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to create product" },
       { status: 500 }

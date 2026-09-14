@@ -38,25 +38,57 @@ export function getResendClient(): Resend | null {
 
 /**
  * Returns the configured default sender email.
- * Falls back to "Flavour & Co. <onboarding@resend.dev>" in development if unset.
+ * Ensures the company display name is always "Flavour & Co. <email>"
+ * even if EMAIL_FROM only contains a raw email address or generic prefix.
  */
 export function getEmailFromAddress(): string {
   const configured = process.env.EMAIL_FROM;
   if (configured && configured.trim().length > 0) {
-    return configured.trim();
+    const clean = configured.trim().replace(/^["']|["']$/g, "");
+    const match = clean.match(/^(?:.*<)?([^<>@\s]+@[^<>@\s]+)>?$/);
+    if (match) {
+      const email = match[1];
+      return `Flavour & Co. <${email}>`;
+    }
+    return clean;
   }
-  return "Flavour & Co. <onboarding@resend.dev>";
+  return "Flavour & Co. <Orders@flavourandco.com.au>";
 }
 
 /**
- * Returns the store administrator email for order alerts.
+ * Returns the store primary administrator email for order alerts.
  */
 export function getAdminEmailAddress(): string {
   const configured = process.env.ADMIN_EMAIL;
   if (configured && configured.trim().length > 0) {
-    return configured.trim();
+    return configured.trim().replace(/^["']|["']$/g, "");
   }
-  return "help@flavourandco.com.au";
+  return "info@flavourandco.com.au";
+}
+
+/**
+ * Returns the backup administrator email for order alerts and fallbacks.
+ */
+export function getAdminBackupEmailAddress(): string | null {
+  const configured = process.env.ADMIN_BACKUP_EMAIL || process.env.BACKUP_ADMIN_EMAIL;
+  if (configured && configured.trim().length > 0) {
+    const clean = configured.trim().replace(/^["']|["']$/g, "");
+    if (clean.length > 0) return clean;
+  }
+  return null;
+}
+
+/**
+ * Returns all admin email recipients (primary + backup if configured).
+ */
+export function getAdminEmailRecipients(): string[] {
+  const primary = getAdminEmailAddress();
+  const backup = getAdminBackupEmailAddress();
+  const list = [primary];
+  if (backup && backup.toLowerCase() !== primary.toLowerCase()) {
+    list.push(backup);
+  }
+  return list;
 }
 
 /**

@@ -67,7 +67,8 @@ export const useProductStore = create<ProductState>()(
       getFilteredProducts: () => {
         const { products, selectedCategory, searchQuery, sortBy } = get();
 
-        let filtered = [...products];
+        // Always exclude drafts from public storefront
+        let filtered = products.filter((p) => !p.isDraft);
 
         // 1. Category Filter
         if (selectedCategory && selectedCategory !== "all") {

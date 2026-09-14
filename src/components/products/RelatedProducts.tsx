@@ -19,8 +19,8 @@ export default function RelatedProducts({
   const [visibleCount, setVisibleCount] = useState<number>(initialCount);
   const products = useProductStore((s) => s.products);
 
-  // Filter out current product and prioritize products of the same category
-  const filteredProducts = products.filter((p) => p.id !== currentProduct.id);
+  // Filter out current product, draft products, and prioritize products of the same category
+  const filteredProducts = products.filter((p) => p.id !== currentProduct.id && !p.isDraft);
   const sameCategoryProducts = filteredProducts.filter(
     (p) => p.category === currentProduct.category
   );

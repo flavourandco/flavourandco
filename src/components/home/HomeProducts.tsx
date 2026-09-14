@@ -43,7 +43,7 @@ export default function HomeProducts() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const featuredProducts = sortProductsByCustomOrder(products.filter((p) => p.isFeatured));
+  const featuredProducts = sortProductsByCustomOrder(products.filter((p) => p.isFeatured && !p.isDraft));
   const maxIndex = Math.max(0, featuredProducts.length - itemsPerPage);
 
   // Clamp currentIndex when itemsPerPage changes

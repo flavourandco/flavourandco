@@ -22,7 +22,7 @@ export default function Products() {
     fetchProducts(true);
   }, [fetchProducts]);
 
-  const products = sortProductsByCustomOrder(rawProducts);
+  const products = sortProductsByCustomOrder(rawProducts.filter((p) => !p.isDraft));
 
   const toggleWishlist = (id: string) => {
     const isCurrentlyWishlisted = wishlist.includes(id);
