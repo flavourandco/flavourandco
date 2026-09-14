@@ -621,7 +621,7 @@ export default function AdminProductsPage() {
                   <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Price ($ AUD)</th>
                   <th className="py-3 px-4">Pack Info</th>
-                  <th className="py-3 px-4">Flags</th>
+                  <th className="py-3 px-4">Visibility</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -643,62 +643,42 @@ export default function AdminProductsPage() {
                     <td className="py-3 px-4 font-bold text-slate-900">${p.price.toFixed(2)}</td>
                     <td className="py-3 px-4 text-slate-600">{p.packInfo}</td>
                     <td className="py-3 px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {p.isDraft && (
-                          <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 text-[9px] font-bold rounded-sm border border-amber-300">
-                            Draft
-                          </span>
-                        )}
-                        {p.isFeatured && (
-                          <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 text-[9px] font-bold rounded-sm border border-purple-200/60">
-                            Featured
-                          </span>
-                        )}
-                        {p.isBestSeller && (
-                          <span className="px-1.5 py-0.5 bg-sky-50 text-sky-700 text-[9px] font-bold rounded-sm border border-sky-200/60">
-                            Bestseller
-                          </span>
-                        )}
-                      </div>
+                      {/* Visibility: Live / Draft Interactive Switch */}
+                      <button
+                        type="button"
+                        disabled={togglingDraftProductId === p.id}
+                        onClick={() => handleToggleDraftProduct(p)}
+                        className={`inline-flex items-center gap-1.5 py-1 text-xs font-semibold transition-all cursor-pointer select-none ${
+                          togglingDraftProductId === p.id ? "opacity-75 cursor-not-allowed" : ""
+                        }`}
+                        title={p.isDraft ? "Draft (hidden) - Click to make Live" : "Live (published) - Click to make Draft"}
+                      >
+                        <div
+                          className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                            p.isDraft ? "bg-amber-500" : "bg-emerald-600"
+                          }`}
+                        >
+                          <div
+                            className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
+                              p.isDraft ? "translate-x-3" : "translate-x-0"
+                            }`}
+                          >
+                            {togglingDraftProductId === p.id && (
+                              <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
+                            )}
+                          </div>
+                        </div>
+                        <span className={`text-[11px] font-semibold ${p.isDraft ? "text-amber-800" : "text-emerald-700"}`}>
+                          {p.isDraft ? "Draft" : "Live"}
+                        </span>
+                      </button>
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1.5">
-                        {/* On/Off Toggle for Featured (Shortcut) */}
-                        <button
-                          type="button"
-                          disabled={togglingFeaturedProductId === p.id}
-                          onClick={() => handleToggleFeaturedProduct(p)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer select-none ${
-                            p.isFeatured
-                              ? "bg-amber-100/90 text-amber-950 hover:bg-amber-200/90"
-                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                          } ${togglingFeaturedProductId === p.id ? "opacity-75 cursor-not-allowed" : ""}`}
-                          title={p.isFeatured ? "Featured on Homepage" : "Not Featured"}
-                        >
-                          <span className="text-[11px]">Featured</span>
-                          
-                          {/* Interactive On/Off Pill Switch */}
-                          <div
-                            className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
-                              p.isFeatured ? "bg-amber-600" : "bg-slate-300"
-                            }`}
-                          >
-                            <div
-                              className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
-                                p.isFeatured ? "translate-x-3" : "translate-x-0"
-                              }`}
-                            >
-                              {togglingFeaturedProductId === p.id && (
-                                <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
-                              )}
-                            </div>
-                          </div>
-                        </button>
-
                         {/* EDIT BUTTON (Direct action in row) */}
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer border border-slate-300/60"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer"
                         >
                           <Edit2 className="w-3 h-3 text-slate-600" /> Edit
                         </button>
@@ -740,39 +720,6 @@ export default function AdminProductsPage() {
               </div>
               
               <div className="flex items-center gap-2">
-                {/* Featured Toggle in View Modal */}
-                <button
-                  type="button"
-                  disabled={togglingFeaturedProductId === viewingProduct.id}
-                  onClick={() => {
-                    handleToggleFeaturedProduct(viewingProduct);
-                    setViewingProduct({ ...viewingProduct, isFeatured: !viewingProduct.isFeatured });
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-sm transition-all cursor-pointer select-none ${
-                    viewingProduct.isFeatured
-                      ? "bg-amber-100/90 text-amber-950 hover:bg-amber-200/90 border border-amber-300/80"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
-                  } ${togglingFeaturedProductId === viewingProduct.id ? "opacity-75 cursor-not-allowed" : ""}`}
-                  title={viewingProduct.isFeatured ? "Featured on Homepage" : "Not Featured"}
-                >
-                  <span className="text-[11px]">Featured</span>
-                  <div
-                    className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
-                      viewingProduct.isFeatured ? "bg-amber-600" : "bg-slate-300"
-                    }`}
-                  >
-                    <div
-                      className={`w-3 h-3 rounded-full bg-white shadow-xs transition-transform flex items-center justify-center ${
-                        viewingProduct.isFeatured ? "translate-x-3" : "translate-x-0"
-                      }`}
-                    >
-                      {togglingFeaturedProductId === viewingProduct.id && (
-                        <Loader2 className="w-2 h-2 text-slate-700 animate-spin" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-
                 <button
                   onClick={() => handleOpenEditFromView(viewingProduct)}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-sm transition-colors cursor-pointer shadow-xs"
@@ -1448,63 +1395,85 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
-                {/* Draft / Published Toggle Pill (Fixed size to prevent layout shifts) */}
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+                {/* Left Side: Featured on Home Toggle (Text first, then toggle switch, fixed text width to avoid layout shifts) */}
                 <button
                   type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, isDraft: !prev.isDraft }))}
-                  className={`inline-flex items-center justify-center gap-2 w-[120px] h-9 rounded-full text-xs font-semibold cursor-pointer transition-all select-none shrink-0 ${
-                    formData.isDraft
-                      ? "bg-amber-100 text-amber-950 hover:bg-amber-200"
-                      : "bg-emerald-100 text-emerald-950 hover:bg-emerald-200"
-                  }`}
-                  title={formData.isDraft ? "Click to set as Published" : "Click to set as Draft"}
+                  onClick={() => setFormData((prev) => ({ ...prev, isFeatured: !prev.isFeatured }))}
+                  className="inline-flex items-center gap-2 h-9 text-xs font-semibold cursor-pointer transition-all select-none shrink-0 text-slate-700 hover:text-slate-900"
+                  title={formData.isFeatured ? "Featured on Home - click to turn off" : "Not Featured on Home - click to feature"}
                 >
+                  <span className={`w-[135px] text-left text-xs font-semibold transition-colors ${formData.isFeatured ? "text-purple-900" : "text-slate-600"}`}>
+                    {formData.isFeatured ? "Featured on Home" : "Not Featured on Home"}
+                  </span>
                   <div
                     className={`w-6 h-3.5 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
-                      formData.isDraft ? "bg-amber-600" : "bg-emerald-600"
+                      formData.isFeatured ? "bg-purple-600" : "bg-slate-300"
                     }`}
                   >
                     <div
                       className={`w-2.5 h-2.5 rounded-full bg-white shadow-xs transition-transform ${
-                        formData.isDraft ? "translate-x-2.5" : "translate-x-0"
+                        formData.isFeatured ? "translate-x-2.5" : "translate-x-0"
                       }`}
                     />
                   </div>
-                  <span className="text-center">
-                    {formData.isDraft ? "Draft" : "Published"}
-                  </span>
                 </button>
 
-                {/* Cancel Button */}
-                <button
-                  type="button"
-                  disabled={isSubmitting || stagedMedia.isUploading}
-                  onClick={handleAttemptCloseEdit}
-                  className="h-9 min-w-[76px] px-4 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center shrink-0"
-                >
-                  Cancel
-                </button>
+                {/* Right Side: Draft/Live Toggle + Cancel + Submit */}
+                <div className="flex items-center gap-3">
+                  {/* Draft / Live Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, isDraft: !prev.isDraft }))}
+                    className="inline-flex items-center justify-center gap-2 px-2.5 h-9 text-xs font-semibold cursor-pointer transition-all select-none shrink-0 text-slate-700 hover:text-slate-900"
+                    title={formData.isDraft ? "Draft - click to make Live" : "Live - click to make Draft"}
+                  >
+                    <div
+                      className={`w-6 h-3.5 rounded-full transition-colors relative flex items-center p-0.5 shrink-0 ${
+                        formData.isDraft ? "bg-amber-500" : "bg-emerald-600"
+                      }`}
+                    >
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full bg-white shadow-xs transition-transform ${
+                          formData.isDraft ? "translate-x-2.5" : "translate-x-0"
+                        }`}
+                      />
+                    </div>
+                    <span className={`text-center font-semibold ${formData.isDraft ? "text-amber-800" : "text-emerald-700"}`}>
+                      {formData.isDraft ? "Draft" : "Live"}
+                    </span>
+                  </button>
 
-                {/* Submit Button (Fixed min-width to avoid jitter between button states) */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting || stagedMedia.isUploading}
-                  className="h-9 min-w-[130px] inline-flex items-center justify-center gap-2 px-5 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs disabled:opacity-75 transition-all shrink-0"
-                >
-                  {isSubmitting || stagedMedia.isUploading ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
-                      <span>{stagedMedia.isUploading ? "Uploading..." : formData.isDraft ? "Saving..." : editingProduct ? "Saving..." : "Adding..."}</span>
-                    </>
-                  ) : formData.isDraft ? (
-                    "Save Draft"
-                  ) : editingProduct ? (
-                    "Save Changes"
-                  ) : (
-                    "Add Product"
-                  )}
-                </button>
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    disabled={isSubmitting || stagedMedia.isUploading}
+                    onClick={handleAttemptCloseEdit}
+                    className="h-9 min-w-[76px] px-4 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-sm transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center shrink-0"
+                  >
+                    Cancel
+                  </button>
+
+                  {/* Submit Button (Fixed min-width to avoid jitter between button states) */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || stagedMedia.isUploading}
+                    className="h-9 min-w-[130px] inline-flex items-center justify-center gap-2 px-5 text-xs font-semibold text-white bg-slate-900 hover:bg-black rounded-sm cursor-pointer shadow-xs disabled:opacity-75 transition-all shrink-0"
+                  >
+                    {isSubmitting || stagedMedia.isUploading ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                        <span>{stagedMedia.isUploading ? "Uploading..." : formData.isDraft ? "Saving..." : editingProduct ? "Saving..." : "Adding..."}</span>
+                      </>
+                    ) : formData.isDraft ? (
+                      "Save Draft"
+                    ) : editingProduct ? (
+                      "Save Changes"
+                    ) : (
+                      "Add Product"
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
