@@ -296,6 +296,8 @@ export default function CheckoutPage() {
     setPaymentModalStage("transferring");
     setPaymentError(null);
 
+    let pendingOrderId: string | undefined = undefined;
+
     try {
       // Phase 1: Create Server-Authoritative Pending Order Intent
       const intentRes = await fetch("/api/checkout/create-intent", {
@@ -312,6 +314,8 @@ export default function CheckoutPage() {
       if (!intentRes.ok || !intentData.success) {
         throw new Error(intentData.error || "Failed to create order intent. Please try again.");
       }
+
+      pendingOrderId = intentData.orderId;
 
       // Phase 2: Execute Payment Call with Server-Validated Order & Persistent Idempotency Key
       const payRes = await fetch("/api/checkout/square", {
@@ -334,7 +338,7 @@ export default function CheckoutPage() {
       clearCart();
       addToast("Order placed successfully! Thank you for ordering with Flavour & Co.", "success");
 
-      // Show payment confirmed animation for 1.2 seconds before redirecting
+      // Show payment confirmed animation for 1.2 seconds before redirecting to success page
       await new Promise((resolve) => setTimeout(resolve, 1200));
       router.push(`/checkout/success?orderId=${encodeURIComponent(payData.orderId)}`);
     } catch (err: any) {
@@ -344,9 +348,14 @@ export default function CheckoutPage() {
       setPaymentError(errMsg);
       addToast(errMsg, "error");
 
-      // Show payment cancelled animation for 1.4 seconds before closing modal back to checkout
-      await new Promise((resolve) => setTimeout(resolve, 1400));
+      // Show payment cancelled animation for 1.2 seconds before redirecting to payment failed page
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       setPaymentModalStage(null);
+
+      const params = new URLSearchParams();
+      if (errMsg) params.set("reason", errMsg);
+      if (pendingOrderId) params.set("orderId", pendingOrderId);
+      router.push(`/checkout/failed?${params.toString()}`);
     } finally {
       setIsProcessing(false);
     }

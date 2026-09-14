@@ -90,7 +90,38 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Valid product price is required" }, { status: 400 });
     }
 
-    const id = body.id || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    // Helper to generate clean URL slug from name
+    const slugify = (text: string) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/['"]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    let baseSlug = (body.id ? slugify(body.id) : slugify(name)) || `product-${Date.now().toString().slice(-4)}`;
+
+    if (isSupabaseConfigured()) {
+      const supabase = getSupabaseServerClient();
+      if (supabase) {
+        // Query existing products to prevent slug collisions
+        const { data: existingList } = await supabase
+          .from("products")
+          .select("id")
+          .ilike("id", `${baseSlug}%`);
+
+        const takenIds = new Set((existingList || []).map((item: { id: string }) => item.id.toLowerCase()));
+        if (takenIds.has(baseSlug)) {
+          let counter = 1;
+          while (takenIds.has(`${baseSlug}-${counter}`)) {
+            counter++;
+          }
+          baseSlug = `${baseSlug}-${counter}`;
+        }
+      }
+    }
+
+    const id = baseSlug;
 
     const newProduct: Product = {
       id,

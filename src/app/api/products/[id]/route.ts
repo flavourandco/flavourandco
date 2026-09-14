@@ -51,7 +51,20 @@ export async function PUT(
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
       if (supabase) {
-        const updatePayload = {
+        const newId = body.id && typeof body.id === "string" ? body.id.trim().toLowerCase().replace(/[^a-z0-9-]+/g, "") : id;
+
+        // If ID / slug is changing, check uniqueness and update referencing reviews
+        if (newId && newId !== id) {
+          const { data: existing } = await supabase.from("products").select("id").eq("id", newId).maybeSingle();
+          if (existing) {
+            return NextResponse.json({ success: false, error: `Product slug '${newId}' is already in use by another product.` }, { status: 400 });
+          }
+
+          // Update referencing reviews if any
+          await supabase.from("reviews").update({ product_id: newId }).eq("product_id", id);
+        }
+
+        const updatePayload: Record<string, any> = {
           name: body.name,
           tagline: body.tagline || "",
           short_description: body.shortDescription || "",
@@ -72,6 +85,10 @@ export async function PUT(
           updated_at: new Date().toISOString(),
         };
 
+        if (newId && newId !== id) {
+          updatePayload.id = newId;
+        }
+
         const { data, error } = await supabase
           .from("products")
           .update(updatePayload)
@@ -85,8 +102,9 @@ export async function PUT(
         // Revalidate route caches
         revalidatePath("/api/products");
         revalidatePath(`/api/products/${id}`);
+        if (newId !== id) revalidatePath(`/api/products/${newId}`);
         revalidatePath("/shop");
-        revalidatePath(`/shop/${body.category || "frozen"}/${id}`);
+        revalidatePath(`/shop/${body.category || "frozen"}/${newId || id}`);
         revalidatePath("/");
 
         return NextResponse.json({ success: true, data });

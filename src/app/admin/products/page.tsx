@@ -257,6 +257,29 @@ export default function AdminProductsPage() {
     }
   };
 
+  const generateUniqueSlug = (name: string, currentId = ""): string => {
+    const base = name
+      .toLowerCase()
+      .trim()
+      .replace(/['"]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || `product-${Date.now().toString().slice(-4)}`;
+
+    const existingIds = new Set(
+      products
+        .map((p) => p.id.toLowerCase())
+        .filter((id) => id !== currentId.toLowerCase())
+    );
+
+    if (!existingIds.has(base)) return base;
+
+    let counter = 1;
+    while (existingIds.has(`${base}-${counter}`)) {
+      counter++;
+    }
+    return `${base}-${counter}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -275,8 +298,13 @@ export default function AdminProductsPage() {
 
       const primaryImage = finalImages[0] || formData.image || "/product-placeholder.svg";
 
+      const finalId = editingProduct
+        ? (formData.id.trim() || editingProduct.id)
+        : generateUniqueSlug(formData.name);
+
       const payload = {
         ...formData,
+        id: finalId,
         image: primaryImage,
         images: finalImages.length > 0 ? finalImages : [primaryImage],
       };
@@ -827,20 +855,36 @@ export default function AdminProductsPage() {
               <div className="flex-1 overflow-y-auto min-h-0 p-6 space-y-6 overscroll-contain" data-lenis-prevent>
                 {activeTab === "basic" && (
                   <div className="space-y-4">
-                    {/* Row 1: Product ID/Slug & Product Name */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">* Slug</label>
-                        <input
-                          type="text"
-                          required
-                          disabled={Boolean(editingProduct)}
-                          value={formData.id}
-                          onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                          placeholder="e.g. butter-chicken-pie"
-                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-mono disabled:opacity-60"
-                        />
+                    {/* Row 1: Product Name (Full width for Add, 2-col for Edit with Slug) */}
+                    {editingProduct ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">* Product Name</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="e.g. Authentic Butter Chicken Pie"
+                            className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Slug / URL Identifier</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.id}
+                            onChange={(e) => setFormData({ ...formData, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "") })}
+                            placeholder="e.g. authentic-butter-chicken-pie"
+                            className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-mono"
+                          />
+                          <span className="text-[10px] text-slate-400 block mt-0.5">
+                            Unique URL identifier for this product
+                          </span>
+                        </div>
                       </div>
+                    ) : (
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">* Product Name</label>
                         <input
@@ -852,7 +896,7 @@ export default function AdminProductsPage() {
                           className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-medium"
                         />
                       </div>
-                    </div>
+                    )}
 
                     {/* Row 2: Tagline */}
                     <div>
@@ -868,14 +912,14 @@ export default function AdminProductsPage() {
                       />
                     </div>
 
-                    {/* Row 3: Category, Base Price, Servings & Pack Info, Badge Tag */}
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    {/* Row 3: Category, Base Price, Servings & Pack Info (Clean 3-column layout) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">* Category</label>
                         <select
                           value={formData.category}
                           onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-medium"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-medium cursor-pointer"
                         >
                           <option value="frozen">Frozen</option>
                           <option value="freshly-baked">Freshly Baked</option>
@@ -902,19 +946,6 @@ export default function AdminProductsPage() {
                           placeholder="e.g. Pack of 12 (12 Servings)"
                           className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Custom Ribbon / Badge Tag</label>
-                        <input
-                          type="text"
-                          value={formData.badge}
-                          onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                          placeholder="e.g. Best Seller, Hot Deal, Chef Special, 20% OFF..."
-                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-sm focus:outline-none focus:border-slate-900 font-sans"
-                        />
-                        <span className="text-[10px] text-slate-500 block mt-1">
-                          Full custom control: Whatever text you type here will appear on product cards & detail page. Leave empty for no ribbon.
-                        </span>
                       </div>
                     </div>
 
