@@ -127,8 +127,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_key
 CLERK_SECRET_KEY=sk_test_your_clerk_secret
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-CLERK_WEBHOOK_SECRET=ep_your_clerk_webhook_signing_secret
+CLERK_WEBHOOK_SIGNING_SECRET=whsec_your_clerk_webhook_signing_secret
 
 # ------------------------------------------------------------------------------
 # 3. Square Payment Gateway

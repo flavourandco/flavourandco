@@ -1,24 +1,39 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
-export async function POST(req: Request) {
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+export async function GET() {
+  return NextResponse.json({
+    status: "active",
+    endpoint: "/api/webhooks/clerk",
+    description: "Clerk Authentication Webhook Handler for Flavour & Co.",
+    supportedEvents: ["user.created", "user.updated", "user.deleted"],
+  });
+}
 
-  const headerPayload = await headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+export async function POST(req: Request) {
+  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
+
+  const svix_id = req.headers.get("svix-id");
+  const svix_timestamp = req.headers.get("svix-timestamp");
+  const svix_signature = req.headers.get("svix-signature");
 
   const body = await req.text();
   let evt: any;
 
-  // If CLERK_WEBHOOK_SECRET is configured, cryptographically verify signature with Svix
+  // Cryptographically verify Svix signature if signing secret is provided
   if (WEBHOOK_SECRET) {
     if (!svix_id || !svix_timestamp || !svix_signature) {
-      return NextResponse.json({ success: false, error: "Missing svix headers" }, { status: 400 });
+      console.error("Clerk Webhook: Missing required svix headers");
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Missing required svix headers (svix-id, svix-timestamp, svix-signature)",
+        },
+        { status: 400 }
+      );
     }
+
     try {
       const wh = new Webhook(WEBHOOK_SECRET);
       evt = wh.verify(body, {
@@ -28,9 +43,30 @@ export async function POST(req: Request) {
       }) as any;
     } catch (err: unknown) {
       const error = err as Error;
-      return NextResponse.json({ success: false, error: `Webhook verification failed: ${error.message}` }, { status: 400 });
+      console.error("Clerk Webhook signature verification failed:", error.message);
+      return NextResponse.json(
+        { success: false, error: `Webhook verification failed: ${error.message}` },
+        { status: 400 }
+      );
     }
   } else {
+    // In production, reject unverified payloads
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "Clerk Webhook Error: CLERK_WEBHOOK_SIGNING_SECRET is not configured in production environment."
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Webhook signing secret is not configured on server",
+        },
+        { status: 500 }
+      );
+    }
+
+    console.warn(
+      "CLERK_WEBHOOK_SIGNING_SECRET is not configured. Webhook signature verification bypassed in development mode."
+    );
     try {
       evt = JSON.parse(body);
     } catch {
@@ -41,19 +77,21 @@ export async function POST(req: Request) {
   const eventType = evt.type || evt.event || "";
   const data = evt.data || evt;
 
+  // Handle non-user events gracefully with 200 OK so Clerk/Svix does not retry unnecessarily
   if (!eventType.startsWith("user.")) {
     return NextResponse.json({
       success: true,
-      message: `Ignored non-user event: ${eventType}`,
+      message: `Ignored event: ${eventType}`,
     });
   }
 
   if (!data || !data.id) {
-    return NextResponse.json({ success: false, error: "Invalid payload data" }, { status: 400 });
+    return NextResponse.json({ success: false, error: "Invalid payload data: missing user ID" }, { status: 400 });
   }
 
   const clerkUserId = data.id;
 
+  // 1. Handle user.deleted event
   if (eventType === "user.deleted") {
     if (isSupabaseConfigured()) {
       const supabase = getSupabaseServerClient();
@@ -65,9 +103,13 @@ export async function POST(req: Request) {
         }
       }
     }
-    return NextResponse.json({ success: true, message: `User ${clerkUserId} deleted` });
+    return NextResponse.json({
+      success: true,
+      message: `User ${clerkUserId} deleted successfully`,
+    });
   }
 
+  // 2. Handle user.created and user.updated events
   // Extract primary email address or fallback to first available
   const primaryEmailObj = data.email_addresses?.find(
     (e: any) => e.id === data.primary_email_address_id
@@ -94,7 +136,7 @@ export async function POST(req: Request) {
   if (isSupabaseConfigured()) {
     const supabase = getSupabaseServerClient();
     if (supabase) {
-      // Build record to upsert (omitting image_url if empty string/null fallback)
+      // Build record to upsert
       const userRecord: Record<string, any> = {
         clerk_user_id: clerkUserId,
         email,
@@ -112,7 +154,7 @@ export async function POST(req: Request) {
         { onConflict: "clerk_user_id" }
       );
 
-      // If error occurs (e.g. extra columns like image_url or role not created yet in DB schema), retry with minimal fields
+      // If error occurs (e.g. extra columns like image_url or role not present), retry with minimal fields
       if (error) {
         const minimalRecord = {
           clerk_user_id: clerkUserId,
@@ -141,7 +183,7 @@ export async function POST(req: Request) {
 
   return NextResponse.json({
     success: true,
-    message: `User ${clerkUserId} synced successfully`,
+    message: `User ${clerkUserId} synced successfully (${eventType})`,
     data: { clerkUserId, email, name, role, imageUrl },
   });
 }

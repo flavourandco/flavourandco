@@ -44,7 +44,7 @@ export async function GET() {
 
           return NextResponse.json(
             { success: true, data: sortProductsByCustomOrder(formattedProducts) },
-            { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+            { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600" } }
           );
         }
       }

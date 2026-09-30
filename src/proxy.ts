@@ -15,6 +15,11 @@ export default function proxy(req: NextRequest, evt: NextFetchEvent) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const secretKey = process.env.CLERK_SECRET_KEY;
 
+  // Never intercept webhook endpoints (Clerk, Square, etc.)
+  if (req.nextUrl.pathname.startsWith("/api/webhooks")) {
+    return NextResponse.next();
+  }
+
   // If Clerk keys are missing or invalid, bypass middleware gracefully instead of failing with 500
   if (
     !publishableKey ||

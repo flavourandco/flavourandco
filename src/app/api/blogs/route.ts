@@ -37,7 +37,7 @@ export async function GET() {
 
           return NextResponse.json(
             { success: true, data: formattedBlogs },
-            { headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" } }
+            { headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=1800" } }
           );
         }
       }
