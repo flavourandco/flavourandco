@@ -91,7 +91,7 @@ export default function Footer() {
               <span className="text-xs font-bold uppercase tracking-wider text-secondary">Follow Us</span>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://www.instagram.com/plateteamindia?utm_source=qr"
+                  href="https://www.instagram.com/flavourandcoaus"
                   target="_blank"
                   rel="noreferrer"
                   className="p-2.5 rounded-full bg-white/10 hover:bg-secondary hover:text-brand-green text-white transition-all hover:scale-105"
@@ -100,7 +100,7 @@ export default function Footer() {
                   <InstagramIcon className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://www.facebook.com/share/1DQUjBQw5r/?mibextid=wwXIfr"
+                  href="https://www.facebook.com/share/1Ez19eYZXP/"
                   target="_blank"
                   rel="noreferrer"
                   className="p-2.5 rounded-full bg-white/10 hover:bg-secondary hover:text-brand-green text-white transition-all hover:scale-105"
@@ -279,7 +279,7 @@ export default function Footer() {
               <span className="text-xs font-bold uppercase tracking-wider text-secondary">Follow Us</span>
               <div className="flex items-center gap-3.5 text-secondary">
                 <a
-                  href="https://www.instagram.com/plateteamindia?utm_source=qr"
+                  href="https://www.instagram.com/flavourandcoaus"
                   target="_blank"
                   rel="noreferrer"
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
@@ -288,7 +288,7 @@ export default function Footer() {
                   <InstagramIcon className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://www.facebook.com/share/1DQUjBQw5r/?mibextid=wwXIfr"
+                  href="https://www.facebook.com/share/1Ez19eYZXP/"
                   target="_blank"
                   rel="noreferrer"
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
