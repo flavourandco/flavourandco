@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Geist, Cormorant_Garamond } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import Script from "next/script";
 import "./globals.css";
 import SmoothScroll from "@/components/home/SmoothScroll";
 import FloatingAdminButton from "@/components/layout/FloatingAdminButton";
@@ -35,6 +36,8 @@ export const metadata: Metadata = {
     "Delicious Indo-Australian pies created by Simran, showcased on Channel 7's Plate of Origin.",
 };
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-5WKDYE0HD3";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -52,8 +55,23 @@ export default function RootLayout({
           <link rel="dns-prefetch" href="https://res.cloudinary.com" />
           <link rel="preconnect" href="https://mxqzkuzjhqrfayixgzsm.supabase.co" crossOrigin="anonymous" />
           <link rel="dns-prefetch" href="https://mxqzkuzjhqrfayixgzsm.supabase.co" />
+          <link rel="preconnect" href="https://www.googletagmanager.com" />
         </head>
         <body className="min-h-full flex flex-col font-serif">
+          {/* Google tag (gtag.js) */}
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', '${GA_MEASUREMENT_ID}');
+            `}
+          </Script>
           <UserSyncListener />
           <ToastContainer />
           <SmoothScroll>{children}</SmoothScroll>
