@@ -13,6 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 import type { Order } from "@/lib/types";
+import { resolveItemVariant } from "@/lib/utils";
 
 interface OrderReceiptModalProps {
   order: Order | null;
@@ -256,8 +257,7 @@ export default function OrderReceiptModal({
                           : 0;
                       const itemQty = item.quantity || 1;
                       const lineTotal = itemPrice * itemQty;
-                      const variantLabel =
-                        item.variantName || item.variant || "Standard";
+                      const variantLabel = resolveItemVariant(item);
 
                       return (
                         <tr key={idx} className="hover:bg-stone-50/80">

@@ -67,24 +67,38 @@ export default function ProductDetailPage({
   const [customQtyValue, setCustomQtyValue] = useState<string>("10");
 
   // Active Variant & Unit Price
-  const activeVariant = product?.variants?.[selectedVariantIdx];
+  const availableVariants = product?.variants && product.variants.length > 0
+    ? product.variants
+    : product?.preparationOptions && product.preparationOptions.length > 0
+    ? product.preparationOptions.map((opt) => ({ name: opt, price: product.price }))
+    : product?.category === "freshly-baked"
+    ? [{ name: "Freshly Baked", price: product?.price || 0 }]
+    : product?.category === "frozen"
+    ? [{ name: "Frozen", price: product?.price || 0 }]
+    : [];
+
+  const activeVariant = availableVariants[selectedVariantIdx] || availableVariants[0];
   const unitPrice = activeVariant ? activeVariant.price : (product?.price || 0);
+  const variantName = activeVariant?.name;
 
   // Check if product / variant is already in cart
-  const itemId = activeVariant ? `${product?.id}-${activeVariant.name}` : (product?.id || "");
-  const isInCart = cartItems.some((i) => i.productId === product?.id || i.id === itemId);
+  const itemId = variantName ? `${product?.id}-${variantName}` : (product?.id || "");
+  const isInCart = cartItems.some((i) => i.id === itemId);
 
   // Sync quantity state with cart item if present
   useEffect(() => {
-    const existingCartItem = cartItems.find((i) => i.id === itemId || i.productId === product?.id);
+    const existingCartItem = cartItems.find((i) => i.id === itemId);
     if (existingCartItem) {
       setQuantity(existingCartItem.quantity);
       if (existingCartItem.quantity >= 10) {
         setIsCustomQtyInput(true);
         setCustomQtyValue(String(existingCartItem.quantity));
       }
+    } else {
+      setQuantity(1);
+      setIsCustomQtyInput(false);
     }
-  }, [itemId, cartItems, product?.id]);
+  }, [itemId, cartItems]);
 
   const handleCustomQtySubmit = () => {
     const parsed = parseInt(customQtyValue, 10);
@@ -268,7 +282,7 @@ export default function ProductDetailPage({
                   ) : (
                     <Button
                       onClick={() => {
-                        addItem(product, quantity, activeVariant?.name, unitPrice);
+                        addItem(product, quantity, variantName, unitPrice);
                       }}
                       variant="primary"
                       className="flex-1 py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider gap-1.5 shadow-sm hover:shadow transition-all rounded-md"
@@ -281,7 +295,7 @@ export default function ProductDetailPage({
                   <Button
                     onClick={() => {
                       clearCart();
-                      addItem(product, quantity, activeVariant?.name, unitPrice, { showToast: false });
+                      addItem(product, quantity, variantName, unitPrice, { showToast: false });
                       router.push("/checkout");
                     }}
                     variant="secondary"
@@ -505,21 +519,21 @@ export default function ProductDetailPage({
               )}
 
               {/* ───────────────────────────────────────────────────────────
-                  SELECT VARIANTS (Clean, small pills, no prices inside)
+                  SELECT VARIANT (Right Side Variant Selector)
                  ─────────────────────────────────────────────────────────── */}
-              {product.variants && product.variants.length > 0 && (
+              {availableVariants && availableVariants.length > 0 && (
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-stone-700 block">
-                      Select Variants
+                      Select Variant
                     </label>
                     <span className="text-xs font-mono font-semibold text-[#6b1e30]">
-                      {product.variants[selectedVariantIdx]?.name}
+                      {availableVariants[selectedVariantIdx]?.name || variantName}
                     </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {product.variants.map((v, idx) => {
+                    {availableVariants.map((v, idx) => {
                       const isSelected = selectedVariantIdx === idx;
                       return (
                         <button

@@ -28,6 +28,7 @@ import {
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/layout/Footer";
 import { useAuthStore } from "@/store/auth.store";
+import { resolveItemVariant } from "@/lib/utils";
 import { BoneyardProfilePageSkeleton } from "@/components/ui/BoneyardSkeleton";
 import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 import type { Order } from "@/lib/types";
@@ -766,7 +767,7 @@ export default function ProfilePage() {
                           const itemPrice = typeof item.price === "number" ? item.price : (typeof item.unitPrice === "number" ? item.unitPrice : 0);
                           const itemQty = item.quantity || 1;
                           const lineTotal = itemPrice * itemQty;
-                          const variantLabel = item.variantName || item.variant || "Standard";
+                          const variantLabel = resolveItemVariant(item);
                           const itemImg = item.image || item.product?.image || item.product?.images?.[0];
 
                           return (

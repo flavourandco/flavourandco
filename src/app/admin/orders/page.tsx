@@ -25,6 +25,7 @@ import { BoneyardTableSkeleton } from "@/components/ui/BoneyardSkeleton";
 import OrderReceiptModal from "@/components/orders/OrderReceiptModal";
 import { notifyContentUpdated, subscribeToRealtimeUpdates } from "@/lib/realtime";
 import { exportOrdersToCSV } from "@/lib/csv-export";
+import { resolveItemVariant } from "@/lib/utils";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -549,7 +550,7 @@ export default function AdminOrdersPage() {
                           const itemPrice = typeof item.price === "number" ? item.price : (typeof item.unitPrice === "number" ? item.unitPrice : 0);
                           const itemQty = item.quantity || 1;
                           const lineTotal = itemPrice * itemQty;
-                          const variantLabel = item.variant || item.variantName || "Standard Pack";
+                          const variantLabel = resolveItemVariant(item);
                           const itemImg = item.image || item.product?.image || item.product?.images?.[0];
 
                           return (
@@ -566,7 +567,11 @@ export default function AdminOrdersPage() {
                                   <span className="font-semibold text-slate-900">{item.name || item.product?.name || "Gourmet Pie"}</span>
                                 </div>
                               </td>
-                              <td className="py-2.5 px-3 text-slate-500 font-medium">{variantLabel}</td>
+                              <td className="py-2.5 px-3">
+                                <span className="inline-block bg-slate-100 text-slate-800 text-[11px] font-semibold px-2 py-0.5 rounded border border-slate-200">
+                                  {variantLabel}
+                                </span>
+                              </td>
                               <td className="py-2.5 px-3 text-right font-mono">${itemPrice.toFixed(2)}</td>
                               <td className="py-2.5 px-3 text-center font-bold">{itemQty}</td>
                               <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono">
@@ -577,7 +582,7 @@ export default function AdminOrdersPage() {
                         })
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-3 px-3 text-center text-slate-400">Standard Bakery Order Package</td>
+                          <td colSpan={5} className="py-3 px-3 text-center text-slate-400">No items breakdown available</td>
                         </tr>
                       )}
                     </tbody>

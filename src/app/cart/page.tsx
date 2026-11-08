@@ -26,6 +26,7 @@ import Button from "@/components/ui/Button";
 import { useCartStore } from "@/store/cart.store";
 import { getValidProductImages } from "@/lib/media";
 import { BoneyardCartSkeleton } from "@/components/ui/BoneyardSkeleton";
+import { resolveItemVariant } from "@/lib/utils";
 
 export default function CartPage() {
   const router = useRouter();
@@ -286,11 +287,9 @@ export default function CartPage() {
                               )}
                               
                               <div className="flex flex-wrap items-center gap-2 text-[10px] pt-0.5">
-                                {item.variantName && (
-                                  <span className="bg-stone-100 text-stone-800 font-semibold px-2 py-0.5 rounded-sm border border-stone-200">
-                                    Option: {item.variantName}
-                                  </span>
-                                )}
+                                <span className="bg-stone-100 text-[#07402b] font-bold px-2 py-0.5 rounded-sm border border-stone-200">
+                                  Variant: {resolveItemVariant(item)}
+                                </span>
                                 {item.product.packInfo && (
                                   <span className="bg-[#faf6f0] text-stone-700 font-medium px-2 py-0.5 rounded-sm border border-[#c69c40]/30 font-mono">
                                     {item.product.packInfo}

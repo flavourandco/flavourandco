@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import { useCartStore } from "@/store/cart.store";
+import { resolveItemVariant } from "@/lib/utils";
 
 interface FailedOrderInfo {
   id: string;
@@ -335,11 +336,9 @@ function FailedContent() {
                         <span className="text-[10px] font-bold text-[#6b1e30] bg-white px-1.5 py-0.2 rounded border border-stone-200">
                           {item.quantity}x
                         </span>
-                        {item.variantName && (
-                          <span className="text-[10px] text-[#07402b] font-medium bg-[#07402b]/10 px-1.5 py-0.2 rounded">
-                            {item.variantName}
-                          </span>
-                        )}
+                        <span className="text-[10px] text-[#07402b] font-medium bg-[#07402b]/10 px-1.5 py-0.2 rounded">
+                          Variant: {resolveItemVariant(item)}
+                        </span>
                       </div>
                     </div>
                   </div>

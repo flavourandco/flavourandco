@@ -1,6 +1,7 @@
 import React from "react";
 import { BaseLayout } from "./BaseLayout";
 import type { EmailOrderData } from "../types";
+import { resolveItemVariant } from "@/lib/utils";
 
 export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({ order }) => {
   const firstName = order.customerName ? order.customerName.split(" ")[0] : "there";
@@ -100,7 +101,7 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
                 const unitPrice = item.price ?? 0;
                 const qty = item.quantity ?? 1;
                 const lineTotal = (unitPrice * qty).toFixed(2);
-                const variantText = item.variant || "";
+                const variantText = resolveItemVariant(item);
 
                 return (
                   <tr key={idx} style={{ borderBottom: idx < order.items.length - 1 ? "1px solid #f5efe6" : "none" }}>
@@ -108,9 +109,9 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
                       <div style={{ fontWeight: "600", color: "#1c1410", fontSize: "13px" }}>
                         {item.name}
                       </div>
-                      {variantText && variantText !== "Standard" && (
+                      {variantText && (
                         <div style={{ fontSize: "11px", color: "#78716c", marginTop: "2px" }}>
-                          Variant: {variantText}
+                          Variant: <strong style={{ color: "#07402b" }}>{variantText}</strong>
                         </div>
                       )}
                       <div style={{ fontSize: "11px", color: "#a8a29e", marginTop: "2px" }}>

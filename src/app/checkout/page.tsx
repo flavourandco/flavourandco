@@ -44,6 +44,7 @@ import {
   AUSTRALIAN_STATES,
 } from "@/lib/shipping";
 import { formatCustomerError } from "@/lib/error-formatter";
+import { resolveItemVariant } from "@/lib/utils";
 
 const QUICK_DELIVERY_PREFERENCES = [
   "Leave at front door",
@@ -120,7 +121,7 @@ import { BoneyardCartSkeleton } from "@/components/ui/BoneyardSkeleton";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentModalStage, setPaymentModalStage] = useState<PaymentModalStage | null>(null);
@@ -223,7 +224,13 @@ export default function CheckoutPage() {
     }
   }, [formData.email, promoInput]);
 
-  if (!mounted) {
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push("/sign-in?redirect_url=/checkout");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (!mounted || !isLoaded || !isSignedIn) {
     return (
       <PageLayout title="Checkout" hideHeader fullWidth>
         <div className="bg-[#fdfbf7] min-h-[75vh] pt-4 sm:pt-6">
@@ -749,11 +756,9 @@ export default function CheckoutPage() {
                             <span className="text-[9px] font-bold text-[#6b1e30] bg-white px-1.5 py-0.2 rounded border border-stone-200">
                               {item.quantity}x
                             </span>
-                            {item.variantName && (
-                              <span className="text-[9px] text-[#07402b] font-semibold bg-[#07402b]/10 px-1.5 py-0.2 rounded">
-                                {item.variantName}
-                              </span>
-                            )}
+                            <span className="text-[9px] text-[#07402b] font-semibold bg-[#07402b]/10 px-1.5 py-0.2 rounded">
+                              Variant: {resolveItemVariant(item)}
+                            </span>
                           </div>
                         </div>
                         <div className="text-right shrink-0">

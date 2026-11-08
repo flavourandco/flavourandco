@@ -1,6 +1,8 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { NextRequest, NextFetchEvent } from "next/server";
+
+const isProtectedRoute = createRouteMatcher(["/checkout(.*)"]);
 
 export const config = {
   matcher: [
@@ -27,11 +29,20 @@ export default function proxy(req: NextRequest, evt: NextFetchEvent) {
     publishableKey.includes("your-") ||
     secretKey.includes("your-")
   ) {
+    if (req.nextUrl.pathname.startsWith("/checkout")) {
+      const signInUrl = new URL("/sign-in", req.url);
+      signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
+      return NextResponse.redirect(signInUrl);
+    }
     return NextResponse.next();
   }
 
   try {
-    const handler = clerkMiddleware();
+    const handler = clerkMiddleware(async (auth, request) => {
+      if (isProtectedRoute(request)) {
+        await auth.protect();
+      }
+    });
     return handler(req, evt);
   } catch (error) {
     console.error("Clerk middleware invocation failed:", error);

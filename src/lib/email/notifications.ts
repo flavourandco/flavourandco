@@ -4,6 +4,7 @@ import { sendTransactionalEmail } from "./send";
 import type { Order, OrderItem, ShippingAddress } from "@/lib/types";
 import type { EmailOrderData, FormattedAddress, OrderEmailEvent } from "./types";
 import { getTrackingUrl } from "@/lib/tracking";
+import { resolveItemVariant } from "@/lib/utils";
 
 // Template Components
 import { CustomerOrderConfirmation } from "./templates/CustomerOrderConfirmation";
@@ -70,7 +71,7 @@ function normalizeOrderItems(rawItems: any[], appBaseUrl?: string): OrderItem[] 
       price: typeof it.price === "number" ? it.price : (typeof it.unitPrice === "number" ? it.unitPrice : 0),
       quantity: typeof it.quantity === "number" ? it.quantity : 1,
       image: it.image || it.product?.image || it.product?.images?.[0] || "",
-      variant: it.variant || it.variantName || undefined,
+      variant: resolveItemVariant(it) || undefined,
       productUrl,
     };
   });

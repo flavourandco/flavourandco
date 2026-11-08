@@ -84,6 +84,7 @@ export async function POST(req: Request) {
         unitPrice: it.unitPrice,
         quantity: it.quantity,
         variantName: it.variantName,
+        variant: it.variantName,
       })),
       subtotal: totals.subtotal,
       shipping_fee: totals.shippingFee,

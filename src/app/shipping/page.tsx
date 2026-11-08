@@ -33,7 +33,7 @@ export default function ShippingPage() {
             </div>
             <div>
               <h3 className="font-bold text-primary text-base">Fresh or Frozen Choice</h3>
-              <p className="text-xs text-stone-600 mt-1">Select your preferred format (freshly baked or frozen pack) directly when adding items on the shop page.</p>
+              <p className="text-xs text-stone-600 mt-1">Select your preferred variant (freshly baked or frozen pack) directly when adding items on the shop page.</p>
             </div>
           </div>
 

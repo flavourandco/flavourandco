@@ -38,13 +38,22 @@ export const useCartStore = create<CartState>()(
       items: [],
 
       addItem: (product, quantity = 1, variantName, unitPrice, options = { showToast: true }) => {
-        const itemUnitPrice = unitPrice ?? product.price;
-        const itemId = variantName ? `${product.id}-${variantName}` : product.id;
+        // Resolve default variant name if not provided
+        const resolvedVariantName =
+          variantName ||
+          (product.variants && product.variants.length > 0 ? product.variants[0]?.name : undefined) ||
+          (product.category === "freshly-baked" ? "Freshly Baked" : product.category === "frozen" ? "Frozen" : undefined);
+
+        const matchedVariant = resolvedVariantName && product.variants
+          ? product.variants.find((v) => v.name.toLowerCase() === resolvedVariantName.toLowerCase())
+          : undefined;
+
+        const itemUnitPrice = unitPrice ?? (matchedVariant?.price ?? product.price);
+        const finalVariantName = matchedVariant?.name || resolvedVariantName;
+        const itemId = finalVariantName ? `${product.id}-${finalVariantName}` : product.id;
 
         const currentItems = get().items;
-        const existingIndex = currentItems.findIndex(
-          (item) => item.productId === product.id || item.id === itemId || item.id === product.id
-        );
+        const existingIndex = currentItems.findIndex((item) => item.id === itemId);
 
         if (existingIndex > -1) {
           const updatedItems = [...currentItems];
@@ -53,7 +62,7 @@ export const useCartStore = create<CartState>()(
             ...existingItem,
             id: itemId,
             quantity: existingItem.quantity + quantity,
-            variantName: variantName || existingItem.variantName,
+            variantName: finalVariantName || existingItem.variantName,
             unitPrice: itemUnitPrice || existingItem.unitPrice,
           };
           set({ items: updatedItems });
@@ -62,7 +71,7 @@ export const useCartStore = create<CartState>()(
             id: itemId,
             productId: product.id,
             product,
-            variantName,
+            variantName: finalVariantName,
             unitPrice: itemUnitPrice,
             quantity,
           };
@@ -70,17 +79,17 @@ export const useCartStore = create<CartState>()(
         }
 
         if (options?.showToast !== false) {
-          const toastMsg = variantName
-            ? `Added ${quantity}x ${product.name} (${variantName}) to cart!`
+          const toastMsg = finalVariantName
+            ? `Added ${quantity}x ${product.name} (${finalVariantName}) to cart!`
             : `Added ${quantity}x ${product.name} to cart!`;
           useUIStore.getState().addToast(toastMsg, "success");
         }
       },
 
       removeItem: (id) => {
-        const itemToRemove = get().items.find((item) => item.id === id || item.productId === id);
+        const itemToRemove = get().items.find((item) => item.id === id);
         set((state) => ({
-          items: state.items.filter((item) => item.id !== id && item.productId !== id),
+          items: state.items.filter((item) => item.id !== id),
         }));
         if (itemToRemove) {
           useUIStore.getState().addToast(`Removed ${itemToRemove.product.name} from cart`, "info");
@@ -94,7 +103,7 @@ export const useCartStore = create<CartState>()(
         }
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id || item.productId === id ? { ...item, quantity } : item
+            item.id === id ? { ...item, quantity } : item
           ),
         }));
       },

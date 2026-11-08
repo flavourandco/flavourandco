@@ -33,8 +33,21 @@ export default function ProductCard({
     setMounted(true);
   }, []);
 
+  const price = typeof product.price === "number" ? product.price : (Number(product.price) || 0);
+
+  const defaultVariant = product.variants?.[0];
+  const chosenVariantName =
+    defaultVariant?.name ||
+    (product.category === "freshly-baked"
+      ? "Freshly Baked"
+      : product.category === "frozen"
+      ? "Frozen"
+      : undefined);
+  const chosenPrice = defaultVariant?.price ?? price;
+
+  const currentItemId = chosenVariantName ? `${product.id}-${chosenVariantName}` : product.id;
   const cartItem = mounted
-    ? items.find((i) => i.productId === product.id || i.id === product.id)
+    ? items.find((i) => i.id === currentItemId || i.productId === product.id)
     : undefined;
   const quantityInCart = cartItem?.quantity || 0;
 
@@ -52,10 +65,9 @@ export default function ProductCard({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, 1);
+    addItem(product, 1, chosenVariantName, chosenPrice);
   };
 
-  const price = typeof product.price === "number" ? product.price : (Number(product.price) || 0);
   const slug = (product.name || "pie")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -187,7 +199,7 @@ export default function ProductCard({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  addItem(product, 1);
+                  addItem(product, 1, chosenVariantName, chosenPrice);
                 }}
                 className="h-7 w-7 sm:h-7 sm:w-8 rounded-sm bg-white hover:bg-[#6b1e30] text-[#6b1e30] hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-stone-200 shadow-2xs"
                 aria-label="Increase quantity"

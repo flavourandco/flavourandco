@@ -59,3 +59,56 @@ export function sortProductsByCustomOrder<T extends Product>(productsList: T[]):
 
   return [...productsList].sort((a, b) => getRank(a) - getRank(b));
 }
+
+/**
+ * Resolves the display variant label for an order item.
+ * Prioritizes customer-selected variant (e.g. "Freshly Baked", "Frozen", or specific pack).
+ * Intelligently falls back if legacy or unassigned, avoiding generic "Standard" placeholders.
+ */
+export function resolveItemVariant(item?: {
+  variant?: string | null;
+  variantName?: string | null;
+  name?: string | null;
+  id?: string | null;
+  product?: {
+    category?: string | null;
+    variants?: Array<{ name: string }>;
+  } | null;
+} | null): string {
+  if (!item) return "Freshly Baked";
+  const explicit = item.variantName || item.variant;
+  if (explicit && typeof explicit === "string") {
+    const trimmed = explicit.trim();
+    if (
+      trimmed &&
+      trimmed.toLowerCase() !== "standard" &&
+      trimmed.toLowerCase() !== "standard pack" &&
+      trimmed.toLowerCase() !== "standard variant" &&
+      trimmed.toLowerCase() !== "standard bakery order package"
+    ) {
+      return trimmed;
+    }
+  }
+
+  // Check product metadata if attached
+  if (item.product?.category === "freshly-baked") return "Freshly Baked";
+  if (item.product?.category === "frozen") return "Frozen";
+  if (item.product?.variants && item.product.variants.length > 0) {
+    return item.product.variants[0].name;
+  }
+
+  // Fallback based on item name/id inspection
+  const idOrName = `${item.id || ""} ${item.name || ""}`.toLowerCase();
+  if (idOrName.includes("freshly-baked") || idOrName.includes("freshly baked") || idOrName.includes("fresh")) {
+    return "Freshly Baked";
+  }
+  if (idOrName.includes("frozen")) {
+    return "Frozen";
+  }
+  if (idOrName.includes("grazing")) {
+    return "Freshly Baked";
+  }
+
+  // Default for Flavour & Co. artisanal pies
+  return "Freshly Baked";
+}

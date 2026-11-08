@@ -7,6 +7,7 @@ export interface OrderItemInput {
   id: string;
   productId?: string;
   variantName?: string;
+  variant?: string;
   quantity: number;
   unitPrice?: number;
   product?: {
@@ -15,6 +16,8 @@ export interface OrderItemInput {
     price?: number;
     image?: string;
     images?: string[];
+    category?: string;
+    variants?: Array<{ name?: string; price?: number }>;
   };
 }
 
@@ -122,7 +125,15 @@ export async function calculateAuthoritativeOrderTotals(
 
   for (const rawItem of rawItems) {
     const qty = Math.max(1, Math.floor(Number(rawItem.quantity) || 1));
-    const variantName = rawItem.variantName || null;
+    let variantName = rawItem.variantName || rawItem.variant || null;
+    if (
+      variantName &&
+      (variantName.toLowerCase() === "standard" ||
+        variantName.toLowerCase() === "standard pack" ||
+        variantName.toLowerCase() === "standard variant")
+    ) {
+      variantName = null;
+    }
 
     // Determine base product ID candidate by stripping variant suffixes if present
     let baseIdCandidate = rawItem.productId || rawItem.id || "";
@@ -167,9 +178,10 @@ export async function calculateAuthoritativeOrderTotals(
 
       // If variant is requested, check DB variant price
       if (variantName && Array.isArray(matchedProd.variants)) {
-        const normVar = normalizeKey(variantName);
+        const targetVariant = variantName;
+        const normVar = normalizeKey(targetVariant);
         const matchedVar = matchedProd.variants.find(
-          (v) => normalizeKey(v.name) === normVar || v.name?.toLowerCase() === variantName.toLowerCase()
+          (v) => normalizeKey(v.name) === normVar || v.name?.toLowerCase() === targetVariant.toLowerCase()
         );
         if (matchedVar && !isNaN(Number(matchedVar.price)) && Number(matchedVar.price) > 0) {
           unitPrice = Number(matchedVar.price);
@@ -187,6 +199,30 @@ export async function calculateAuthoritativeOrderTotals(
     } else if (rawItem.unitPrice && Number(rawItem.unitPrice) > 0) {
       unitPrice = Number(rawItem.unitPrice);
       productName = rawItem.product?.name || rawItem.id;
+    }
+
+    // Resolve variant name fallback if not specified
+    if (!variantName && matchedProd) {
+      if (Array.isArray(matchedProd.variants) && matchedProd.variants.length > 0) {
+        variantName = matchedProd.variants[0]?.name || null;
+      } else if ((matchedProd as any).category === "freshly-baked") {
+        variantName = "Freshly Baked";
+      } else if ((matchedProd as any).category === "frozen") {
+        variantName = "Frozen";
+      }
+    }
+
+    if (!variantName) {
+      const idOrName = `${rawItem.id || ""} ${rawItem.productId || ""} ${rawItem.product?.name || productName}`.toLowerCase();
+      if (idOrName.includes("freshly-baked") || idOrName.includes("freshly baked") || idOrName.includes("fresh")) {
+        variantName = "Freshly Baked";
+      } else if (idOrName.includes("frozen")) {
+        variantName = "Frozen";
+      } else if (idOrName.includes("grazing")) {
+        variantName = "Freshly Baked";
+      } else {
+        variantName = "Freshly Baked";
+      }
     }
 
     // Default price fallback if missing
