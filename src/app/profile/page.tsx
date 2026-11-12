@@ -322,7 +322,7 @@ export default function ProfilePage() {
                                 </span>
                               )}
 
-                              <span className="font-mono font-black text-sm sm:text-base text-[#6b1e30]">
+                              <span className="font-sans tracking-tight font-black text-sm sm:text-base text-[#6b1e30]">
                                 A${ord.totalAmount.toFixed(2)}
                               </span>
                             </div>
@@ -354,7 +354,7 @@ export default function ProfilePage() {
                                         <span className="truncate">{itemName}</span>
                                       </p>
                                     </div>
-                                    <span className="font-mono text-stone-800 font-bold shrink-0 text-xs whitespace-nowrap pl-2">
+                                    <span className="font-sans tracking-tight text-stone-800 font-bold shrink-0 text-xs whitespace-nowrap pl-2">
                                       A${(itPrice * itQty).toFixed(2)}
                                     </span>
                                   </div>
@@ -787,9 +787,9 @@ export default function ProfilePage() {
                                 </div>
                               </td>
                               <td className="py-2.5 px-3 text-stone-500">{variantLabel}</td>
-                              <td className="py-2.5 px-3 text-right font-mono">A${itemPrice.toFixed(2)}</td>
+                              <td className="py-2.5 px-3 text-right font-sans tracking-tight font-medium text-stone-700">A${itemPrice.toFixed(2)}</td>
                               <td className="py-2.5 px-3 text-center font-bold">{itemQty}</td>
-                              <td className="py-2.5 px-3 text-right font-bold text-stone-900 font-mono">
+                              <td className="py-2.5 px-3 text-right font-bold text-stone-900 font-sans tracking-tight">
                                 A${lineTotal.toFixed(2)}
                               </td>
                             </tr>
@@ -817,15 +817,15 @@ export default function ProfilePage() {
                 <div className="w-full sm:w-60 space-y-1 text-xs border-t sm:border-t-0 sm:border-l border-stone-200 sm:pl-4 pt-2 sm:pt-0">
                   <div className="flex justify-between text-stone-600">
                     <span>Subtotal:</span>
-                    <span className="font-mono">A${(selectedOrder.subtotal || selectedOrder.totalAmount).toFixed(2)}</span>
+                    <span className="font-sans tracking-tight font-semibold">A${(selectedOrder.subtotal || selectedOrder.totalAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-stone-600">
                     <span>Delivery:</span>
-                    <span className="font-mono">{selectedOrder.shippingFee === 0 ? "FREE" : `A$${(selectedOrder.shippingFee || 0).toFixed(2)}`}</span>
+                    <span className="font-sans tracking-tight font-semibold">{selectedOrder.shippingFee === 0 ? "FREE" : `A$${(selectedOrder.shippingFee || 0).toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between text-[#6b1e30] font-black text-sm pt-2 border-t border-stone-200">
                     <span>Total Paid:</span>
-                    <span className="font-mono text-base">A${selectedOrder.totalAmount.toFixed(2)} AUD</span>
+                    <span className="font-sans tracking-tight text-base font-black">A${selectedOrder.totalAmount.toFixed(2)} AUD</span>
                   </div>
                 </div>
               </div>

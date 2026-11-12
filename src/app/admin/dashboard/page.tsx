@@ -372,7 +372,7 @@ export default function AdminDashboardPage() {
                       <td className="py-3 text-slate-500 text-[11px]">
                         {new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </td>
-                      <td className="py-3 text-right pr-1 font-bold text-slate-900">
+                      <td className="py-3 text-right pr-1 font-bold text-slate-900 font-sans tracking-tight">
                         ${o.totalAmount.toFixed(2)}
                       </td>
                       <td className="py-3 text-center">

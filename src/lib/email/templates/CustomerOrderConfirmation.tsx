@@ -121,7 +121,7 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
                     <td align="center" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", color: "#44403c" }}>
                       {qty}
                     </td>
-                    <td align="right" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", fontFamily: "monospace", color: "#1c1410" }}>
+                    <td align="right" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", color: "#1c1410", letterSpacing: "-0.02em" }}>
                       ${lineTotal}
                     </td>
                   </tr>
@@ -155,13 +155,13 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
           <tbody>
             <tr>
               <td style={{ padding: "4px 0", fontSize: "13px", color: "#57534e" }}>Subtotal:</td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontFamily: "monospace", color: "#1c1410" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontWeight: "600", color: "#1c1410", letterSpacing: "-0.02em" }}>
                 ${order.subtotal.toFixed(2)} AUD
               </td>
             </tr>
             <tr>
               <td style={{ padding: "4px 0", fontSize: "13px", color: "#57534e" }}>Express Delivery:</td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontFamily: "monospace", color: "#1c1410" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontWeight: "600", color: "#1c1410", letterSpacing: "-0.02em" }}>
                 {order.shippingFee === 0 ? "FREE" : `$${order.shippingFee.toFixed(2)} AUD`}
               </td>
             </tr>
@@ -178,7 +178,7 @@ export const CustomerOrderConfirmation: React.FC<{ order: EmailOrderData }> = ({
               <td style={{ padding: "4px 0", fontSize: "15px", fontWeight: "bold", color: "#6b1e30" }}>
                 Total Paid:
               </td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "17px", fontWeight: "bold", fontFamily: "monospace", color: "#6b1e30" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "17px", fontWeight: "bold", color: "#6b1e30", letterSpacing: "-0.02em" }}>
                 ${order.totalAmount.toFixed(2)} AUD
               </td>
             </tr>

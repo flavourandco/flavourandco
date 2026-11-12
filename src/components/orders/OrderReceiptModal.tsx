@@ -274,13 +274,13 @@ export default function OrderReceiptModal({
                               {variantLabel}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-stone-700 whitespace-nowrap">
+                          <td className="py-2.5 px-3 text-right font-sans tracking-tight font-medium text-stone-700 whitespace-nowrap">
                             A${itemPrice.toFixed(2)}
                           </td>
-                          <td className="py-2.5 px-3 text-center font-bold font-mono text-stone-900 whitespace-nowrap">
+                          <td className="py-2.5 px-3 text-center font-bold text-stone-900 whitespace-nowrap">
                             {itemQty}
                           </td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-stone-900 whitespace-nowrap">
+                          <td className="py-2.5 px-4 text-right font-sans tracking-tight font-bold text-stone-900 whitespace-nowrap">
                             A${lineTotal.toFixed(2)}
                           </td>
                         </tr>
@@ -330,12 +330,12 @@ export default function OrderReceiptModal({
             <div className="sm:col-span-6 bg-[#faf6f0] p-4 rounded-md border border-stone-300 space-y-2 text-xs">
               <div className="flex items-center justify-between text-stone-700 whitespace-nowrap">
                 <span className="font-medium">Items Subtotal</span>
-                <span className="font-mono font-bold">A${subtotal.toFixed(2)}</span>
+                <span className="font-sans tracking-tight font-bold">A${subtotal.toFixed(2)}</span>
               </div>
 
               <div className="flex items-center justify-between text-stone-700 whitespace-nowrap">
                 <span className="font-medium">Express Courier Shipping</span>
-                <span className="font-mono font-bold">
+                <span className="font-sans tracking-tight font-bold">
                   {shippingFee === 0 ? (
                     <span className="text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
                       FREE
@@ -355,7 +355,7 @@ export default function OrderReceiptModal({
                 <span className="font-serif font-extrabold uppercase tracking-wider text-stone-900 text-sm">
                   Total Paid:
                 </span>
-                <span className="font-mono text-lg sm:text-xl font-black text-[#6b1e30]">
+                <span className="font-sans tracking-tight text-lg sm:text-xl font-black text-[#6b1e30]">
                   A${totalAmount.toFixed(2)} AUD
                 </span>
               </div>

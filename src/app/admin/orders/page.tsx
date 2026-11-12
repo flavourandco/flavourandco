@@ -572,9 +572,9 @@ export default function AdminOrdersPage() {
                                   {variantLabel}
                                 </span>
                               </td>
-                              <td className="py-2.5 px-3 text-right font-mono">${itemPrice.toFixed(2)}</td>
+                              <td className="py-2.5 px-3 text-right font-sans tracking-tight font-medium text-slate-700">${itemPrice.toFixed(2)}</td>
                               <td className="py-2.5 px-3 text-center font-bold">{itemQty}</td>
-                              <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-mono">
+                              <td className="py-2.5 px-3 text-right font-bold text-slate-900 font-sans tracking-tight">
                                 ${lineTotal.toFixed(2)}
                               </td>
                             </tr>
@@ -602,11 +602,11 @@ export default function AdminOrdersPage() {
                 <div className="w-full sm:w-64 space-y-1.5 border-t sm:border-t-0 sm:border-l border-slate-200/80 sm:pl-4 pt-3 sm:pt-0 shrink-0 text-xs">
                   <div className="flex justify-between text-slate-600">
                     <span>Items Subtotal:</span>
-                    <span className="font-mono">${(selectedOrder.subtotal || selectedOrder.totalAmount).toFixed(2)}</span>
+                    <span className="font-sans tracking-tight font-semibold">${(selectedOrder.subtotal || selectedOrder.totalAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>Delivery Fee:</span>
-                    <span className="font-mono">${(selectedOrder.shippingFee || 0).toFixed(2)}</span>
+                    <span className="font-sans tracking-tight font-semibold">${(selectedOrder.shippingFee || 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>Taxes:</span>
@@ -614,7 +614,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="flex justify-between text-slate-900 font-extrabold pt-1.5 border-t border-slate-200 text-sm">
                     <span>Total Paid:</span>
-                    <span className="font-mono">${selectedOrder.totalAmount.toFixed(2)} AUD</span>
+                    <span className="font-sans tracking-tight font-bold">${selectedOrder.totalAmount.toFixed(2)} AUD</span>
                   </div>
                 </div>
               </div>

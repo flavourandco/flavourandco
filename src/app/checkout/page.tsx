@@ -433,7 +433,7 @@ export default function CheckoutPage() {
                     <span>Order Summary ({items.length} {items.length === 1 ? "Item" : "Items"})</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-black text-[#6b1e30]">A${total.toFixed(2)} AUD</span>
+                    <span className="font-sans tracking-tight text-sm font-black text-[#6b1e30]">A${total.toFixed(2)} AUD</span>
                     {showMobileSummary ? <ChevronUp className="w-4 h-4 text-stone-400" /> : <ChevronDown className="w-4 h-4 text-stone-400" />}
                   </div>
                 </button>
@@ -449,24 +449,24 @@ export default function CheckoutPage() {
                             </span>
                             <span className="font-serif font-medium truncate">{item.product.name}</span>
                           </div>
-                          <span className="font-mono font-bold">A${(item.unitPrice * item.quantity).toFixed(2)}</span>
+                          <span className="font-sans tracking-tight font-bold">A${(item.unitPrice * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
                     <div className="text-xs space-y-1 text-stone-600 pt-1 border-t border-stone-100">
                       <div className="flex justify-between">
                         <span>Items Subtotal</span>
-                        <span className="font-mono">A${subtotal.toFixed(2)}</span>
+                        <span className="font-sans tracking-tight font-semibold">A${subtotal.toFixed(2)}</span>
                       </div>
                       {isDiscountApplied && (
                         <div className="flex justify-between text-emerald-700 font-semibold">
                           <span>Offer Applied</span>
-                          <span className="font-mono">-A${discountAmount.toFixed(2)}</span>
+                          <span className="font-sans tracking-tight font-semibold">-A${discountAmount.toFixed(2)}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
                         <span>Delivery</span>
-                        <span className="font-mono">{shippingFee === 0 ? "FREE" : `A$${shippingFee.toFixed(2)}`}</span>
+                        <span className="font-sans tracking-tight font-semibold">{shippingFee === 0 ? "FREE" : `A$${shippingFee.toFixed(2)}`}</span>
                       </div>
                     </div>
                   </div>
@@ -649,7 +649,7 @@ export default function CheckoutPage() {
                                 )}
                               </span>
                             </div>
-                            <span className="text-[10px] font-bold uppercase bg-stone-200 text-stone-800 px-2 py-0.5 rounded-md shrink-0 font-mono">
+                            <span className="text-[10px] font-bold uppercase bg-stone-200 text-stone-800 px-2 py-0.5 rounded-md shrink-0 font-sans tracking-tight">
                               A$15.00
                             </span>
                           </div>
@@ -762,10 +762,10 @@ export default function CheckoutPage() {
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="font-bold font-mono text-stone-900 text-xs sm:text-sm block">
+                          <span className="font-bold font-sans tracking-tight text-stone-900 text-xs sm:text-sm block">
                             A${(item.unitPrice * item.quantity).toFixed(2)}
                           </span>
-                          <span className="text-[9px] font-mono text-stone-400">
+                          <span className="text-[10px] font-sans tracking-tight text-stone-400">
                             A${item.unitPrice.toFixed(2)}/ea
                           </span>
                         </div>
@@ -823,13 +823,13 @@ export default function CheckoutPage() {
                   <div className="space-y-2.5 pt-3 border-t border-stone-100 text-xs text-stone-700">
                     <div className="flex justify-between">
                       <span className="text-stone-500">Items Subtotal</span>
-                      <span className="font-bold font-mono text-stone-900">A${subtotal.toFixed(2)}</span>
+                      <span className="font-bold font-sans tracking-tight text-stone-900">A${subtotal.toFixed(2)}</span>
                     </div>
 
                     {isDiscountApplied && (
                       <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50/80 px-2 py-1 rounded">
                         <span>Offer Applied</span>
-                        <span className="font-mono">-A${discountAmount.toFixed(2)}</span>
+                        <span className="font-sans tracking-tight font-semibold">-A${discountAmount.toFixed(2)}</span>
                       </div>
                     )}
 
@@ -843,7 +843,7 @@ export default function CheckoutPage() {
                           FREE
                         </span>
                       ) : (
-                        <span className="font-bold font-mono text-stone-900">A${shippingFee.toFixed(2)}</span>
+                        <span className="font-bold font-sans tracking-tight text-stone-900">A${shippingFee.toFixed(2)}</span>
                       )}
                     </div>
 
@@ -858,7 +858,7 @@ export default function CheckoutPage() {
                         <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Total Due</span>
                         <span className="text-[11px] text-stone-400 font-medium">All taxes included</span>
                       </div>
-                      <span className="font-mono text-xl font-black text-[#6b1e30]">
+                      <span className="font-sans tracking-tight text-xl font-black text-[#6b1e30]">
                         A${total.toFixed(2)} <span className="text-xs font-sans font-bold text-stone-600">AUD</span>
                       </span>
                     </div>

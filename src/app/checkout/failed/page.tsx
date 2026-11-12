@@ -344,10 +344,10 @@ function FailedContent() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="font-bold font-mono text-stone-900 text-xs sm:text-sm block">
+                    <span className="font-bold font-sans tracking-tight text-stone-900 text-xs sm:text-sm block">
                       A${(item.unitPrice * item.quantity).toFixed(2)}
                     </span>
-                    <span className="text-[9px] font-mono text-stone-400">
+                    <span className="text-[10px] font-sans tracking-tight text-stone-400">
                       A${item.unitPrice.toFixed(2)}/ea
                     </span>
                   </div>
@@ -360,7 +360,7 @@ function FailedContent() {
           <div className="space-y-2 pt-3 border-t border-stone-100 text-xs text-stone-700">
             <div className="flex justify-between">
               <span className="text-stone-500">Items Subtotal</span>
-              <span className="font-mono font-bold text-stone-900">A${displaySubtotal.toFixed(2)}</span>
+              <span className="font-sans tracking-tight font-bold text-stone-900">A${displaySubtotal.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -370,7 +370,7 @@ function FailedContent() {
                   FREE
                 </span>
               ) : (
-                <span className="font-mono font-bold text-stone-900">A${displayShippingFee.toFixed(2)}</span>
+                <span className="font-sans tracking-tight font-bold text-stone-900">A${displayShippingFee.toFixed(2)}</span>
               )}
             </div>
 
@@ -382,7 +382,7 @@ function FailedContent() {
             {/* Total Highlight */}
             <div className="flex justify-between items-baseline pt-3 border-t border-stone-200">
               <span className="font-bold uppercase tracking-wider text-stone-800 text-xs">Total Due</span>
-              <span className="font-mono text-xl sm:text-2xl font-black text-[#6b1e30]">
+              <span className="font-sans tracking-tight text-xl sm:text-2xl font-black text-[#6b1e30]">
                 A${displayTotal.toFixed(2)} AUD
               </span>
             </div>

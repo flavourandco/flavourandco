@@ -191,7 +191,7 @@ export default function CartPage() {
                       <Truck className="h-4 w-4 text-[#07402b]" />
                       {remainingForFreeShipping > 0 ? (
                         <>
-                          Add <strong className="text-[#6b1e30] font-mono">A${remainingForFreeShipping.toFixed(2)}</strong> more for <strong>FREE Delivery</strong>!
+                          Add <strong className="text-[#6b1e30] font-sans font-bold tracking-tight">A${remainingForFreeShipping.toFixed(2)}</strong> more for <strong>FREE Delivery</strong>!
                         </>
                       ) : (
                         <span className="text-emerald-700 font-extrabold flex items-center gap-1">
@@ -295,7 +295,7 @@ export default function CartPage() {
                                     {item.product.packInfo}
                                   </span>
                                 )}
-                                <span className="text-stone-400 font-mono font-semibold">
+                                <span className="text-stone-400 font-sans tracking-tight font-semibold">
                                   A${item.unitPrice.toFixed(2)} each
                                 </span>
                               </div>
@@ -329,7 +329,7 @@ export default function CartPage() {
 
                             {/* Line Total */}
                             <div className="text-right min-w-[75px]">
-                              <span className="text-sm sm:text-base font-black font-mono tracking-tight text-[#6b1e30] block">
+                              <span className="text-sm sm:text-base font-extrabold font-sans tracking-tight text-[#6b1e30] block">
                                 A${lineTotal.toFixed(2)}
                               </span>
                             </div>
@@ -434,13 +434,13 @@ export default function CartPage() {
                   <div className="space-y-3.5 text-xs text-stone-700">
                     <div className="flex items-center justify-between">
                       <span className="text-stone-500">Items Subtotal</span>
-                      <span className="font-bold font-mono text-stone-900 text-sm">A${subtotal.toFixed(2)}</span>
+                      <span className="font-bold font-sans tracking-tight text-stone-900 text-sm">A${subtotal.toFixed(2)}</span>
                     </div>
 
                     {isDiscountApplied && (
                       <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50/80 px-2.5 py-1.5 rounded-md border border-emerald-200">
                         <span>Offer Applied</span>
-                        <span className="font-mono text-sm">-A${discountAmount.toFixed(2)}</span>
+                        <span className="font-sans font-bold tracking-tight text-sm">-A${discountAmount.toFixed(2)}</span>
                       </div>
                     )}
 
@@ -469,7 +469,7 @@ export default function CartPage() {
                         <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block">Subtotal Due</span>
                         <span className="text-xs text-stone-400 font-medium">Delivery fee calculated next</span>
                       </div>
-                      <span className="font-mono text-2xl sm:text-3xl font-black text-[#6b1e30]">
+                      <span className="font-sans tracking-tight text-2xl sm:text-3xl font-black text-[#6b1e30]">
                         A${total.toFixed(2)} <span className="text-xs font-sans font-bold text-stone-600">AUD</span>
                       </span>
                     </div>

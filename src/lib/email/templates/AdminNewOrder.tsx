@@ -136,10 +136,10 @@ export const AdminNewOrder: React.FC<{ order: EmailOrderData }> = ({ order }) =>
                     <td align="center" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", color: "#6b1e30" }}>
                       {qty}
                     </td>
-                    <td align="right" style={{ padding: "12px 14px", fontSize: "12px", fontFamily: "monospace", color: "#57534e" }}>
+                    <td align="right" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "600", color: "#57534e", letterSpacing: "-0.02em" }}>
                       ${unitPrice.toFixed(2)}
                     </td>
-                    <td align="right" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", fontFamily: "monospace", color: "#1c1410" }}>
+                    <td align="right" style={{ padding: "12px 14px", fontSize: "13px", fontWeight: "bold", color: "#1c1410", letterSpacing: "-0.02em" }}>
                       ${lineTotal}
                     </td>
                   </tr>
@@ -173,13 +173,13 @@ export const AdminNewOrder: React.FC<{ order: EmailOrderData }> = ({ order }) =>
           <tbody>
             <tr>
               <td style={{ padding: "4px 0", fontSize: "13px", color: "#57534e" }}>Subtotal:</td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontFamily: "monospace", color: "#1c1410" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontWeight: "600", color: "#1c1410", letterSpacing: "-0.02em" }}>
                 ${order.subtotal.toFixed(2)} AUD
               </td>
             </tr>
             <tr>
               <td style={{ padding: "4px 0", fontSize: "13px", color: "#57534e" }}>Shipping Fee:</td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontFamily: "monospace", color: "#1c1410" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "13px", fontWeight: "600", color: "#1c1410", letterSpacing: "-0.02em" }}>
                 ${order.shippingFee.toFixed(2)} AUD
               </td>
             </tr>
@@ -196,7 +196,7 @@ export const AdminNewOrder: React.FC<{ order: EmailOrderData }> = ({ order }) =>
               <td style={{ padding: "4px 0", fontSize: "15px", fontWeight: "bold", color: "#07402b" }}>
                 Total Paid Amount:
               </td>
-              <td align="right" style={{ padding: "4px 0", fontSize: "17px", fontWeight: "bold", fontFamily: "monospace", color: "#07402b" }}>
+              <td align="right" style={{ padding: "4px 0", fontSize: "17px", fontWeight: "bold", color: "#07402b", letterSpacing: "-0.02em" }}>
                 ${order.totalAmount.toFixed(2)} AUD
               </td>
             </tr>

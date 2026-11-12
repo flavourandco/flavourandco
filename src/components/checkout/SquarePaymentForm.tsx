@@ -382,7 +382,7 @@ export default function SquarePaymentForm({
           ) : (
             <>
               <CheckCircle2 className="h-4 w-4" />
-              <span>Pay A${totalAmount.toFixed(2)} AUD</span>
+              <span>Pay <span className="font-sans tracking-tight">A${totalAmount.toFixed(2)}</span> AUD</span>
             </>
           )}
         </button>

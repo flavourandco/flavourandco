@@ -36,7 +36,7 @@ export const OrderRefunded: React.FC<{ order: EmailOrderData }> = ({ order }) =>
               </tr>
               <tr>
                 <td style={{ padding: "4px 0", fontSize: "13px", color: "#57534e" }}>Refunded Amount:</td>
-                <td align="right" style={{ padding: "4px 0", fontSize: "15px", fontWeight: "bold", fontFamily: "monospace", color: "#6b1e30" }}>
+                <td align="right" style={{ padding: "4px 0", fontSize: "15px", fontWeight: "bold", color: "#6b1e30", letterSpacing: "-0.02em" }}>
                   ${refundAmount.toFixed(2)} AUD
                 </td>
               </tr>
